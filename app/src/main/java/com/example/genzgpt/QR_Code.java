@@ -26,7 +26,7 @@ public class QR_Code extends Activity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        // Initialize your activity here
+        // Initialize
         // setContentView(R.layout.your_layout);
     }
 
