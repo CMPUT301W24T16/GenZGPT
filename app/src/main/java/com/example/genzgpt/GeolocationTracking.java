@@ -15,6 +15,9 @@ import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;
 
+/**
+ * This class handles Geolocation Tracking for the user, includes permission requests and location pulls.
+ */
 public class GeolocationTracking extends Activity {
     private FusedLocationProviderClient fusedLocationClient;
     private String[] permissions = {android.Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION};
