@@ -3,4 +3,10 @@
     <string name="qr_code_image_desc">QR Code Image</string>
     <string name="save_qr_code">Save</string>
     <string name="cancel_qr_code">Cancel</string>
+    <string name="user_profile_picture">Profile Picture</string>
+    <string name="edit_profile_picture">Edit Profile Picture</string>
+    <string name="menu_addCamera">Add Profile Picture from Camera</string>
+    <string name="menu_addGallery">Add Profile Picture from Gallery</string>
+    <string name="menu_deleteProfile">Delete Profile Picture</string>
+
 </resources>

@@ -1,0 +1,11 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/menu_addCamera"
+        android:title="@string/menu_addCamera" />
+    <item
+        android:id="@+id/menu_addGallery"
+        android:title="@string/menu_addGallery" />
+    <item
+        android:id="@+id/menu_deleteProfile"
+        android:title="@string/menu_deleteProfile" />
+</menu>
