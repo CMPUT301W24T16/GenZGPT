@@ -4,26 +4,49 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+/**
+ * Class representing an Event
+ */
 public class Event {
-    // Attributes of an event
     private String eventId;
     private String eventName;
     private Date eventDate;
     private String location;
-    private List<Organizer> organizers;
-    private List<Attendee> attendees;
+    private List<User> registeredAttendees; // Users who have registered for the event
+    private List<User> checkedInAttendees;  // Users who have actually checked in
 
-    // Constructor to create a new event
+    /**
+     * Constructor to create a new Event
+     */
     public Event(String eventId, String eventName, Date eventDate, String location) {
         this.eventId = eventId;
         this.eventName = eventName;
         this.eventDate = eventDate;
         this.location = location;
-        this.organizers = new ArrayList<>();
-        this.attendees = new ArrayList<>();
+        this.registeredAttendees = new ArrayList<>();
+        this.checkedInAttendees = new ArrayList<>();
     }
 
-    // Getters and Setters for the event attributes
+    /**
+     * Registers a user for the event
+     */
+    public void registerAttendee(User user) {
+        if (!registeredAttendees.contains(user)) {
+            registeredAttendees.add(user);
+        }
+    }
+
+    /**
+     * Checks in a user for the event
+     */
+    public void checkInAttendee(User user) {
+        if (registeredAttendees.contains(user) && !checkedInAttendees.contains(user)) {
+            checkedInAttendees.add(user);
+        }
+    }
+
+    // Getters and Setters
+
     public String getEventId() {
         return eventId;
     }
@@ -56,31 +79,13 @@ public class Event {
         this.location = location;
     }
 
-    public List<Organizer> getOrganizers() {
-        return organizers;
+    public List<User> getRegisteredAttendees() {
+        return new ArrayList<>(registeredAttendees);
     }
 
-    public void setOrganizers(List<Organizer> organizers) {
-        this.organizers = organizers;
+    public List<User> getCheckedInAttendees() {
+        return new ArrayList<>(checkedInAttendees);
     }
 
-    public List<Attendee> getAttendees() {
-        return attendees;
-    }
-
-    public void setAttendees(List<Attendee> attendees) {
-        this.attendees = attendees;
-    }
-
-    // Method to add an organizer
-    public void addOrganizer(Organizer organizer) {
-        this.organizers.add(organizer);
-    }
-
-    public void updateEventDetails(String eventName, Date eventDate, String location) {
-        this.eventName = eventName;
-        this.eventDate = eventDate;
-        this.location = location;
-    }
 
 }
