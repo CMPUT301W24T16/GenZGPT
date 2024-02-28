@@ -8,7 +8,7 @@ import java.util.List;
  * Class representing an Event
  */
 public class Event {
-    private String eventId;
+    private Integer eventId;
     private String eventName;
     private Date eventDate;
     private String location;
@@ -19,7 +19,7 @@ public class Event {
     /**
      * Constructor to create a new Event
      */
-    public Event(String eventId, String eventName, Date eventDate, String location) {
+    public Event(Integer eventId, String eventName, Date eventDate, String location) {
         this.eventId = eventId;
         this.eventName = eventName;
         this.eventDate = eventDate;
@@ -45,10 +45,7 @@ public class Event {
 
     // Checks in a user for the event
     public void checkInAttendee(User user) {
-        if (registeredAttendees.contains(user) && !checkedInAttendees.contains(user)) {
             checkedInAttendees.add(user);
-        }
-        // Alternative logic can be implemented here based on your requirements
     }
 
     public void removeAttendee(User user) {
@@ -64,11 +61,11 @@ public class Event {
     }
 
     // Getters and Setters for event properties
-    public String getEventId() {
+    public Integer getEventId() {
         return eventId;
     }
 
-    public void setEventId(String eventId) {
+    public void setEventId(int eventId) {
         this.eventId = eventId;
     }
 

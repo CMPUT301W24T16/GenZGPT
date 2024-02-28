@@ -21,32 +21,32 @@ public class EventManager {
     }
 
     // Remove an event
-    public void removeEvent(String eventId) {
+    public void removeEvent(Integer eventId) {
         events.removeIf(event -> event.getEventId().equals(eventId));
     }
 
     // Update an existing event
-    public void updateEvent(String eventId, String newName, Date newDate, String newLocation) {
+    public void updateEvent(Integer eventId, String newName, Date newDate, String newLocation) {
         findEventById(eventId).ifPresent(event -> event.updateEventDetails(newName, newDate, newLocation));
     }
 
     // Register an attendee to an event
-    public void registerAttendeeToEvent(String eventId, User attendee) {
+    public void registerAttendeeToEvent(Integer eventId, User attendee) {
         findEventById(eventId).ifPresent(event -> event.registerAttendee(attendee));
     }
 
     // Check in an attendee to an event
-    public void checkInAttendeeToEvent(String eventId, User attendee) {
+    public void checkInAttendeeToEvent(Integer eventId, User attendee) {
         findEventById(eventId).ifPresent(event -> event.checkInAttendee(attendee));
     }
 
     // Remove an attendee from an event
-    public void removeAttendeeFromEvent(String eventId, User attendee) {
+    public void removeAttendeeFromEvent(Integer eventId, User attendee) {
         findEventById(eventId).ifPresent(event -> event.removeAttendee(attendee));
     }
 
     // Helper method to find an event by ID
-    private Optional<Event> findEventById(String eventId) {
+    private Optional<Event> findEventById(Integer eventId) {
         return events.stream().filter(event -> event.getEventId().equals(eventId)).findFirst();
     }
 
