@@ -1,0 +1,62 @@
+package com.example.genzgpt;
+
+import static androidx.core.app.NotificationCompat.VISIBILITY_PUBLIC;
+
+import android.content.Context;
+
+import androidx.annotation.NonNull;
+import androidx.core.app.NotificationCompat;
+
+/**
+ * The contents of a notification that an attendee shall receive after reaching a milestone
+ * number of attendees at their event.
+ *
+ * FIXME: See AppNotification.java FIXME
+ */
+public class MilestoneNotification extends AppNotification{
+    /**
+     * @see com.example.genzgpt.AppNotification#title
+     */
+    protected String title = "Event Milestone";
+
+    /**
+     * @see com.example.genzgpt.AppNotification#channelID
+     */
+    private String channelID = "Milestone";
+
+    protected int notificationID = 0;
+
+    /**
+     * Constructs the format for how to notify an event organizer they have reached a certain
+     * milestone.
+     * @param eventName
+     *      The name of the event whose milestone we are notifying an organizer about.
+     * @param milestone
+     *      The milestone number of attendees that the event has reached.
+     */
+    public MilestoneNotification(String eventName, Integer milestone) {
+        this.message = "Congratulations! " + eventName + " has reached " + milestone.toString() +
+                " attendees!";
+    }
+
+    /**
+     * Creates a builder that can create an event milestone notification.
+     * FIXME: The builder we return needs some other methods later (and maybe some removed).
+     * FIXME: Mainly, we need to add Intent.
+     * @param context
+     *      The information needed about the app to construct this notification builder.
+     *      FIXME: I HAVE NO IDEA WHAT KIND OF CONTEXT I AM ACTUALLY LOOKING FOR.
+     * @return
+     *      A way for other processes to build a milestone notification.
+     */
+    public NotificationCompat.Builder getBuilder(@NonNull Context context) {
+        NotificationCompat.Builder builder = new NotificationCompat.Builder(
+                context.getApplicationContext(), channelID)
+                .setSmallIcon(R.drawable.test_picture) // FIXME: set to app icon later
+                .setContentTitle(title)
+                .setContentText(message)
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setVisibility(VISIBILITY_PUBLIC);
+        return builder;
+    }
+}
