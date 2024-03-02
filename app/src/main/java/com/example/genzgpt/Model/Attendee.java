@@ -1,6 +1,7 @@
 package com.example.genzgpt;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Implements Attendee Role
