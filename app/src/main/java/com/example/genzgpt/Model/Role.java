@@ -1,4 +1,4 @@
-package com.example.genzgpt;
+package com.example.genzgpt.Model;
 
 /**
  * Abstract role class, just holds the name of the Role and a getter

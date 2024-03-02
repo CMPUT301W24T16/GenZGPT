@@ -1,4 +1,4 @@
-package com.example.genzgpt;
+package com.example.genzgpt.Model;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,14 +28,14 @@ public class Organizer extends Role {
     }
 
     // US 01.03.01 - Send notifications to all checked-in attendees
-    public void sendPushNotification(Event event, String message) {
+    /**public void sendPushNotification(Event event, String message) {
         List<User> checkedIn = event.getAttendees();
         NotificationService notificationService = new NotificationService();
 
         for (User c : checkedIn) {
             notificationService.sendPushNotificationToUser(r, message);
         }
-    }
+    }*/
 
     // More Organizer methods here...
 }
