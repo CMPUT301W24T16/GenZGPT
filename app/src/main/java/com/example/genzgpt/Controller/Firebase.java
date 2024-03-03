@@ -1,4 +1,4 @@
-package com.example.genzgpt;
+package com.example.genzgpt.Controller;
 
 public class Firebase {
     //Handle Firebase interactions

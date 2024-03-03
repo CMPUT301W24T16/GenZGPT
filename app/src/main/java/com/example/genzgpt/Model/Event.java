@@ -1,8 +1,11 @@
-package com.example.genzgpt;
+package com.example.genzgpt.Model;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Class representing an Event
@@ -14,7 +17,11 @@ public class Event {
     private String location;
     private List<User> organizers;
     private List<User> registeredAttendees; // Users who have registered for the event
-    private List<User> checkedInAttendees;  // Users who have actually checked in
+    private List<User> checkedInAttendees; // Users who have actually checked in
+
+    private Map<String, Integer> checkedInAttendeesCount;  // Users who have actually checked inMap<String, Integer> attendeeCheckInCounts;
+    private Integer maxAttendees; // Nullable, if null, no limit is imposed
+
 
     /**
      * Constructor to create a new Event
@@ -27,6 +34,7 @@ public class Event {
         this.organizers = new ArrayList<>();
         this.registeredAttendees = new ArrayList<>();
         this.checkedInAttendees = new ArrayList<>();
+        this.checkedInAttendeesCount = new HashMap<>();
     }
 
     // Add an organizer to the event
@@ -38,19 +46,29 @@ public class Event {
 
     // Registers a user for the event
     public void registerAttendee(User user) {
-        if (!registeredAttendees.contains(user)) {
-            registeredAttendees.add(user);
+        if (maxAttendees == null || registeredAttendees.size() < maxAttendees) {
+            if (!registeredAttendees.contains(user)) {
+                registeredAttendees.add(user);
+            }
         }
     }
 
+
     // Checks in a user for the event
     public void checkInAttendee(User user) {
-            checkedInAttendees.add(user);
+        String userId = user.getId();
+        if (!checkedInAttendeesCount.containsKey(userId)) {
+            checkedInAttendees.add(user); // Add to list only if not already checked in
+        }
+        checkedInAttendeesCount.put(userId, checkedInAttendeesCount.getOrDefault(userId, 0) + 1);
     }
 
     public void removeAttendee(User user) {
         registeredAttendees.remove(user);
-        checkedInAttendees.remove(user);
+        if (checkedInAttendeesCount.containsKey(user.getId())) {
+            checkedInAttendees.remove(user);
+            checkedInAttendeesCount.remove(user.getId());
+        }
     }
 
     // Update event details
@@ -89,9 +107,12 @@ public class Event {
         return location;
     }
 
-    public void setLocation(String location) {
-        this.location = location;
-    }
+    public void setLocation(String location) { this.location = location; }
+
+    public Integer getMaxAttendees() { return maxAttendees; }
+
+    public void setMaxAttendees(Integer maxAttendees) { this.maxAttendees = maxAttendees; }
+
 
     // Getters for the lists (returns a copy for encapsulation)
     public List<User> getOrganizers() {
@@ -121,5 +142,9 @@ public class Event {
 
     public int getNumberOfCheckedInAttendees() {
         return checkedInAttendees.size();
+    }
+    //method to get check-in count for a specific attendee
+    public int getCheckInCount(User user) {
+        return checkedInAttendeesCount.getOrDefault(user.getId(), 0);
     }
 }
