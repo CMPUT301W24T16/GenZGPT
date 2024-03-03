@@ -20,6 +20,7 @@ public class Event {
     private List<User> checkedInAttendees; // Users who have actually checked in
 
     private Map<String, Integer> checkedInAttendeesCount;  // Users who have actually checked inMap<String, Integer> attendeeCheckInCounts;
+    private Integer maxAttendees; // Nullable, if null, no limit is imposed
 
 
     /**
@@ -45,10 +46,13 @@ public class Event {
 
     // Registers a user for the event
     public void registerAttendee(User user) {
-        if (!registeredAttendees.contains(user)) {
-            registeredAttendees.add(user);
+        if (maxAttendees == null || registeredAttendees.size() < maxAttendees) {
+            if (!registeredAttendees.contains(user)) {
+                registeredAttendees.add(user);
+            }
         }
     }
+
 
     // Checks in a user for the event
     public void checkInAttendee(User user) {
@@ -104,6 +108,11 @@ public class Event {
     }
 
     public void setLocation(String location) { this.location = location; }
+
+    public Integer getMaxAttendees() { return maxAttendees; }
+
+    public void setMaxAttendees(Integer maxAttendees) { this.maxAttendees = maxAttendees; }
+
 
     // Getters for the lists (returns a copy for encapsulation)
     public List<User> getOrganizers() {
