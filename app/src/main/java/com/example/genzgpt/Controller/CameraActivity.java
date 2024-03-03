@@ -1,4 +1,4 @@
-package com.example.genzgpt;
+package com.example.genzgpt.Controller;
 import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
