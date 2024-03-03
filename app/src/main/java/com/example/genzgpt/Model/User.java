@@ -1,4 +1,6 @@
-package com.example.genzgpt;
+package com.example.genzgpt.Model;
+
+import com.example.genzgpt.Model.Role;
 
 import java.util.ArrayList;
 import java.util.List;

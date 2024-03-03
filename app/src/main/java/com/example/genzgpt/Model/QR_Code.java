@@ -1,4 +1,4 @@
-package com.example.genzgpt;
+package com.example.genzgpt.Model;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -8,6 +8,8 @@ import android.os.Bundle;
 import android.widget.ImageView;
 import android.widget.Toast;
 import androidx.annotation.Nullable;
+
+import com.example.genzgpt.R;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
