@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/home"
+        android:title="Home"
+        android:icon="@drawable/navbar_darkhome"/>
+    <item
+        android:id="@+id/events"
+        android:title="My Events"
+        android:icon="@drawable/navbar_events"/>
+    <item
+        android:id="@+id/qr"
+        android:title="QR"
+        android:icon="@drawable/navbar_qr"/>
+    <item
+        android:id="@+id/event_host"
+        android:title="Event Host"
+        android:icon="@drawable/navbar_event_host"
+        />
+    <item
+        android:id="@+id/profile"
+        android:title="User Profile"
+        android:icon="@drawable/navbar_profile_settings"
+        />
+</menu>
