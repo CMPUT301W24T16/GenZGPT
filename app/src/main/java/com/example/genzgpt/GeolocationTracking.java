@@ -21,10 +21,22 @@ import com.google.android.gms.tasks.OnSuccessListener;
 public class GeolocationTracking extends Activity {
     private FusedLocationProviderClient fusedLocationClient;
     private String[] permissions = {android.Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION};
+
+    /**
+     * This class represents request codes for the specified permissions.
+     */
     class RequestCode{
         static final int COARSE_LOCATION_PERMISSION = 100;
         static final int FINE_LOCATION_PERMISSION = 101;
     }
+
+    /**
+     * This method is an onCreate for the activity
+     * @param savedInstanceState If the activity is being re-initialized after
+     *     previously being shut down then this Bundle contains the data it most
+     *     recently supplied in {@link #onSaveInstanceState}.  <b><i>Note: Otherwise it is null.</i></b>
+     *
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -38,6 +50,10 @@ public class GeolocationTracking extends Activity {
             checkPermission(android.Manifest.permission.ACCESS_FINE_LOCATION, GeolocationTracking.RequestCode.FINE_LOCATION_PERMISSION);
         } else {
             fusedLocationClient.getLastLocation().addOnSuccessListener(this, new OnSuccessListener<Location>() {
+                /**
+                 * Method that gets the location if it is successful, if not successful throw exception
+                 * @param location
+                 */
                 @Override
                 public void onSuccess(Location location) {
                     if (location != null) {
@@ -53,6 +69,15 @@ public class GeolocationTracking extends Activity {
         }
     }
 
+    /**
+     * This method will output the status of the permission request as a Toast prompt
+     * @param requestCode The request code passed in {@link #requestPermissions(String[], int)}.
+     * @param permissions The requested permissions. Never null.
+     * @param grantResults The grant results for the corresponding permissions
+     *     which is either {@link android.content.pm.PackageManager#PERMISSION_GRANTED}
+     *     or {@link android.content.pm.PackageManager#PERMISSION_DENIED}. Never null.
+     *
+     */
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults){
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -73,6 +98,12 @@ public class GeolocationTracking extends Activity {
             }
         }
     }
+
+    /**
+     * This method will ask for permissions if they are not already granted.
+     * @param permission
+     * @param requestCode
+     */
     public void checkPermission(String permission, int requestCode){
         if (ContextCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_DENIED){
             ActivityCompat.requestPermissions(this, permissions, requestCode);

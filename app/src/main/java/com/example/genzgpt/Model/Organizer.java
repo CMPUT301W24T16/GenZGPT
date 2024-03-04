@@ -27,14 +27,14 @@ public class Organizer extends Role {
     }
 
     // US 01.03.01 - Send notifications to all checked-in attendees
-    public void sendPushNotification(Event event, String message) {
+   /* public void sendPushNotification(Event event, String message) {
         List<User> checkedIn = event.getAttendees();
         NotificationService notificationService = new NotificationService();
 
         for (User u : checkedIn) {
             notificationService.sendPushNotificationToUser(u, message);
         }
-    }
+    }*/
 
     // US 01.09.01 View how many times an attendee has checked into an event.
     public int getCheckInCount(User user, Event event) {
