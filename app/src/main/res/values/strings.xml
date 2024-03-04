@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">GenZGPT</string>
     <string name="title_activity_maps">MapsActivity</string>
+    <string name="qr_code_image_desc">QR Code Image</string>
+    <string name="save_qr_code">Save</string>
+    <string name="cancel_qr_code">Cancel</string>
 </resources>
