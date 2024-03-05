@@ -37,6 +37,9 @@ public class QR_Code extends Activity {
         // setContentView(R.layout.your_layout);
     }
 
+    /**
+     * Initiates the QR code scanner using the ZXing library.
+     */
     private void startQRScanner() {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
                 == PackageManager.PERMISSION_GRANTED) {
@@ -60,6 +63,13 @@ public class QR_Code extends Activity {
         integrator.initiateScan();
     }
 
+    /**
+     * Handles the result of the QR code scanner.
+     *
+     * @param requestCode The request code.
+     * @param resultCode  The result code.
+     * @param data        The Intent data.
+     */
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -104,7 +114,11 @@ public class QR_Code extends Activity {
         return bitmap;
     }
 
-    // Example method to handle QR code generation and display
+    /**
+     * Example method to handle QR code generation and display.
+     *
+     * @param data The data to be encoded in the QR code.
+     */
     public void createAndDisplayQRCode(String data) {
         try {
             Bitmap qrCodeBitmap = generateQRCodeImage(data);
@@ -116,9 +130,12 @@ public class QR_Code extends Activity {
         }
     }
 
-    public String getCode() {
-        return code;
-    }
+
+    /**
+     * Overrides the onPointerCaptureChanged method.
+     *
+     * @param hasCapture The capture status.
+     */
 
     @Override
     public void onPointerCaptureChanged(boolean hasCapture) {

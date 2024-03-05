@@ -37,14 +37,22 @@ public class Event {
         this.checkedInAttendeesCount = new HashMap<>();
     }
 
-    // Add an organizer to the event
+    /**
+     * Adds an organizer to the event.
+     *
+     * @param user The user to be added as an organizer.
+     */
     public void addOrganizer(User user) {
         if (!organizers.contains(user)) {
             organizers.add(user);
         }
     }
 
-    // Registers a user for the event
+    /**
+     * Registers a user for the event if the maximum attendee limit has not been reached.
+     *
+     * @param user The user to be registered.
+     */
     public void registerAttendee(User user) {
         if (maxAttendees == null || registeredAttendees.size() < maxAttendees) {
             if (!registeredAttendees.contains(user)) {
@@ -54,7 +62,11 @@ public class Event {
     }
 
 
-    // Checks in a user for the event
+    /**
+     * Checks in a user for the event and updates the check-in count.
+     *
+     * @param user The user to be checked in.
+     */
     public void checkInAttendee(User user) {
         String userId = user.getId();
         if (!checkedInAttendeesCount.containsKey(userId)) {
@@ -63,6 +75,11 @@ public class Event {
         checkedInAttendeesCount.put(userId, checkedInAttendeesCount.getOrDefault(userId, 0) + 1);
     }
 
+    /**
+     * Removes a user from the list of registered attendees and, if checked in, updates the check-in details.
+     *
+     * @param user The user to be removed.
+     */
     public void removeAttendee(User user) {
         registeredAttendees.remove(user);
         if (checkedInAttendeesCount.containsKey(user.getId())) {
@@ -71,7 +88,13 @@ public class Event {
         }
     }
 
-    // Update event details
+    /**
+     * Updates the details of the event, including its name, date, and location.
+     *
+     * @param newName     The new name of the event.
+     * @param newDate     The new date and time of the event.
+     * @param newLocation The new location of the event.
+     */
     public void updateEventDetails(String newName, Date newDate, String newLocation) {
         this.eventName = newName;
         this.eventDate = newDate;
