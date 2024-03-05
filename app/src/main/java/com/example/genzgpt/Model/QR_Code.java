@@ -1,15 +1,20 @@
 package com.example.genzgpt.Model;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.widget.ImageView;
 import android.widget.Toast;
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+
 import com.example.genzgpt.R;
+
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
@@ -19,11 +24,11 @@ import com.google.zxing.integration.android.IntentResult;
 
 /**
  * This class handles QR codes by scanning and generating QR codes.
+ * It includes permission handling for camera access.
  */
 public class QR_Code extends Activity {
     private String code;
-    private int LeadingDigit;
-    private Boolean SignIn;
+    private static final int CAMERA_PERMISSION_REQUEST_CODE = 100;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -36,11 +41,24 @@ public class QR_Code extends Activity {
      * Initiates the QR code scanner using the ZXing library.
      */
     private void startQRScanner() {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
+                == PackageManager.PERMISSION_GRANTED) {
+            // Permission is already granted
+            initiateQRScanner();
+        } else {
+            // Permission is not granted, request it
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.CAMERA},
+                    CAMERA_PERMISSION_REQUEST_CODE);
+        }
+    }
+
+    private void initiateQRScanner() {
         IntentIntegrator integrator = new IntentIntegrator(this);
         integrator.setDesiredBarcodeFormats(IntentIntegrator.QR_CODE);
         integrator.setPrompt("Scan a QR code");
-        integrator.setCameraId(0);  // Use a specific camera of the device
-        integrator.setBeepEnabled(true);  // Enable or disable beep on scan
+        integrator.setCameraId(0); // Use a specific camera of the device
+        integrator.setBeepEnabled(true); // Enable or disable beep on scan
         integrator.setBarcodeImageEnabled(true);
         integrator.initiateScan();
     }
@@ -53,6 +71,20 @@ public class QR_Code extends Activity {
      * @param data        The Intent data.
      */
     @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == CAMERA_PERMISSION_REQUEST_CODE) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Permission was granted
+                initiateQRScanner();
+            } else {
+                // Permission wasn't granted
+                Toast.makeText(this, "Camera permission is required to scan QR codes", Toast.LENGTH_LONG).show();
+            }
+        }
+    }
+
+    @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
         if (result != null) {
@@ -61,7 +93,7 @@ public class QR_Code extends Activity {
             } else {
                 Toast.makeText(this, "Scanned: " + result.getContents(), Toast.LENGTH_LONG).show();
                 code = result.getContents();
-                // Handle the scanned QR code data
+                // how do we want to handle data?
             }
         } else {
             super.onActivityResult(requestCode, resultCode, data);
@@ -98,15 +130,18 @@ public class QR_Code extends Activity {
         }
     }
 
+
     /**
      * Overrides the onPointerCaptureChanged method.
      *
      * @param hasCapture The capture status.
      */
+
     @Override
     public void onPointerCaptureChanged(boolean hasCapture) {
         super.onPointerCaptureChanged(hasCapture);
     }
 }
+
 
 

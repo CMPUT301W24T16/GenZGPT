@@ -3,6 +3,11 @@
     <string name="qr_code_image_desc">QR Code Image</string>
     <string name="save_qr_code">Save</string>
     <string name="cancel_qr_code">Cancel</string>
+
+    <string name="attendees">Attendees</string>
+    <string name="back">Back</string>
+
     <string name="test_channel">Should be deleted later.</string>
     <string name="test_channel_description">Should be deleted later</string>
+
 </resources>
