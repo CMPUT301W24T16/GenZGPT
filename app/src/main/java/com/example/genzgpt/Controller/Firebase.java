@@ -17,6 +17,8 @@ import com.google.firebase.storage.UploadTask;
 import java.util.UUID;
 
 public class Firebase {
+
+    private String email;
     //Handle Firebase interactions
 
     public static void uploadImageToFirebaseStorage(Uri imageUri, StorageReference storageReference, ProgressDialog progressDialog, Context context) {
@@ -52,5 +54,23 @@ public class Firebase {
 
     private static void showToast(Context context, String message) {
         Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
+    }
+
+    private static void getUserData(){
+
+    }
+
+    private void getUserData(String email){
+        //search the firebase database, user, and returns email, name, and profile picture
+
+    }
+
+    private void setEmail(String email){
+        this.email = email;
+    }
+
+    public Firebase() {
+        //constructor
+
     }
 }

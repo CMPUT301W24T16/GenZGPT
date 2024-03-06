@@ -14,14 +14,16 @@ import java.util.List;
  */
 public class User {
     private String id;
-    private String name;
+    private String lastName;
+    private String firstName;
     private String email;
     private List<Role> roles; // Organizer/Attendee
 
     // Constructor
-    public User(String id, String name, String email) {
+    public User(String id, String firstName, String lastName, String email) {
         this.id = id;
-        this.name = name;
+        this.firstName = firstName;
+        this.lastName = lastName;
         this.email = email;
         this.roles = new ArrayList<>();
     }
@@ -39,18 +41,24 @@ public class User {
     // Getters
     public String getId() {
         return id;}
-    public String getName() {
-        return name;}
+    public String getFirstName() {
+        return firstName;}
     public String getEmail() {
         return email;}
+    public String getLastName() {
+        return lastName;
+    }
 
     // Setters
     public void setId(String id) {
         this.id = id;}
-    public void setName(String name) {
-        this.name = name;}
+    public void setName(String firstName) {
+        this.firstName = firstName;}
     public void setEmail(String email) {
         this.email = email;}
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
 
     public void login() {
         // Login implementation
