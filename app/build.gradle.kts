@@ -46,4 +46,5 @@ dependencies {
     implementation("com.journeyapps:zxing-android-embedded:4.1.0")
     implementation("com.google.zxing:core:3.4.0")
     implementation("androidx.core:core-ktx:1.12.0")
+    implementation("com.google.firebase:firebase-storage:20.3.0")
 }
