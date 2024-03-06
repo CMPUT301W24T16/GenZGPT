@@ -49,14 +49,14 @@ public class Organizer extends Role {
      * @param message The message to be sent in the push notification.
      */
     // US 01.03.01 - Send notifications to all checked-in attendees
-    public void sendPushNotification(Event event, String message) {
+   /* public void sendPushNotification(Event event, String message) {
         List<User> checkedIn = event.getAttendees();
         NotificationService notificationService = new NotificationService();
 
         for (User u : checkedIn) {
             notificationService.sendPushNotificationToUser(u, message);
         }
-    }
+    }*/
 
     /**
      * Retrieves the number of times an attendee has checked into a specific event.
