@@ -17,15 +17,19 @@ public class User {
     private String lastName;
     private String firstName;
     private String email;
+    private long phone;
+    private Boolean geolocation;
     private List<Role> roles; // Organizer/Attendee
 
     // Constructor
-    public User(String id, String firstName, String lastName, String email) {
+    public User(String id, String firstName, String lastName, long phone, String email, Boolean geolocation) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
+        this.phone = phone;
         this.roles = new ArrayList<>();
+        this.geolocation = false;
     }
 
     // Method to add role to the user
@@ -48,6 +52,12 @@ public class User {
     public String getLastName() {
         return lastName;
     }
+    public long getPhone() {
+        return phone;
+    }
+    public boolean isGeolocation() {
+        return geolocation;
+    }
 
     // Setters
     public void setId(String id) {
@@ -58,6 +68,12 @@ public class User {
         this.email = email;}
     public void setLastName(String lastName) {
         this.lastName = lastName;
+    }
+    public void setPhone(long phone) {
+        this.phone = phone;
+    }
+    public void setGeolocation(boolean geolocation) {
+        this.geolocation = geolocation;
     }
 
     public void login() {
