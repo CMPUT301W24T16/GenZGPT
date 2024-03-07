@@ -24,6 +24,9 @@ public class MilestoneNotification extends AppNotification{
      */
     private String channelID = "Milestone";
 
+    /**
+     * @see com.example.genzgpt.AppNotification#notificationID
+     */
     protected int notificationID = 0;
 
     /**

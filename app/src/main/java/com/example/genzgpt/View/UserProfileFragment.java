@@ -7,15 +7,20 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 
 import com.example.genzgpt.R;
 
 /**
  * A simple {@link Fragment} subclass.
+ * Serves as a display for a User's Profile
  * Use the {@link UserProfileFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
 public class UserProfileFragment extends Fragment {
+    private Button editButton;
+    private View profileInfo;
+    private View userBanner;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -55,6 +60,16 @@ public class UserProfileFragment extends Fragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+
+        //FIXME:
+        // need to add these ids to the xml file for this fragment
+        // editButton = View.findViewById(R.id.edit_button);
+        // profileInfo = View.findViewById(R.id.profile_info);
+        // userBanner = View.findViewById(R.id.user_banner);
+
+        // editButton.setOnClickListener( v -> {
+        //      new EditProfileFragment().show(getSupportFragmentManager(), "Profile Information");
+        // });
     }
 
     @Override
