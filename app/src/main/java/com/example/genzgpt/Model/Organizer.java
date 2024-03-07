@@ -8,6 +8,7 @@ import java.util.List;
  */
 public class Organizer extends Role {
     private List<Event> managedEvents;
+
     public Organizer() {
         super("Organizer");
         this.managedEvents = new ArrayList<>();
@@ -49,14 +50,16 @@ public class Organizer extends Role {
      * @param message The message to be sent in the push notification.
      */
     // US 01.03.01 - Send notifications to all checked-in attendees
-    public void sendPushNotification(Event event, String message) {
-        List<User> checkedIn = event.getAttendees();
-        NotificationService notificationService = new NotificationService();
-
-        for (User u : checkedIn) {
-            notificationService.sendPushNotificationToUser(u, message);
-        }
-    }
+    /*
+     * public void sendPushNotification(Event event, String message) {
+     * List<User> checkedIn = event.getAttendees();
+     * NotificationService notificationService = new NotificationService();
+     * 
+     * for (User u : checkedIn) {
+     * notificationService.sendPushNotificationToUser(u, message);
+     * }
+     * }
+     */
 
     /**
      * Retrieves the number of times an attendee has checked into a specific event.
@@ -73,7 +76,8 @@ public class Organizer extends Role {
     /**
      * Retrieves the list of people signed up to attend a specific event.
      *
-     * @param event The event for which the list of registered attendees is retrieved.
+     * @param event The event for which the list of registered attendees is
+     *              retrieved.
      * @return The list of registered attendees.
      */
     // US 01.10.01 - View people signed up to attend
