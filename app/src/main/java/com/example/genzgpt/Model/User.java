@@ -14,16 +14,22 @@ import java.util.List;
  */
 public class User {
     private String id;
-    private String name;
+    private String lastName;
+    private String firstName;
     private String email;
+    private long phone;
+    private Boolean geolocation;
     private List<Role> roles; // Organizer/Attendee
 
     // Constructor
-    public User(String id, String name, String email) {
+    public User(String id, String firstName, String lastName, long phone, String email, Boolean geolocation) {
         this.id = id;
-        this.name = name;
+        this.firstName = firstName;
+        this.lastName = lastName;
         this.email = email;
+        this.phone = phone;
         this.roles = new ArrayList<>();
+        this.geolocation = false;
     }
 
     // Method to add role to the user
@@ -39,18 +45,36 @@ public class User {
     // Getters
     public String getId() {
         return id;}
-    public String getName() {
-        return name;}
+    public String getFirstName() {
+        return firstName;}
     public String getEmail() {
         return email;}
+    public String getLastName() {
+        return lastName;
+    }
+    public long getPhone() {
+        return phone;
+    }
+    public boolean isGeolocation() {
+        return geolocation;
+    }
 
     // Setters
     public void setId(String id) {
         this.id = id;}
-    public void setName(String name) {
-        this.name = name;}
+    public void setName(String firstName) {
+        this.firstName = firstName;}
     public void setEmail(String email) {
         this.email = email;}
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+    public void setPhone(long phone) {
+        this.phone = phone;
+    }
+    public void setGeolocation(boolean geolocation) {
+        this.geolocation = geolocation;
+    }
 
     public void login() {
         // Login implementation

@@ -1,4 +1,4 @@
-package com.example.genzgpt;
+package com.example.genzgpt.View;
 
 import android.os.Bundle;
 
@@ -8,13 +8,15 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.genzgpt.R;
+
 /**
  * A simple {@link Fragment} subclass.
- * Serves as a Display for the User's Events List
- * Use the {@link MyEventsFragment#newInstance} factory method to
+ * Serves as a display for the user's most recently accessed event that they are organizing.
+ * Use the {@link EventHostFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class MyEventsFragment extends Fragment {
+public class EventHostFragment extends Fragment {
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -25,7 +27,7 @@ public class MyEventsFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
-    public MyEventsFragment() {
+    public EventHostFragment() {
         // Required empty public constructor
     }
 
@@ -35,11 +37,11 @@ public class MyEventsFragment extends Fragment {
      *
      * @param param1 Parameter 1.
      * @param param2 Parameter 2.
-     * @return A new instance of fragment MyEventsFragment.
+     * @return A new instance of fragment EventHostFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static MyEventsFragment newInstance(String param1, String param2) {
-        MyEventsFragment fragment = new MyEventsFragment();
+    public static EventHostFragment newInstance(String param1, String param2) {
+        EventHostFragment fragment = new EventHostFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -60,6 +62,6 @@ public class MyEventsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_my_events, container, false);
+        return inflater.inflate(R.layout.fragment_event_host, container, false);
     }
 }

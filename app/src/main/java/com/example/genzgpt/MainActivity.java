@@ -6,6 +6,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.MenuItem;
 
+import com.example.genzgpt.Controller.CameraFragment;
+import com.example.genzgpt.View.EventHostFragment;
+import com.example.genzgpt.View.MainPageFragment;
+import com.example.genzgpt.View.MyEventsFragment;
+import com.example.genzgpt.View.UserProfileFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
 
@@ -18,6 +23,8 @@ public class MainActivity extends AppCompatActivity {
     MyEventsFragment myEvents = new MyEventsFragment();
     EventHostFragment eventHost = new EventHostFragment();
     UserProfileFragment userProfile = new UserProfileFragment();
+    CameraFragment cameraActivity = new CameraFragment();
+
 
 
     NavigationBarView.OnItemSelectedListener navListener = new NavigationBarView.OnItemSelectedListener() {
@@ -37,7 +44,10 @@ public class MainActivity extends AppCompatActivity {
                         .commit();
                 return true;
             } else if (id == R.id.qr) {
-                // FIXME: Need to take to the QR Camera
+                getSupportFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.flFragment, cameraActivity)
+                        .commit();
                 return true;
             } else if (id == R.id.event_host) {
                 getSupportFragmentManager()

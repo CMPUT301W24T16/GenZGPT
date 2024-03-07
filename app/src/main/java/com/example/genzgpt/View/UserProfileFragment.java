@@ -1,4 +1,4 @@
-package com.example.genzgpt;
+package com.example.genzgpt.View;
 
 import android.os.Bundle;
 
@@ -7,14 +7,20 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+
+import com.example.genzgpt.R;
 
 /**
  * A simple {@link Fragment} subclass.
- * Serves as a display for the User's Main Page.
- * Use the {@link MainPageFragment#newInstance} factory method to
+ * Serves as a display for a User's Profile
+ * Use the {@link UserProfileFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class MainPageFragment extends Fragment {
+public class UserProfileFragment extends Fragment {
+    private Button editButton;
+    private View profileInfo;
+    private View userBanner;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -25,7 +31,7 @@ public class MainPageFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
-    public MainPageFragment() {
+    public UserProfileFragment() {
         // Required empty public constructor
     }
 
@@ -35,11 +41,11 @@ public class MainPageFragment extends Fragment {
      *
      * @param param1 Parameter 1.
      * @param param2 Parameter 2.
-     * @return A new instance of fragment MainPageFragment.
+     * @return A new instance of fragment UserProfileFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static MainPageFragment newInstance(String param1, String param2) {
-        MainPageFragment fragment = new MainPageFragment();
+    public static UserProfileFragment newInstance(String param1, String param2) {
+        UserProfileFragment fragment = new UserProfileFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -54,12 +60,22 @@ public class MainPageFragment extends Fragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+
+        //FIXME:
+        // need to add these ids to the xml file for this fragment
+        // editButton = View.findViewById(R.id.edit_button);
+        // profileInfo = View.findViewById(R.id.profile_info);
+        // userBanner = View.findViewById(R.id.user_banner);
+
+        // editButton.setOnClickListener( v -> {
+        //      new EditProfileFragment().show(getSupportFragmentManager(), "Profile Information");
+        // });
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_main_page, container, false);
+        return inflater.inflate(R.layout.fragment_user_profile, container, false);
     }
 }

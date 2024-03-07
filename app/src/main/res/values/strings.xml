@@ -9,5 +9,11 @@
 
     <string name="test_channel">Should be deleted later.</string>
     <string name="test_channel_description">Should be deleted later</string>
+    <string name="number">number:</string>
+    <string name="total">N</string>
+    <string name="events">My Events</string>
+    <string name="capture">Capture</string>
+    <string name="request_permissions">Request Permissions</string>
+    <string name="this_app_requires_camera_and_storage_permissions_to_function_properly">This app requires camera and storage permissions to function properly.</string>
 
 </resources>

@@ -11,52 +11,59 @@ import java.util.Optional;
 import java.util.Date;
 
 /**
- * Manages a collection of events.
+ * This class manages a collection of events. It provides functionalities to add, update, and remove events,
+ * as well as to manage event attendees by registering them, checking them in, and removing them from events.
  */
 public class EventManager {
-    private List<Event> events;
+    private final List<Event> events;
 
+    /**
+     * Constructs an EventManager with an empty list of events.
+     */
     public EventManager() {
         this.events = new ArrayList<>();
     }
 
-    // Add a new event
+    /**
+     * Adds a new event to the collection.
+     * @param event The event to be added.
+     */
     public void addEvent(Event event) {
         events.add(event);
     }
 
-    // Remove an event
+    /**
+     * Removes an event from the collection based on its event ID.
+     * @param eventId The ID of the event to be removed.
+     */
     public void removeEvent(Integer eventId) {
         events.removeIf(event -> event.getEventId().equals(eventId));
     }
 
-    // Update an existing event
-    public void updateEvent(Integer eventId, String newName, Date newDate, String newLocation) {
-        findEventById(eventId).ifPresent(event -> event.updateEventDetails(newName, newDate, newLocation));
-    }
 
-    // Register an attendee to an event
-    public void registerAttendeeToEvent(Integer eventId, User attendee) {
-        findEventById(eventId).ifPresent(event -> event.registerAttendee(attendee));
-    }
-
-    // Check in an attendee to an event
-    public void checkInAttendeeToEvent(Integer eventId, User attendee) {
-        findEventById(eventId).ifPresent(event -> event.checkInAttendee(attendee));
-    }
-
-    // Remove an attendee from an event
-    public void removeAttendeeFromEvent(Integer eventId, User attendee) {
-        findEventById(eventId).ifPresent(event -> event.removeAttendee(attendee));
-    }
-
-    // Helper method to find an event by ID
+    /**
+     * Finds an event by its ID.
+     * @param eventId The ID of the event to find.
+     * @return An Optional containing the found event if present, or an empty Optional if not found.
+     */
     private Optional<Event> findEventById(Integer eventId) {
         return events.stream().filter(event -> event.getEventId().equals(eventId)).findFirst();
     }
 
-    // Additional methods as needed
-    // - Get a list of all events
-    // - Get details of a specific event
-    // - Methods to manage organizers of events, etc.
+    /**
+     * Retrieves a list of all events managed by this EventManager.
+     * @return A list of all events.
+     */
+    public List<Event> getAllEvents() {
+        return new ArrayList<>(events); // Returns a copy to prevent modification
+    }
+
+    /**
+     * Retrieves details of a specific event by its ID.
+     * @param eventId The ID of the event to retrieve.
+     * @return An Optional containing the event details if found, or an empty Optional if not found.
+     */
+    public Optional<Event> getEventDetails(Integer eventId) {
+        return findEventById(eventId);
+    }
 }
