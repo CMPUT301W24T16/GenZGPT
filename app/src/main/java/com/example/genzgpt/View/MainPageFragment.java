@@ -1,4 +1,4 @@
-package com.example.genzgpt;
+package com.example.genzgpt.View;
 
 import android.os.Bundle;
 
@@ -8,12 +8,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.genzgpt.R;
+
 /**
  * A simple {@link Fragment} subclass.
- * Use the {@link MyEventsFragment#newInstance} factory method to
+ * Use the {@link MainPageFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class MyEventsFragment extends Fragment {
+public class MainPageFragment extends Fragment {
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -24,7 +26,7 @@ public class MyEventsFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
-    public MyEventsFragment() {
+    public MainPageFragment() {
         // Required empty public constructor
     }
 
@@ -34,11 +36,11 @@ public class MyEventsFragment extends Fragment {
      *
      * @param param1 Parameter 1.
      * @param param2 Parameter 2.
-     * @return A new instance of fragment MyEventsFragment.
+     * @return A new instance of fragment MainPageFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static MyEventsFragment newInstance(String param1, String param2) {
-        MyEventsFragment fragment = new MyEventsFragment();
+    public static MainPageFragment newInstance(String param1, String param2) {
+        MainPageFragment fragment = new MainPageFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -59,6 +61,6 @@ public class MyEventsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_my_events, container, false);
+        return inflater.inflate(R.layout.fragment_main_page, container, false);
     }
 }

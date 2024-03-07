@@ -15,7 +15,7 @@
         android:layout_alignParentEnd="true"
         android:layout_centerHorizontal="true"
         android:background="@drawable/round_outline"
-        android:ems="14"
+        android:ems="11"
         android:gravity="end|center"
         android:text="*Profile Name*"
         android:textColor="@color/white"

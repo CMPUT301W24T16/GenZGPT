@@ -4,19 +4,41 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.net.Uri;
+import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
+import com.example.genzgpt.Model.Event;
+import com.example.genzgpt.Model.User;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.android.gms.tasks.Tasks;
+import com.google.firebase.Timestamp;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 public class Firebase {
+
+    private String email;
+    private final FirebaseFirestore db;
     //Handle Firebase interactions
 
     public static void uploadImageToFirebaseStorage(Uri imageUri, StorageReference storageReference, ProgressDialog progressDialog, Context context) {
@@ -53,4 +75,398 @@ public class Firebase {
     private static void showToast(Context context, String message) {
         Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
     }
+    /**
+     * Retrieves the user data from Firebase.
+     * @return the user details for a particular email.
+     * @param email
+     */
+    public User getUserData(String email) {
+        try {
+            DocumentSnapshot document = db.collection("users")
+                    .document(email)
+                    .get()
+                    .getResult();
+
+            if (document.exists()) {
+                String firstName = document.getString("firstName");
+                String lastName = document.getString("lastName");
+                Long phoneNumber = document.getLong("phoneNumber");
+                boolean geolocation = Boolean.TRUE.equals(document.getBoolean("geolocation"));
+                String userID = document.getId();
+
+                return new User(userID, firstName, lastName, phoneNumber, email, geolocation);
+            } else {
+                return null;
+            }
+        } catch (Exception e) {
+            return null;
+        }
+    } //fixme need to utilize get user data. Store emails in the firebase lists?
+
+    /**
+     * Retrieves the list of events from the database.
+     * @return the event details for a particular event name.
+     * @param eventName
+     */
+    public Event getEventData(String eventName) {
+        try {
+            QuerySnapshot querySnapshot = db.collection("events")
+                    .whereEqualTo("eventName", eventName)
+                    .get()
+                    .getResult();
+
+            if (!querySnapshot.isEmpty()) {
+                DocumentSnapshot document = querySnapshot.getDocuments().get(0);
+                String eventId = document.getId();
+                Date eventDate = document.getDate("eventDate");
+                String location = document.getString("location");
+                Integer maxAttendees = document.getLong("maxAttendees") != null ? document.getLong("maxAttendees").intValue() : null;
+
+                Event event = new Event(Integer.parseInt(eventId), eventName, eventDate, location, 0);
+                event.setMaxAttendees(maxAttendees);
+
+                List<Map<String, Object>> organizerMaps = (List<Map<String, Object>>) document.get("organizers");
+                if (organizerMaps != null) {
+                    for (Map<String, Object> organizerMap : organizerMaps) {
+                        User organizer = createUserFromMap(organizerMap);
+                        event.addOrganizer(organizer);
+                    }
+                }
+
+                List<Map<String, Object>> registeredAttendeeMaps = (List<Map<String, Object>>) document.get("registeredAttendees");
+                if (registeredAttendeeMaps != null) {
+                    for (Map<String, Object> attendeeMap : registeredAttendeeMaps) {
+                        User attendee = createUserFromMap(attendeeMap);
+                        event.registerAttendee(attendee);
+                    }
+                }
+
+                List<Map<String, Object>> checkedInAttendeeMaps = (List<Map<String, Object>>) document.get("checkedInAttendees");
+                if (checkedInAttendeeMaps != null) {
+                    for (Map<String, Object> attendeeMap : checkedInAttendeeMaps) {
+                        User attendee = createUserFromMap(attendeeMap);
+                        event.checkInAttendee(attendee);
+                    }
+                }
+
+                return event;
+            } else {
+                return null;
+            }
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    /**
+     * Retrieves the user data from Firebase.
+     * @return the user details for a particular email.
+     * @param userMap
+     */
+    private User createUserFromMap(Map<String, Object> userMap) {
+        String userId = (String) userMap.get("id");
+        String firstName = (String) userMap.get("firstName");
+        String lastName = (String) userMap.get("lastName");
+        String email = (String) userMap.get("email");
+        Long phoneNumber = (Long) userMap.get("phoneNumber");
+        boolean geolocation = (boolean) userMap.get("geolocation");
+
+        return new User(userId, firstName, lastName, phoneNumber, email, geolocation);
+    }
+
+    /**
+     * Creates a new user in the database.
+     * @param user
+     */
+    public void createUser(User user) {
+        try {
+            // Check if the user already exists
+            DocumentReference userRef = db.collection("users").document(user.getEmail());
+            DocumentSnapshot userSnapshot = userRef.get().getResult();
+
+            if (userSnapshot.exists()) {
+                // User already exists, handle accordingly (e.g., throw an exception or return an error)
+                throw new IllegalArgumentException("User with ID " + user.getEmail() + " already exists");
+            } else {
+                // Create a new user document
+                Map<String, Object> userData = new HashMap<>();
+                userData.put("id", user.getId());
+                userData.put("firstName", user.getFirstName());
+                userData.put("lastName", user.getLastName());
+                userData.put("email", user.getEmail());
+                userData.put("phoneNumber", user.getPhone());
+                userData.put("geolocation", user.isGeolocation());
+
+                userRef.set(userData)
+                        .addOnSuccessListener(aVoid -> {
+                            // User created successfully
+                            Log.i("Firebase", "User created successfully");
+                        })
+                        .addOnFailureListener(e -> {
+                            // Error occurred while creating the user
+                            Log.e("Firebase", "Error creating user: " + e.getMessage());
+                        });
+            }
+        } catch (Exception e) {
+            // Handle any exceptions that occur during the process
+            System.err.println("Error creating user: " + e.getMessage());
+        }
+    }
+    /**
+     * Creates a new event in the database.
+     * @param organizer
+     * @param event
+     */
+    public void createEvent(Event event, User organizer) {
+        try {
+            // Create a new event document
+            DocumentReference eventRef = db.collection("events").document();
+            String eventId = eventRef.getId();
+
+            // Create a map to store the event data
+            Map<String, Object> eventData = new HashMap<>();
+            eventData.put("eventId", eventId);
+            eventData.put("eventName", event.getEventName());
+            eventData.put("eventDate", event.getEventDate());
+            eventData.put("location", event.getLocation());
+            eventData.put("maxAttendees", event.getMaxAttendees());
+
+            // Add the organizer's email to the list of organizers
+            List<String> organizerEmails = new ArrayList<>();
+            organizerEmails.add(organizer.getEmail());
+            eventData.put("organizers", organizerEmails);
+
+            // Initialize empty lists for registered attendees and checked-in attendees
+            eventData.put("registeredAttendees", new ArrayList<>());
+            eventData.put("checkedInAttendees", new ArrayList<>());
+
+            eventRef.set(eventData)
+                    .addOnSuccessListener(aVoid -> {
+                        // Event created successfully
+                        Log.i("Firebase", "Event created successfully");
+                    })
+                    .addOnFailureListener(e -> {
+                        // Error occurred while creating the event
+                        Log.e("Firebase", "Error creating event: " + e.getMessage());
+                    });
+        } catch (Exception e) {
+            // Handle any exceptions that occur during the process
+            Log.e("Firebase", "Error creating event: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Adds a user to the list of registered attendees for a specific event.
+     * @param eventName
+     * @param userEmail
+     */
+    public void addUserToCheckedInAttendees(String eventName, String userEmail) {
+        //fixme get rid of context
+        try {
+            CollectionReference eventsRef = db.collection("events");
+            Query query = eventsRef.whereEqualTo("eventName", eventName);
+
+            query.get().addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
+                    QuerySnapshot snapshot = task.getResult();
+                    if (snapshot != null && !snapshot.isEmpty()) {
+                        // Assuming there is only one event with the given name
+                        DocumentSnapshot eventDocument = snapshot.getDocuments().get(0);
+                        String eventId = eventDocument.getId();
+
+                        DocumentReference eventRef = db.collection("events").document(eventId);
+                        eventRef.update("checkedInAttendees", FieldValue.arrayUnion(userEmail))
+                                .addOnSuccessListener(aVoid -> {
+                                    // User added to checkedInAttendees successfully
+                                    Log.i("Firebase", "User added to checkedInAttendees successfully");
+                                })
+                                .addOnFailureListener(e -> {
+                                    // Error occurred while adding user to checkedInAttendees
+                                    Log.e("Firebase", "Error adding user to checkedInAttendees: " + e.getMessage());
+                                });
+                    } else {
+                        // No events found with the specified name
+                        Log.i("Firebase", "No events found with the name: " + eventName);
+                    }
+                } else {
+                    // Error occurred while querying events
+                    Log.e("Firebase", "Error querying events: " + task.getException().getMessage());
+                }
+            });
+        } catch (Exception e) {
+            // Handle any exceptions that occur during the process
+            Log.e("Firebase", "Error adding user to checkedInAttendees: " + e.getMessage());
+        }
+    }
+
+
+    /**
+     * set the email of the user
+     * @param email
+     */
+    private void setEmail(String email){
+        this.email = email;
+    }
+
+    public Firebase() {
+        db = FirebaseFirestore.getInstance();
+    }
+
+    /**
+     * Deletes an event from the database.
+     * @param eventName
+     */
+    public void deleteEvent(String eventName) {
+        try {
+            CollectionReference eventsRef = db.collection("events");
+            Query query = eventsRef.whereEqualTo("eventName", eventName);
+
+            query.get().addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
+                    QuerySnapshot snapshot = task.getResult();
+                    if (snapshot != null && !snapshot.isEmpty()) {
+                        // Delete each matching event document
+                        for (DocumentSnapshot document : snapshot.getDocuments()) {
+                            document.getReference().delete()
+                                    .addOnSuccessListener(aVoid -> {
+                                        // Event deleted successfully
+                                        Log.i("Firebase", "Event deleted successfully");
+                                    })
+                                    .addOnFailureListener(e -> {
+                                        // Error occurred while deleting the event
+                                        Log.e("Firebase", "Error deleting event: " + e.getMessage());
+                                    });
+                        }
+                    } else {
+                        // No events found with the specified name
+                        Log.i("Firebase", "No events found with the name: " + eventName);
+                    }
+                } else {
+                    // Error occurred while querying events
+                    Log.e("Firebase", "Error querying events: " + task.getException().getMessage());
+                }
+            });
+        } catch (Exception e) {
+            // Handle any exceptions that occur during the process
+            Log.e("Firebase", "Error deleting event: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Deletes a user from the database.
+     * @param userEmail
+     */
+    public void deleteUser(String userEmail) {
+        try {
+            CollectionReference usersRef = db.collection("users");
+            Query query = usersRef.whereEqualTo("email", userEmail);
+
+            query.get().addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
+                    QuerySnapshot snapshot = task.getResult();
+                    if (snapshot != null && !snapshot.isEmpty()) {
+                        // Delete each matching user document
+                        for (DocumentSnapshot document : snapshot.getDocuments()) {
+                            document.getReference().delete()
+                                    .addOnSuccessListener(aVoid -> {
+                                        // User deleted successfully
+                                        Log.i("Firebase", "User deleted successfully");
+                                    })
+                                    .addOnFailureListener(e -> {
+                                        // Error occurred while deleting the user
+                                        Log.e("Firebase", "Error deleting user: " + e.getMessage());
+                                    });
+                        }
+                    } else {
+                        // No users found with the specified email
+                        Log.i("Firebase", "No users found with the email: " + userEmail);
+                    }
+                } else {
+                    // Error occurred while querying users
+                    Log.e("Firebase", "Error querying users: " + task.getException().getMessage());
+                }
+            });
+        } catch (Exception e) {
+            // Handle any exceptions that occur during the process
+            Log.e("Firebase", "Error deleting user: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Retrieves the list of all users from the database.
+     * @return list of users
+     * Synchronous method
+     */
+    public List<User> fetchUsers() {
+        List<User> userList = new ArrayList<>();
+
+        try {
+            Task<QuerySnapshot> task = db.collection("users").get();
+            Tasks.await(task);
+
+            if (task.isSuccessful()) {
+                QuerySnapshot querySnapshot = task.getResult();
+                if (querySnapshot != null) {
+                    for (DocumentSnapshot document : querySnapshot.getDocuments()) {
+                        // Extract user data from the document
+                        String userID = document.getId();
+                        String firstName = document.getString("firstName");
+                        String lastName = document.getString("lastName");
+                        String email = document.getString("email");
+                        Long phoneNumber = document.getLong("phoneNumber");
+                        boolean geolocation = document.getBoolean("geolocation") != null && Boolean.TRUE.equals(document.getBoolean("geolocation"));
+                        User user = new User(userID, firstName, lastName, phoneNumber, email, geolocation);
+                        userList.add(user);
+                    }
+                }
+            } else {
+                throw task.getException();
+            }
+        } catch (Exception e) {
+            Log.e("Firebase", "Error fetching users: " + e.getMessage());
+        }
+
+        return userList;
+    }
+
+    /**
+     * Retrieves the list of all events from the database.
+     * @return list of events
+     * Synchronous method
+     */
+    public List<Event> fetchEvents() {
+        List<Event> eventList = new ArrayList<>();
+
+        try {
+            Task<QuerySnapshot> task = db.collection("events").get();
+            Tasks.await(task);
+
+            if (task.isSuccessful()) {
+                QuerySnapshot querySnapshot = task.getResult();
+                if (querySnapshot != null) {
+                    for (DocumentSnapshot document : querySnapshot.getDocuments()) {
+                        // Extract event data from the document
+                        int eventID = document.getLong("maxAttendees") != null ? document.getLong("maxAttendees").intValue() : null;
+                        String eventName = document.getString("eventName");
+                        String eventDescription = document.getString("eventDescription");
+                        String eventLocation = document.getString("eventLocation");
+                        Integer maxAttendees = document.getLong("maxAttendees") != null ? document.getLong("maxAttendees").intValue() : null;
+                        Timestamp eventTimestamp = document.getTimestamp("eventTimestamp");
+                        Date eventDate = eventTimestamp != null ? eventTimestamp.toDate() : null;
+
+                        // Create an Event object with the extracted data
+                        Event event = new Event(eventID, eventName, eventDate, eventLocation, maxAttendees);
+                        eventList.add(event);
+                    }
+                }
+            } else {
+                throw task.getException();
+            }
+        } catch (Exception e) {
+            Log.e("Firebase", "Error fetching events: " + e.getMessage());
+        }
+
+        return eventList;
+    }
+
 }
