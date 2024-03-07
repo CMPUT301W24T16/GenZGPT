@@ -15,5 +15,9 @@
     <string name="capture">Capture</string>
     <string name="request_permissions">Request Permissions</string>
     <string name="this_app_requires_camera_and_storage_permissions_to_function_properly">This app requires camera and storage permissions to function properly.</string>
+    <string name="user_list">User List</string>
+    <string name="first_name">First Name</string>
+    <string name="last_name">Last Name</string>
+    <string name="user_email">User Email</string>
 
 </resources>
