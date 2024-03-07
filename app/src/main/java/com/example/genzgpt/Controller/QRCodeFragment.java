@@ -14,13 +14,17 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
+import com.example.genzgpt.Model.Event;
+import com.example.genzgpt.Model.appUser;
 import com.example.genzgpt.R;
+import com.example.genzgpt.View.EventInfoFragment;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
 public class QRCodeFragment extends Fragment {
     private static final int REQUEST_CAMERA_PERMISSION = 200;
     private String qrCodeResult;
+    private Firebase firebase;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -53,19 +57,40 @@ public class QRCodeFragment extends Fragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
+        String eventCode;
         if (result != null) {
             if (result.getContents() == null) {
                 Log.d("QRCodeFragment", "Cancelled scan");
             } else {
                 qrCodeResult = result.getContents();
                 if (qrCodeResult.startsWith("0")) {
-                    // Open a certain activity
-                    Intent intent = new Intent(getActivity(), CertainActivity.class); //fixme replace with the actual activity
-                    intent.putExtra("code", qrCodeResult.substring(1)); // Pass the code following the 0
-                    startActivity(intent);
+                    // Replace the current fragment with the EventInfoFragment
+                    eventCode = qrCodeResult.substring(1);
+                    Event event = firebase.getEventData(eventCode);
+                    if (event != null) {
+                        // Replace the current fragment with the EventInfoFragment
+                        EventInfoFragment eventInfoFragment = new EventInfoFragment();
+                        eventInfoFragment.setEvent(event);
+                        getFragmentManager().beginTransaction()
+                                .replace(R.id.flFragment, eventInfoFragment)
+                                .addToBackStack(null)
+                                .commit();
+                    }
                 } else if (qrCodeResult.startsWith("1")) {
                     // Check the user in to the event
                     checkInUser(qrCodeResult.substring(1)); // Pass the code following the 1
+                    // Replace the current fragment with the EventInfoFragment
+                    eventCode = qrCodeResult.substring(1);
+                    Event event = firebase.getEventData(eventCode);
+                    if (event != null) {
+                        // Replace the current fragment with the EventInfoFragment
+                        EventInfoFragment eventInfoFragment = new EventInfoFragment();
+                        eventInfoFragment.setEvent(event);
+                        getFragmentManager().beginTransaction()
+                                .replace(R.id.flFragment, eventInfoFragment)
+                                .addToBackStack(null)
+                                .commit();
+                    }
                 }
             }
         } else {
@@ -73,12 +98,8 @@ public class QRCodeFragment extends Fragment {
         }
     }
 
-    private void checkInUser(String eventCode) {
-        // Implement the logic to check the user in to the event
-    }
-
-    // Getter method for the QR code result
-    public String getQrCodeResult() {
-        return qrCodeResult;
+    private void checkInUser(String substring) {
+        // Check in the user to the event
+        firebase.addUserToCheckedInAttendees(substring, appUser.user_email);
     }
 }
