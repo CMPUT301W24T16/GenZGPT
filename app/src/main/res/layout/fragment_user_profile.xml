@@ -28,9 +28,8 @@
         android:layout_centerHorizontal="true"
         android:text="*Profile Name*"
         android:textColor="@color/white"
-        android:textSize="24sp">
+        android:textSize="24sp"/>
 
-    </EditText>
 
     <EditText
         android:id="@+id/user_profile"
