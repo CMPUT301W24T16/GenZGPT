@@ -94,6 +94,7 @@ public class Firebase {
             return null;
         }
     } //fixme need to utilize get user data. Store emails in the firebase lists?
+
     public Event getEventData(String eventName) {
         try {
             QuerySnapshot querySnapshot = db.collection("events")
@@ -227,7 +228,6 @@ public class Firebase {
             Log.e("Firebase", "Error creating event: " + e.getMessage());
         }
     }
-
 
 
     private void setEmail(String email){

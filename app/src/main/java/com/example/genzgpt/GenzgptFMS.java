@@ -27,6 +27,15 @@ public class GenzgptFMS extends FirebaseMessagingService {
         */
     }
 
+    /**
+     * Creates a notification to display.
+     *
+     * @param notification
+     * The data for the notification to display.
+     *
+     * @param context
+     * The context of the application necessary to invoke this method.
+     */
     public void CreateNotification(AppNotification notification, @NonNull Context context) {
         NotificationCompat.Builder builder = notification.getBuilder(context);
 

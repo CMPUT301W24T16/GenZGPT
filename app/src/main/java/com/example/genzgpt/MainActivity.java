@@ -15,6 +15,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
 
 /**
+ * The Main Activity this app uses to run.
  * Credit to https://www.geeksforgeeks.org/bottom-navigation-bar-in-android/ (needs proper format)
  */
 public class MainActivity extends AppCompatActivity {
@@ -26,7 +27,7 @@ public class MainActivity extends AppCompatActivity {
     CameraFragment cameraActivity = new CameraFragment();
 
 
-
+    // Configure the buttons on the Navbar to work as intended.
     NavigationBarView.OnItemSelectedListener navListener = new NavigationBarView.OnItemSelectedListener() {
         @Override
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
@@ -67,6 +68,14 @@ public class MainActivity extends AppCompatActivity {
 
     };
 
+    /**
+     * Handles the initial creation of MainActivity.
+     *
+     * @param savedInstanceState If the activity is being re-initialized after
+     *     previously being shut down then this Bundle contains the data it most
+     *     recently supplied in {@link #onSaveInstanceState}.  <b><i>Note: Otherwise it is null.</i></b>
+     *
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
