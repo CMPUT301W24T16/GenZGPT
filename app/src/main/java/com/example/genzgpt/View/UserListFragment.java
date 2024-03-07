@@ -2,6 +2,7 @@ package com.example.genzgpt.View;
 
 import android.app.AlertDialog;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +17,7 @@ import com.example.genzgpt.Model.User;
 import com.example.genzgpt.R;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class UserListFragment extends Fragment {
@@ -28,7 +30,9 @@ public class UserListFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.user_list_fragment, container, false);
 
+        int spacingInPixels = 16; // Adjust the spacing as needed
         recyclerView = view.findViewById(R.id.userRecyclerView);
+        recyclerView.addItemDecoration(new SpacingItemDecoration(spacingInPixels));
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
         userList = new ArrayList<>();
@@ -45,8 +49,20 @@ public class UserListFragment extends Fragment {
 
     private void fetchUsers() {
         userList.clear();
-        userList.addAll(firebase.fetchUsers());
-        userAdapter.notifyDataSetChanged();
+        firebase.fetchUsers(new Firebase.OnUsersLoadedListener() {
+            @Override
+            public void onUsersLoaded(List<User> loadedUsers) {
+                userList.clear();
+                userList.addAll(loadedUsers);
+                userAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onUsersLoadFailed(Exception e) {
+                // Handle the error case
+                Log.e("UserListFragment", "Failed to load users: " + e.getMessage());
+            }
+        });
     }
 
     private class UserAdapter extends RecyclerView.Adapter<UserViewHolder> {
@@ -72,6 +88,16 @@ public class UserListFragment extends Fragment {
         public int getItemCount() {
             return users.size();
         }
+
+        public void setUsers(List<User> newUsers) {
+            this.users.clear();
+            this.users.addAll(newUsers);
+            notifyDataSetChanged();
+        }
+
+        public List<User> getUsers() {
+            return users;
+        }
     }
 
     private class UserViewHolder extends RecyclerView.ViewHolder {
@@ -84,20 +110,16 @@ public class UserListFragment extends Fragment {
             firstName = itemView.findViewById(R.id.first_name);
             lastName = itemView.findViewById(R.id.last_name);
             email = itemView.findViewById(R.id.user_email);
-
-            itemView.setOnClickListener(v -> {
-                int position = getAdapterPosition();
-                if (position != RecyclerView.NO_POSITION) {
-                    User user = userList.get(position);
-                    showDeleteUserDialog(user);
-                }
-            });
         }
 
         public void bind(User user) {
             firstName.setText(user.getFirstName());
             lastName.setText(user.getLastName());
             email.setText(user.getEmail());
+
+            itemView.setOnClickListener(v -> {
+                showDeleteUserDialog(user);
+            });
         }
     }
 
@@ -116,7 +138,10 @@ public class UserListFragment extends Fragment {
 
     private void deleteUser(User user) {
         firebase.deleteUser(user.getEmail());
-        userList.remove(user);
-        userAdapter.notifyDataSetChanged();
+        int position = userAdapter.getUsers().indexOf(user);
+        if (position != -1) {
+            userAdapter.getUsers().remove(position);
+            userAdapter.notifyItemRemoved(position);
+        }
     }
 }

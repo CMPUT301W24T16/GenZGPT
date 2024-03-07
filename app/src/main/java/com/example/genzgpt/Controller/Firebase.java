@@ -402,6 +402,7 @@ public class Firebase {
 
         try {
             Task<QuerySnapshot> task = db.collection("users").get();
+            Log.d("Firebase", "fetching users");
             Tasks.await(task);
 
             if (task.isSuccessful()) {
@@ -434,39 +435,32 @@ public class Firebase {
      * @return list of events
      * Synchronous method
      */
-    public List<Event> fetchEvents() {
-        List<Event> eventList = new ArrayList<>();
-
-        try {
-            Task<QuerySnapshot> task = db.collection("events").get();
-            Tasks.await(task);
-
-            if (task.isSuccessful()) {
-                QuerySnapshot querySnapshot = task.getResult();
-                if (querySnapshot != null) {
+    public void fetchUsers(OnUsersLoadedListener listener) {
+        db.collection("users").get()
+                .addOnSuccessListener(querySnapshot -> {
+                    List<User> userList = new ArrayList<>();
                     for (DocumentSnapshot document : querySnapshot.getDocuments()) {
-                        // Extract event data from the document
-                        int eventID = document.getLong("maxAttendees") != null ? document.getLong("maxAttendees").intValue() : null;
-                        String eventName = document.getString("eventName");
-                        String eventDescription = document.getString("eventDescription");
-                        String eventLocation = document.getString("eventLocation");
-                        Integer maxAttendees = document.getLong("maxAttendees") != null ? document.getLong("maxAttendees").intValue() : null;
-                        Timestamp eventTimestamp = document.getTimestamp("eventTimestamp");
-                        Date eventDate = eventTimestamp != null ? eventTimestamp.toDate() : null;
-
-                        // Create an Event object with the extracted data
-                        Event event = new Event(eventID, eventName, eventDate, eventLocation, maxAttendees);
-                        eventList.add(event);
+                        // Extract user data from the document
+                        String userID = document.getId();
+                        String firstName = document.getString("firstName");
+                        String lastName = document.getString("lastName");
+                        String email = document.getString("email");
+                        Long phoneNumber = document.getLong("phoneNumber");
+                        boolean geolocation = document.getBoolean("geolocation") != null && Boolean.TRUE.equals(document.getBoolean("geolocation"));
+                        User user = new User(userID, firstName, lastName, phoneNumber, email, geolocation);
+                        userList.add(user);
                     }
-                }
-            } else {
-                throw task.getException();
-            }
-        } catch (Exception e) {
-            Log.e("Firebase", "Error fetching events: " + e.getMessage());
-        }
+                    listener.onUsersLoaded(userList);
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("Firebase", "Error fetching users: " + e.getMessage());
+                    listener.onUsersLoadFailed(e);
+                });
+    }
 
-        return eventList;
+    public interface OnUsersLoadedListener {
+        void onUsersLoaded(List<User> userList);
+        void onUsersLoadFailed(Exception e);
     }
 
 }
