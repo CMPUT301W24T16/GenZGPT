@@ -149,22 +149,56 @@ public class User {
      */
     public void setName(String firstName) {
         this.firstName = firstName;}
+
+    /**
+     * A setter for the email address of the User.
+     *
+     * @param email
+     * The email to set for the User.
+     */
     public void setEmail(String email) {
         this.email = email;}
+
+    /**
+     * A setter for the last name of the User.
+     *
+     * @param lastName
+     * The last name to set for the User.
+     */
     public void setLastName(String lastName) {
         this.lastName = lastName;
     }
+
+    /**
+     * A setter for the phone number of the User.
+     *
+     * @param phone
+     * The phone number to set for the User.
+     */
     public void setPhone(long phone) {
         this.phone = phone;
     }
+
+    /**
+     * A setter for whether or not geolocation is enabled.
+     *
+     * @param geolocation
+     * The geoloaction tracking to enable for the User.
+     */
     public void setGeolocation(boolean geolocation) {
         this.geolocation = geolocation;
     }
 
+    /**
+     * The one time login for the user.
+     */
     public void login() {
         // Login implementation
     }
 
+    /**
+     * A logout for the user.
+     */
     public void logout() {
         // Logout implementation
     }
