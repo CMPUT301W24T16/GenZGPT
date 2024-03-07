@@ -122,7 +122,7 @@ public class Firebase {
                 String location = document.getString("location");
                 Integer maxAttendees = document.getLong("maxAttendees") != null ? document.getLong("maxAttendees").intValue() : null;
 
-                Event event = new Event(Integer.parseInt(eventId), eventName, eventDate, location, 0);
+                Event event = new Event(eventId, eventName, eventDate, location, 0);
                 event.setMaxAttendees(maxAttendees);
 
                 List<Map<String, Object>> organizerMaps = (List<Map<String, Object>>) document.get("organizers");
@@ -319,24 +319,26 @@ public class Firebase {
     public void deleteEvent(String eventName) {
         try {
             CollectionReference eventsRef = db.collection("events");
-            Query query = eventsRef.whereEqualTo("eventName", eventName);
+            Query query = eventsRef.whereEqualTo("event_name", eventName);
 
             query.get().addOnCompleteListener(task -> {
                 if (task.isSuccessful()) {
                     QuerySnapshot snapshot = task.getResult();
                     if (snapshot != null && !snapshot.isEmpty()) {
-                        // Delete each matching event document
-                        for (DocumentSnapshot document : snapshot.getDocuments()) {
-                            document.getReference().delete()
-                                    .addOnSuccessListener(aVoid -> {
-                                        // Event deleted successfully
-                                        Log.i("Firebase", "Event deleted successfully");
-                                    })
-                                    .addOnFailureListener(e -> {
-                                        // Error occurred while deleting the event
-                                        Log.e("Firebase", "Error deleting event: " + e.getMessage());
-                                    });
-                        }
+                        // Get the first matching event document
+                        DocumentSnapshot document = snapshot.getDocuments().get(0);
+                        String eventId = document.getId();
+
+                        // Delete the event document
+                        eventsRef.document(eventId).delete()
+                                .addOnSuccessListener(aVoid -> {
+                                    // Event deleted successfully
+                                    Log.i("Firebase", "Event deleted successfully");
+                                })
+                                .addOnFailureListener(e -> {
+                                    // Error occurred while deleting the event
+                                    Log.e("Firebase", "Error deleting event: " + e.getMessage());
+                                });
                     } else {
                         // No events found with the specified name
                         Log.i("Firebase", "No events found with the name: " + eventName);
@@ -394,44 +396,6 @@ public class Firebase {
 
     /**
      * Retrieves the list of all users from the database.
-     * @return list of users
-     * Synchronous method
-     */
-    public List<User> fetchUsers() {
-        List<User> userList = new ArrayList<>();
-
-        try {
-            Task<QuerySnapshot> task = db.collection("users").get();
-            Log.d("Firebase", "fetching users");
-            Tasks.await(task);
-
-            if (task.isSuccessful()) {
-                QuerySnapshot querySnapshot = task.getResult();
-                if (querySnapshot != null) {
-                    for (DocumentSnapshot document : querySnapshot.getDocuments()) {
-                        // Extract user data from the document
-                        String userID = document.getId();
-                        String firstName = document.getString("firstName");
-                        String lastName = document.getString("lastName");
-                        String email = document.getString("email");
-                        Long phoneNumber = document.getLong("phoneNumber");
-                        boolean geolocation = document.getBoolean("geolocation") != null && Boolean.TRUE.equals(document.getBoolean("geolocation"));
-                        User user = new User(userID, firstName, lastName, phoneNumber, email, geolocation);
-                        userList.add(user);
-                    }
-                }
-            } else {
-                throw task.getException();
-            }
-        } catch (Exception e) {
-            Log.e("Firebase", "Error fetching users: " + e.getMessage());
-        }
-
-        return userList;
-    }
-
-    /**
-     * Retrieves the list of all events from the database.
      * @return list of events
      * Synchronous method
      */
@@ -462,5 +426,34 @@ public class Firebase {
         void onUsersLoaded(List<User> userList);
         void onUsersLoadFailed(Exception e);
     }
+
+    public void fetchEvents(OnEventsLoadedListener listener) {
+        db.collection("events").get()
+                .addOnSuccessListener(querySnapshot -> {
+                    List<Event> eventList = new ArrayList<>();
+                    for (DocumentSnapshot document : querySnapshot.getDocuments()) {
+                        // Extract event data from the document
+                        String eventId = document.getId();
+                        String eventName = document.getString("event_name");
+                        Date eventDate = document.getDate("start_time");
+                        String location = document.getString("event_location");
+                        Integer maxAttendees = document.getLong("maxAttendees") != null ? document.getLong("maxAttendees").intValue() : null;
+                        Event event = new Event(eventId, eventName, eventDate, location, maxAttendees);
+                        event.setMaxAttendees(maxAttendees);
+                        eventList.add(event);
+                    }
+                    listener.onEventsLoaded(eventList);
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("Firebase", "Error fetching events: " + e.getMessage());
+                    listener.onEventsLoadFailed(e);
+                });
+    }
+
+    public interface OnEventsLoadedListener {
+        void onEventsLoaded(List<Event> eventList);
+        void onEventsLoadFailed(Exception e);
+    }
+
 
 }

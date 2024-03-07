@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
  * Class representing an Event
  */
 public class Event {
-    private Integer eventId;
+    private String eventId;
     private String eventName;
     private Date eventDate;
     private String location;
@@ -28,7 +28,7 @@ public class Event {
      * @param location The location of the event.
      * @param maxAttendees The maximum number of attendees for the event, or null if no limit.
      */
-    public Event(Integer eventId, String eventName, Date eventDate, String location, Integer maxAttendees) {
+    public Event(String eventId, String eventName, Date eventDate, String location, Integer maxAttendees) {
         this.eventId = eventId;
         this.eventName = eventName;
         this.eventDate = eventDate;
@@ -63,11 +63,11 @@ public class Event {
     }
 
     // Getters and Setters for event properties
-    public Integer getEventId() {
+    public String getEventId() {
         return eventId;
     }
 
-    public void setEventId(int eventId) {
+    public void setEventId(String eventId) {
         this.eventId = eventId;
     }
 
