@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 
 /**
  * A simple {@link Fragment} subclass.
+ * Serves as a display for the User's Main Page.
  * Use the {@link MainPageFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
