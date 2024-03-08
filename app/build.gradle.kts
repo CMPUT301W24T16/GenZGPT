@@ -60,4 +60,6 @@ dependencies {
     implementation("com.google.firebase:firebase-firestore:24.10.3")
     testImplementation("org.junit.jupiter:junit-jupiter-api:5.8.1")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.8.1")
+    implementation("com.squareup.picasso:picasso:2.71828")
+    testImplementation("org.mockito:mockito-core:3.11.2")
 }

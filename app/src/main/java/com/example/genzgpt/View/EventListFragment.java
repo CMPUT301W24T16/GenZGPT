@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
@@ -15,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.genzgpt.Controller.Firebase;
 import com.example.genzgpt.Model.Event;
 import com.example.genzgpt.R;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -139,6 +141,7 @@ public class EventListFragment extends Fragment {
         private TextView eventName;
         private TextView eventstart;
         private TextView eventLocation;
+        private ImageView eventImage;
 
         /**
          * Constructor for the EventViewHolder
@@ -148,6 +151,7 @@ public class EventListFragment extends Fragment {
             eventName = itemView.findViewById(R.id.event_name);
             eventstart = itemView.findViewById(R.id.event_start);
             eventLocation = itemView.findViewById(R.id.event_location);
+            eventImage = itemView.findViewById(R.id.imageView); // Add ImageView for the image
         }
 
         /**
@@ -157,6 +161,14 @@ public class EventListFragment extends Fragment {
             eventName.setText(event.getEventName());
             eventstart.setText(event.getEventDate().toString());
             eventLocation.setText(event.getLocation());
+
+            // Load the image using Picasso
+            if (event.getImageURL() != null && !event.getImageURL().isEmpty()) {
+                Picasso.get()
+                        .load(event.getImageURL())
+//                        .resize(200, 200) // Specify the desired width and height
+                        .into(eventImage);
+            }
 
             itemView.setOnClickListener(v -> {
                 showDeleteEventDialog(event);
@@ -185,6 +197,18 @@ public class EventListFragment extends Fragment {
      */
     private void deleteEvent(Event event) {
         firebase.deleteEvent(event.getEventName());
+        int position = eventAdapter.getEvents().indexOf(event);
+        if (position != -1) {
+            eventAdapter.getEvents().remove(position);
+            eventAdapter.notifyItemRemoved(position);
+        }
+    }
+
+    private void deleteEventImage(Event event) {
+        // Call deleteImage to delete the associated image
+        firebase.deleteImage(event.getEventId(), event.getImageURL());
+
+        // Remove the event from the RecyclerView
         int position = eventAdapter.getEvents().indexOf(event);
         if (position != -1) {
             eventAdapter.getEvents().remove(position);
