@@ -36,13 +36,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+/**
+ * This class is responsible for handling all interactions with Firebase.
+ */
 public class Firebase {
 
     private String email;
     private final FirebaseFirestore db;
     //Handle Firebase interactions
-    
+
     /**
+
      * Uploads an image to Firebase Storage and associates it with the specified event.
      *
      * @param eventID   ID of the event to associate with the image.
@@ -164,6 +168,7 @@ public class Firebase {
                     Log.e("Firebase", "Error updating image URL: " + e.getMessage());
                 });
     }
+
 
     private static void showToast(Context context, String message) {
         Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
@@ -464,6 +469,9 @@ public class Firebase {
         this.email = email;
     }
 
+    /**
+     * firebase constructor
+     */
     public Firebase() {
         db = FirebaseFirestore.getInstance();
     }
@@ -561,7 +569,7 @@ public class Firebase {
                     List<User> userList = new ArrayList<>();
                     for (DocumentSnapshot document : querySnapshot.getDocuments()) {
                         // Extract user data from the document
-                        String userID = document.getId();
+                        String userID = document.getId(); //comment this out if we get rid of userID
                         String firstName = document.getString("firstName");
                         String lastName = document.getString("lastName");
                         String email = document.getString("email");
@@ -619,6 +627,12 @@ public class Firebase {
         void onEventsLoadFailed(Exception e);
     }
 
+    /**
+     * Retrieves the list of checked-in attendees for a specific event from the database.
+     * @param eventName
+     * @return list of checked-in attendees
+     * asynchronous method
+     */
     public void fetchCheckedInAttendees(String eventName, OnCheckInAttendeesLoadedListener listener) {
         CollectionReference eventsRef = db.collection("events");
         Query query = eventsRef.whereEqualTo("eventName", eventName);
@@ -654,11 +668,18 @@ public class Firebase {
         });
     }
 
+
     public interface OnCheckInAttendeesLoadedListener {
         void onCheckInAttendeesLoaded(List<User> checkedInAttendees);
         void onCheckInAttendeesLoadFailed(Exception e);
     }
 
+    /**
+     * Retrieves the list of registered attendees for a specific event from the database.
+     * @param eventName
+     * @return list of registered attendees
+     * asynchronous method
+     */
     public void fetchRegisteredAttendees(String eventName, OnRegisteredAttendeesLoadedListener listener) {
         CollectionReference eventsRef = db.collection("events");
         Query query = eventsRef.whereEqualTo("eventName", eventName);

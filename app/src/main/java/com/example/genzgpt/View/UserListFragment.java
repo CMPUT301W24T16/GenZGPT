@@ -21,12 +21,24 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * A simple {@link Fragment} subclass.
+ * Serves as a Display for the User's List
+ * Use the {@link UserListFragment} factory method to
+ * create an instance of this fragment.
+ */
 public class UserListFragment extends Fragment {
     private RecyclerView recyclerView;
     private UserAdapter userAdapter;
     private List<User> userList;
     private Firebase firebase;
 
+    /**
+     * Use this factory method to create a new instance of
+     * this fragment using the provided parameters.
+     *
+     * @return A new instance of fragment UserListFragment.
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.user_list_fragment, container, false);
@@ -48,6 +60,9 @@ public class UserListFragment extends Fragment {
         return view;
     }
 
+    /**
+     * Fetch the list of users from Firestore and update the RecyclerView
+     */
     private void fetchUsers() {
         userList.clear();
         firebase.fetchUsers(new Firebase.OnUsersLoadedListener() {
@@ -66,6 +81,9 @@ public class UserListFragment extends Fragment {
         });
     }
 
+    /**
+     * Adapter for the RecyclerView to display the list of users
+     */
     private class UserAdapter extends RecyclerView.Adapter<UserViewHolder> {
         private List<User> users;
 
@@ -73,39 +91,60 @@ public class UserListFragment extends Fragment {
             this.users = users;
         }
 
+        /**
+         * Create a new ViewHolder for the RecyclerView
+         */
         @Override
         public UserViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_user, parent, false);
             return new UserViewHolder(itemView);
         }
 
+        /**
+         * Bind the user to the ViewHolder
+         */
         @Override
         public void onBindViewHolder(UserViewHolder holder, int position) {
             User user = users.get(position);
             holder.bind(user);
         }
 
+        /**
+         * Return the number of users in the list
+         */
         @Override
         public int getItemCount() {
             return users.size();
         }
 
+        /**
+         * Set the list of users to display in the RecyclerView
+         */
         public void setUsers(List<User> newUsers) {
             this.users.clear();
             this.users.addAll(newUsers);
             notifyDataSetChanged();
         }
 
+        /**
+         * Return the list of users
+         */
         public List<User> getUsers() {
             return users;
         }
     }
 
+    /**
+     * ViewHolder for the RecyclerView to display the user
+     */
     private class UserViewHolder extends RecyclerView.ViewHolder {
         private TextView firstName;
         private TextView lastName;
         private TextView email;
 
+        /**
+         * Constructor for the ViewHolder
+         */
         public UserViewHolder(View itemView) {
             super(itemView);
             firstName = itemView.findViewById(R.id.first_name);
@@ -113,6 +152,9 @@ public class UserListFragment extends Fragment {
             email = itemView.findViewById(R.id.user_email);
         }
 
+        /**
+         * Bind the user to the ViewHolder
+         */
         public void bind(User user) {
             firstName.setText(user.getFirstName());
             lastName.setText(user.getLastName());
@@ -124,6 +166,9 @@ public class UserListFragment extends Fragment {
         }
     }
 
+    /**
+     * Show a dialog to confirm the deletion of the user
+     */
     private void showDeleteUserDialog(User user) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle("Delete User")
@@ -137,6 +182,9 @@ public class UserListFragment extends Fragment {
                 .show();
     }
 
+    /**
+     * Delete the user from Firestore and update the RecyclerView
+     */
     private void deleteUser(User user) {
         firebase.deleteUser(user.getEmail());
         int position = userAdapter.getUsers().indexOf(user);
