@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--The background of a launcher for the app
+    ISSUES: THIS IS CURRENTLY A PLACEHOLDER ASSET-->
 <vector
     android:height="108dp"
     android:width="108dp"

@@ -9,8 +9,7 @@ import androidx.core.app.NotificationCompat;
 
 /**
  * A notification containing a message from an event organizer specified for attendees.
- *
- * FIXME: see AppNotification.java FIXME
+ * FIXME: Currently does nothing in the app
  */
 public class MessageNotification extends AppNotification {
     /**
