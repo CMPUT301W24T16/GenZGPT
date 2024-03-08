@@ -9,6 +9,7 @@ import android.view.MenuItem;
 import com.example.genzgpt.Controller.CameraFragment;
 import com.example.genzgpt.Controller.QRCodeFragment;
 import com.example.genzgpt.View.EventHostFragment;
+import com.example.genzgpt.View.EventListFragment;
 import com.example.genzgpt.View.MainPageFragment;
 import com.example.genzgpt.View.MyEventsFragment;
 import com.example.genzgpt.View.UserListFragment;
@@ -24,7 +25,7 @@ public class MainActivity extends AppCompatActivity {
     BottomNavigationView navBar;
     MainPageFragment homePage = new MainPageFragment();
     UserListFragment myEvents = new UserListFragment();
-    EventHostFragment eventHost = new EventHostFragment();
+    EventListFragment eventHost = new EventListFragment();
     UserProfileFragment userProfile = new UserProfileFragment();
     QRCodeFragment QRCodeActivity = new QRCodeFragment();
 
