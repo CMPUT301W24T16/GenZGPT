@@ -519,9 +519,90 @@ public class Firebase {
                 });
     }
 
+
     public interface OnEventsLoadedListener {
         void onEventsLoaded(List<Event> eventList);
         void onEventsLoadFailed(Exception e);
+    }
+
+    public void fetchCheckedInAttendees(String eventName, OnCheckInAttendeesLoadedListener listener) {
+        CollectionReference eventsRef = db.collection("events");
+        Query query = eventsRef.whereEqualTo("eventName", eventName);
+
+        query.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                QuerySnapshot snapshot = task.getResult();
+                if (snapshot != null && !snapshot.isEmpty()) {
+                    // Assuming there is only one event with the given name
+                    DocumentSnapshot eventDocument = snapshot.getDocuments().get(0);
+                    List<String> checkedInAttendeesEmails = (List<String>) eventDocument.get("checkedInAttendees");
+
+                    // Create a list to store the User objects
+                    List<User> checkedInAttendees = new ArrayList<>();
+
+                    // Iterate through the list of attendee emails and fetch their user data
+                    for (String email : checkedInAttendeesEmails) {
+                        User user = getUserData(email);
+                        if (user != null) {
+                            checkedInAttendees.add(user);
+                        }
+                    }
+
+                    listener.onCheckInAttendeesLoaded(checkedInAttendees);
+                } else {
+                    // No events found with the specified name
+                    listener.onCheckInAttendeesLoadFailed(new Exception("No events found with the name: " + eventName));
+                }
+            } else {
+                // Error occurred while querying events
+                listener.onCheckInAttendeesLoadFailed(task.getException());
+            }
+        });
+    }
+
+    public interface OnCheckInAttendeesLoadedListener {
+        void onCheckInAttendeesLoaded(List<User> checkedInAttendees);
+        void onCheckInAttendeesLoadFailed(Exception e);
+    }
+
+    public void fetchRegisteredAttendees(String eventName, OnRegisteredAttendeesLoadedListener listener) {
+        CollectionReference eventsRef = db.collection("events");
+        Query query = eventsRef.whereEqualTo("eventName", eventName);
+
+        query.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                QuerySnapshot snapshot = task.getResult();
+                if (snapshot != null && !snapshot.isEmpty()) {
+                    // Assuming there is only one event with the given name
+                    DocumentSnapshot eventDocument = snapshot.getDocuments().get(0);
+                    List<String> registeredAttendeesEmails = (List<String>) eventDocument.get("registeredAttendees");
+
+                    // Create a list to store the User objects
+                    List<User> registeredAttendees = new ArrayList<>();
+
+                    // Iterate through the list of attendee emails and fetch their user data
+                    for (String email : registeredAttendeesEmails) {
+                        User user = getUserData(email);
+                        if (user != null) {
+                            registeredAttendees.add(user);
+                        }
+                    }
+
+                    listener.onRegisteredAttendeesLoaded(registeredAttendees);
+                } else {
+                    // No events found with the specified name
+                    listener.onRegisteredAttendeesLoadFailed(new Exception("No events found with the name: " + eventName));
+                }
+            } else {
+                // Error occurred while querying events
+                listener.onRegisteredAttendeesLoadFailed(task.getException());
+            }
+        });
+    }
+
+    public interface OnRegisteredAttendeesLoadedListener {
+        void onRegisteredAttendeesLoaded(List<User> registeredAttendees);
+        void onRegisteredAttendeesLoadFailed(Exception e);
     }
 
 

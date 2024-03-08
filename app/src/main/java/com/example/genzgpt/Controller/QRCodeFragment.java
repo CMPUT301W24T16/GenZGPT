@@ -1,7 +1,6 @@
 package com.example.genzgpt.Controller;
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -15,7 +14,7 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.example.genzgpt.Model.Event;
-import com.example.genzgpt.Model.appUser;
+import com.example.genzgpt.Model.AppUser;
 import com.example.genzgpt.R;
 import com.example.genzgpt.View.EventInfoFragment;
 import com.google.zxing.integration.android.IntentIntegrator;
@@ -72,7 +71,7 @@ public class QRCodeFragment extends Fragment {
                         EventInfoFragment eventInfoFragment = new EventInfoFragment();
                         eventInfoFragment.setEvent(event);
                         getFragmentManager().beginTransaction()
-                                .replace(R.id.flFragment, eventInfoFragment)
+                                .replace(R.id.BaseFragment, eventInfoFragment)
                                 .addToBackStack(null)
                                 .commit();
                     }
@@ -87,7 +86,7 @@ public class QRCodeFragment extends Fragment {
                         EventInfoFragment eventInfoFragment = new EventInfoFragment();
                         eventInfoFragment.setEvent(event);
                         getFragmentManager().beginTransaction()
-                                .replace(R.id.flFragment, eventInfoFragment)
+                                .replace(R.id.BaseFragment, eventInfoFragment)
                                 .addToBackStack(null)
                                 .commit();
                     }
@@ -100,6 +99,6 @@ public class QRCodeFragment extends Fragment {
 
     private void checkInUser(String substring) {
         // Check in the user to the event
-        firebase.addUserToCheckedInAttendees(substring, appUser.user_email);
+        firebase.addUserToCheckedInAttendees(substring, AppUser.getAppUserEmail());
     }
 }
