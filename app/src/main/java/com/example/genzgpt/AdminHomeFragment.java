@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 /**
+ * The home page for an administrator (unfinished)
  * A simple {@link Fragment} subclass.
  * Use the {@link AdminHomeFragment#newInstance} factory method to
  * create an instance of this fragment.
@@ -24,6 +25,9 @@ public class AdminHomeFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
+    /**
+     * Empty public constructor for AdminHomeFragment.
+     */
     public AdminHomeFragment() {
         // Required empty public constructor
     }
@@ -46,6 +50,11 @@ public class AdminHomeFragment extends Fragment {
         return fragment;
     }
 
+    /**
+     * Handles programmatic creation of the AdminHomeFragment
+     * @param savedInstanceState If the fragment is being re-created from
+     * a previous saved state, this is the state.
+     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,6 +64,19 @@ public class AdminHomeFragment extends Fragment {
         }
     }
 
+    /**
+     * Handles visual creation of the AdminHomeFragment.
+     * @param inflater The LayoutInflater object that can be used to inflate
+     * any views in the fragment,
+     * @param container If non-null, this is the parent view that the fragment's
+     * UI should be attached to.  The fragment should not add the view itself,
+     * but this can be used to generate the LayoutParams of the view.
+     * @param savedInstanceState If non-null, this fragment is being re-constructed
+     * from a previous saved state as given here.
+     *
+     * @return
+     * The view for AdminHomeFragment.
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {

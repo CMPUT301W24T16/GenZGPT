@@ -12,6 +12,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 /**
+ * The login page for an Admin. Currently not in use.
  * A simple {@link Fragment} subclass.
  * Use the {@link AdminLoginFragment#newInstance} factory method to
  * create an instance of this fragment.
@@ -33,6 +34,9 @@ public class AdminLoginFragment extends Fragment {
     View view;
     private String correctPassword;
 
+    /**
+     * The empty constructor for the AdminLoginFragment
+     */
     public AdminLoginFragment() {
         // Required empty public constructor
     }
@@ -56,7 +60,7 @@ public class AdminLoginFragment extends Fragment {
     }
 
     /**
-     * Handles creation of AdminLoginFragment.
+     * Handles creation of AdminLoginFragment programmatically.
      *
      * @param savedInstanceState If the fragment is being re-created from
      * a previous saved state, this is the state.

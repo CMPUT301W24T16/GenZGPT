@@ -10,6 +10,8 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
 
 /**
+ * The main Activity for administrator stories and usage (not finished yet).
+ *
  *  Acknowledgements:
  *  1. NavBar Credit to agarwalkeshav8399, Last Updated April 5th: 2023,
  *  <a href="https://creativecommons.org/licenses/by-sa/4.0/">...</a>
@@ -49,6 +51,14 @@ public class AdminActivity extends AppCompatActivity {
             return false;
         }
     };
+
+    /**
+     * Handles Creation of AdminActivity
+     * @param savedInstanceState If the activity is being re-initialized after
+     *     previously being shut down then this Bundle contains the data it most
+     *     recently supplied in {@link #onSaveInstanceState}.  <b><i>Note: Otherwise it is null.</i></b>
+     *
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
