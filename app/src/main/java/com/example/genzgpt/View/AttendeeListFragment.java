@@ -171,4 +171,6 @@ public class AttendeeListFragment extends Fragment {
             //checkInCount.setText("Checked In: " + user.getCheckInCount());
         }
     }
+
+
 }

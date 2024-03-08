@@ -61,11 +61,35 @@ public class EventListFragment extends Fragment {
 
         firebase = new Firebase();
 
+        Button createEventButton = view.findViewById(R.id.addEventButton);
+
+        createEventButton.setOnClickListener(v -> {
+            // Navigate to EventCreationFragment
+            EventCreationFragment eventCreationFragment = new EventCreationFragment();
+            switchFragment(eventCreationFragment);
+        });
+
         // Fetch the list of events from Firestore and update the RecyclerView
         fetchEvents();
 
         return view;
     }
+
+    /**
+     * Switches the current fragment to the new fragment
+     */
+    private void switchFragment(EventCreationFragment eventCreationFragment) {
+        FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+
+        // Replace the current fragment with the new fragment
+        fragmentTransaction.replace(R.id.BaseFragment, eventCreationFragment);
+        fragmentTransaction.addToBackStack(null);
+
+        // Commit the transaction
+        fragmentTransaction.commit();
+    }
+
 
     /**
      * Fetches the list of events from Firestore and updates the RecyclerView
@@ -216,6 +240,7 @@ public class EventListFragment extends Fragment {
                 return true;
             });
         }
+
 
         private void switchFragment(Context context, Fragment fragment) {
             FragmentManager fragmentManager = ((AppCompatActivity) context).getSupportFragmentManager();

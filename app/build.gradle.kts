@@ -62,4 +62,9 @@ dependencies {
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.8.1")
     implementation("com.squareup.picasso:picasso:2.71828")
     testImplementation("org.mockito:mockito-core:3.11.2")
+    testImplementation ("junit:junit:4.13.2")
+    androidTestImplementation ("androidx.test:runner:1.4.0")
+    androidTestImplementation ("androidx.test.espresso:espresso-core:3.4.0")
+    androidTestImplementation ("org.mockito:mockito-android:3.3.3")
+    testImplementation ("org.mockito:mockito-core:3.3.3")
 }
