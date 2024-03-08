@@ -71,7 +71,7 @@ public class FirstSignInActivity extends AppCompatActivity {
             firebase.createUser(newUser);
 
             AppUser user = new AppUser(firstName, lastName, phone, email, geo, imageURL);
-
+            user.setUserEmail(email);
             finish();
         });
 

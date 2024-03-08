@@ -16,6 +16,7 @@ import androidx.appcompat.widget.SwitchCompat;
 import androidx.fragment.app.DialogFragment;
 
 import com.example.genzgpt.Controller.Firebase;
+import com.example.genzgpt.Model.AppUser;
 import com.example.genzgpt.Model.User;
 
 /**
@@ -99,6 +100,7 @@ public class EditProfileFragment extends DialogFragment {
             User new_user = new User(null, firstName, lastName, phone, emailName, geoBool, null);
             firebase.deleteUser(emailName);
             firebase.createUser(new_user);
+            AppUser.setUserEmail(emailName);
         }).create();
     }
 }
