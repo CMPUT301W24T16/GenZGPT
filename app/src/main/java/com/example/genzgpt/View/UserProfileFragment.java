@@ -4,6 +4,7 @@ import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -33,10 +34,10 @@ public class UserProfileFragment extends Fragment {
     private TextView userTheme;
     private TextView userGeolocation;
     private Firebase firebase;
+    private User user;
 
     public UserProfileFragment() {
         // Required empty public constructor
-
     }
     @Override
     public void onCreate(Bundle savedInstanceState){
@@ -46,8 +47,6 @@ public class UserProfileFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         firebase = new Firebase();
-        User user = firebase.getUserData("dvtaylor@ualberta.ca");
-
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_user_profile, container, false);
         //Initialize all variables
@@ -60,7 +59,20 @@ public class UserProfileFragment extends Fragment {
         userEmail = view.findViewById(R.id.email_text);
         userTheme = view.findViewById(R.id.theme_text);
         userGeolocation = view.findViewById(R.id.geolocation_text);
-            Bind(user);
+        firebase.getUserData("dvtaylor@ualberta.ca", new Firebase.OnUserLoadedListener() {
+            @Override
+            public void onUserLoaded(User user) {
+                Bind(user);
+            }
+            @Override
+            public void onUserNotFound() {
+                Log.d("Firebase", "User not found.");
+            }
+            @Override
+            public void onUserLoadFailed(Exception e) {
+                Log.e("Firebase", "User retrieval failed.");
+            }
+        });
 
       /*  editButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -73,7 +85,7 @@ public class UserProfileFragment extends Fragment {
     public void Bind(User user){
         userFirstName.setText(user.getFirstName());
         userLastName.setText(user.getLastName());
-        //userPhoneNumber.setText(user.getPhone());
+        userPhoneNumber.setText("123-456-7890");
         userEmail.setText(user.getEmail());
         if (user.isGeolocation()){
             userGeolocation.setText("ON");
