@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- * Acknowledgements:
+ * 1. NavBar Credit to agarwalkeshav8399, Last Updated April 5th: 2023,
+ * <a href="https://creativecommons.org/licenses/by-sa/4.0/">...</a>
+ * <a href="https://auth.geeksforgeeks.org/user/agarwalkeshav8399">...</a>
+ * <a href="https://www.geeksforgeeks.org/bottom-navigation-bar-in-android/">...</a>-->
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -6,8 +11,9 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
+<!--    This xml layout was made with Acknowledgements 1-->
     <FrameLayout
-        android:id="@+id/flFragment"
+        android:id="@+id/BaseFragment"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layout_constraintBottom_toTopOf="@+id/bottomNavigationView"
@@ -16,6 +22,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <!--    This xml layout was made with Acknowledgements 1-->
     <com.google.android.material.bottomnavigation.BottomNavigationView
         android:id="@+id/bottomNavigationView"
         android:layout_width="match_parent"
