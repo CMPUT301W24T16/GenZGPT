@@ -3,7 +3,6 @@ package com.example.genzgpt;
 import static java.lang.Long.parseLong;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.SwitchCompat;
 
 import android.os.Bundle;
 import android.widget.Button;
@@ -15,10 +14,7 @@ import com.example.genzgpt.Controller.Firebase;
 import com.example.genzgpt.Model.AppUser;
 import com.example.genzgpt.Model.User;
 
-/**
- * The activity a user will be taken to if they do not have a profile created.
- */
-public class FirstActivity extends AppCompatActivity {
+public class FirstSignInActivity extends AppCompatActivity {
     Button profileButton;
     Button adminButton;
     EditText profileFirstName;
@@ -27,12 +23,11 @@ public class FirstActivity extends AppCompatActivity {
     EditText phoneNumber;
     Spinner theme;
     Switch geolocation;
-
-
+    AdminLoginFragment adminSignIn = new AdminLoginFragment();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_first);
+        setContentView(R.layout.activity_first_sign_in);
 
         adminButton = findViewById(R.id.admin_button);
         profileButton = findViewById(R.id.user_profile_button);
@@ -68,7 +63,7 @@ public class FirstActivity extends AppCompatActivity {
             boolean geo = geolocation.isActivated();
 
             String imageURL = null;
-            // FIXME: User has no id, yet I need an id for the user.
+
             User newUser = new User(firstName, lastName, phone, email, geo, imageURL);
 
             Firebase firebase = new Firebase();
@@ -79,9 +74,12 @@ public class FirstActivity extends AppCompatActivity {
             finish();
         });
 
+        // Set the adminButton to send to the admin sign in page.
         adminButton.setOnClickListener( v -> {
-            // Send to the admin confirm page
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.sign_in_container, adminSignIn)
+                    .commit();
         });
-
     }
 }

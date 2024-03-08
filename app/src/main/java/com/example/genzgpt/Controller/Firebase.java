@@ -591,7 +591,6 @@ public class Firebase {
                 if (task.isSuccessful()) {
                     QuerySnapshot snapshot = task.getResult();
                     if (snapshot != null && !snapshot.isEmpty()) {
-                        // Delete each matching user document
                         for (DocumentSnapshot document : snapshot.getDocuments()) {
                             document.getReference().delete()
                                     .addOnSuccessListener(aVoid -> {
@@ -662,16 +661,19 @@ public class Firebase {
                 .addOnSuccessListener(querySnapshot -> {
                     List<Event> eventList = new ArrayList<>();
                     for (DocumentSnapshot document : querySnapshot.getDocuments()) {
-                        // Extract event data from the document
-                        String eventId = document.getId();
+                        String eventId = document.getString("eventId");
                         String eventName = document.getString("eventName");
                         Date eventDate = document.getDate("eventDate");
                         String location = document.getString("location");
-                        Integer maxAttendees = document.getLong("maxAttendees") != null ? document.getLong("maxAttendees").intValue() : null;
-                        String imageURL = document.getString("imageURL"); // Retrieve image URL
+                        Long maxAttendeesLong = document.getLong("maxAttendees");
+                        Integer maxAttendees = maxAttendeesLong != null ? maxAttendeesLong.intValue() : null;
+                        String imageURL = document.getString("imageURL");
 
-                        Event event = new Event(eventId, eventName, eventDate, location, maxAttendees, imageURL);
-                        eventList.add(event);
+                        // Check for nulls to avoid adding incomplete events
+                        if (eventName != null && eventDate != null && location != null) {
+                            Event event = new Event(eventId, eventName, eventDate, location, maxAttendees, imageURL);
+                            eventList.add(event);
+                        }
                     }
                     listener.onEventsLoaded(eventList);
                 })
