@@ -23,16 +23,33 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * A Fragment representing a list of attendees for a specific event.
+ * It displays a list of attendees fetched from Firestore and allows navigation back to the previous screen.
+ */
 public class AttendeeListFragment extends Fragment {
     private RecyclerView recyclerView;
     private UserAdapter userAdapter;
     private List<User> attendeeList;
     private Firebase firebase;
     private Event event;
+
+    /**
+     * Constructs a new instance of AttendeeListFragment with a specific event.
+     * @param event The event for which attendees will be listed.
+     */
     public AttendeeListFragment(Event event){
         this.event = event;
     };
 
+    /**
+     * Inflates the fragment's view and initializes its components, such as the RecyclerView for displaying attendees.
+     * Also sets up a click listener for the back arrow ImageView to handle navigation.
+     * @param inflater The LayoutInflater object that can be used to inflate any views in the fragment.
+     * @param container If non-null, this is the parent view that the fragment's UI should be attached to.
+     * @param savedInstanceState If non-null, this fragment is being re-constructed from a previous saved state as given here.
+     * @return The View for the fragment's UI, or null.
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.attendee_list_fragment, container, false);
@@ -65,6 +82,10 @@ public class AttendeeListFragment extends Fragment {
         return view;
     }
 
+    /**
+     * Fetches the list of attendees who have checked in for the event from Firestore and updates the UI accordingly.
+     * @param eventName The name of the event to fetch attendees for.
+     */
     private void fetchCheckedInAttendees(String eventName) {
         attendeeList.clear();
         firebase.fetchCheckedInAttendees(eventName, new Firebase.OnCheckInAttendeesLoadedListener() {
@@ -84,6 +105,9 @@ public class AttendeeListFragment extends Fragment {
         });
     }
 
+    /**
+     * Updates the displayed total count of attendees in the UI.
+     */
     private void updateTotalCount() {
         if (getView() != null) {
             TextView tvTotalCount = getView().findViewById(R.id.number_of_attendees);
@@ -91,7 +115,9 @@ public class AttendeeListFragment extends Fragment {
             tvTotalCount.setText(String.valueOf(attendeeList.size()));
         }
     }
-
+    /**
+     * Adapter class for managing the display of attendees in a RecyclerView.
+     */
     private class UserAdapter extends RecyclerView.Adapter<UserViewHolder> {
         private List<User> attendees;
 
@@ -127,6 +153,9 @@ public class AttendeeListFragment extends Fragment {
         }
     }
 
+    /**
+     * ViewHolder class for displaying individual attendee items in the RecyclerView.
+     */
     private class UserViewHolder extends RecyclerView.ViewHolder {
         private TextView personName;
         //private TextView checkInCount;
