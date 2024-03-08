@@ -460,7 +460,6 @@ public class Firebase {
                 if (task.isSuccessful()) {
                     QuerySnapshot snapshot = task.getResult();
                     if (snapshot != null && !snapshot.isEmpty()) {
-                        // Delete each matching user document
                         for (DocumentSnapshot document : snapshot.getDocuments()) {
                             document.getReference().delete()
                                     .addOnSuccessListener(aVoid -> {
@@ -530,14 +529,13 @@ public class Firebase {
                 .addOnSuccessListener(querySnapshot -> {
                     List<Event> eventList = new ArrayList<>();
                     for (DocumentSnapshot document : querySnapshot.getDocuments()) {
-                        // Make sure field names here match exactly with those in your Firestore database
-                        String eventId = document.getString("eventId"); // Assuming you store eventId
+                        String eventId = document.getString("eventId");
                         String eventName = document.getString("eventName");
-                        Date eventDate = document.getDate("eventDate"); // Ensure this is stored as a Timestamp in Firestore
+                        Date eventDate = document.getDate("eventDate");
                         String location = document.getString("location");
                         Long maxAttendeesLong = document.getLong("maxAttendees");
                         Integer maxAttendees = maxAttendeesLong != null ? maxAttendeesLong.intValue() : null;
-                        String imageURL = document.getString("imageURL"); // Make sure this field exists and is named exactly like this in Firestore
+                        String imageURL = document.getString("imageURL");
 
                         // Check for nulls to avoid adding incomplete events
                         if (eventName != null && eventDate != null && location != null) {
