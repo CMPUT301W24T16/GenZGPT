@@ -11,8 +11,11 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -54,9 +57,6 @@ public class EventListFragment extends Fragment {
         eventList = new ArrayList<>();
         eventAdapter = new EventAdapter(eventList);
         recyclerView.setAdapter(eventAdapter);
-
-        Button createEventButton = view.findViewById(R.id.addEventButton);
-        createEventButton.setOnClickListener(v -> navigateToEventCreationFragment());
 
         firebase = new Firebase();
 
@@ -172,12 +172,29 @@ public class EventListFragment extends Fragment {
             if (event.getImageURL() != null && !event.getImageURL().isEmpty()) {
                 Picasso.get()
                         .load(event.getImageURL())
-                        // .resize(200, 200) // Specify the desired width and height
+//                        .resize(200, 200) // Specify the desired width and height
                         .into(eventImage);
             }
 
             itemView.setOnClickListener(v -> {
+                // Create a new instance of the fragment you want to inflate
+                AttendeeListFragment attendeeListFragment = new AttendeeListFragment(event);
+
+                // Get the FragmentManager and start a new transaction
+                FragmentManager fragmentManager = ((AppCompatActivity) v.getContext()).getSupportFragmentManager();
+                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+
+                // Replace the current fragment with the new fragment
+                fragmentTransaction.replace(R.id.BaseFragment, attendeeListFragment);
+                fragmentTransaction.addToBackStack(null);
+
+                // Commit the transaction
+                fragmentTransaction.commit();
+            });
+
+            itemView.setOnLongClickListener(v -> {
                 showDeleteEventDialog(event);
+                return true;
             });
         }
     }
@@ -208,14 +225,6 @@ public class EventListFragment extends Fragment {
             eventAdapter.getEvents().remove(position);
             eventAdapter.notifyItemRemoved(position);
         }
-
-    }
-
-    private void navigateToEventCreationFragment() {
-        getParentFragmentManager().beginTransaction()
-                .replace(R.id.BaseFragment, new EventCreationFragment())
-                .addToBackStack(null) // This line is crucial
-                .commit();
     }
 
     private void deleteEventImage(Event event) {
@@ -229,5 +238,4 @@ public class EventListFragment extends Fragment {
             eventAdapter.notifyItemRemoved(position);
         }
     }
-
 }
