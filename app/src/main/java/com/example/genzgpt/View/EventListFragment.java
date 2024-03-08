@@ -184,7 +184,7 @@ public class EventListFragment extends Fragment {
                 FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 
                 // Replace the current fragment with the new fragment
-                fragmentTransaction.replace(R.id.flFragment, attendeeListFragment);
+                fragmentTransaction.replace(R.id.BaseFragment, attendeeListFragment);
                 fragmentTransaction.addToBackStack(null);
 
                 // Commit the transaction
