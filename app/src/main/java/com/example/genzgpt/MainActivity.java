@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
+import android.view.View;
 
 import com.example.genzgpt.Controller.QRCodeFragment;
 import com.example.genzgpt.View.EventHostFragment;
@@ -32,6 +33,8 @@ public class MainActivity extends AppCompatActivity {
     EventListFragment eventHost = new EventListFragment();
     UserProfileFragment userProfile = new UserProfileFragment();
     QRCodeFragment QRCodeActivity = new QRCodeFragment();
+    SignInFragment signIn = new SignInFragment();
+
     public static boolean hasSignedIn = false;
 
 
@@ -87,11 +90,10 @@ public class MainActivity extends AppCompatActivity {
      */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        // Go to another Activity if the user needs to put in their information.
-        sendToFirstTime();
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        // Go to another Activity if the user needs to put in their information.
 
         navBar = findViewById(R.id.bottomNavigationView);
 
@@ -102,11 +104,11 @@ public class MainActivity extends AppCompatActivity {
     /**
      * Sends the user to a first time sign in if they have need to do this already.
      */
-    public void sendToFirstTime() {
+    public boolean sendToFirstTime() {
         if (!hasSignedIn) {
             hasSignedIn = true;
-            Intent firstTime = new Intent(MainActivity.this, FirstActivity.class);
-            startActivity(firstTime);
+            return true;
         }
+        return false;
     }
 }
