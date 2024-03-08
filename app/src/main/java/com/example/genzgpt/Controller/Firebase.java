@@ -42,7 +42,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class Firebase {
 
-    private String email;
+    private String userEmail;
     private final FirebaseFirestore db;
     //Handle Firebase interactions
 
@@ -491,6 +491,7 @@ public class Firebase {
             }
         });
     }
+
     /**
      * Creates a new event in the database.
      * @param organizer
@@ -583,7 +584,7 @@ public class Firebase {
      * @param email
      */
     private void setEmail(String email){
-        this.email = email;
+        this.userEmail = email;
     }
 
     /**

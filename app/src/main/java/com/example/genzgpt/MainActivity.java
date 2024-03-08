@@ -1,9 +1,13 @@
 package com.example.genzgpt;
 
+import static android.app.PendingIntent.getActivity;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
@@ -92,8 +96,21 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // currently does nothing
+        if (savedInstanceState != null) {
+            if (savedInstanceState.containsKey("Test")) {
+                hasSignedIn = savedInstanceState.getBoolean("Test");
+            }
+        }
+
+        // Confirm whether or not a user has signed in on this application.
+        SharedPreferences preferences = this.getSharedPreferences("com.example.genzgpt", Context.MODE_PRIVATE);
+        if (preferences.contains("Test")) {
+            hasSignedIn = preferences.getBoolean("Test", false);
+        }
+
         // Go to another Activity if the user needs to put in their information.
-        // sendToFirstTime();
+        sendToFirstTime();
 
         navBar = findViewById(R.id.bottomNavigationView);
 
@@ -110,5 +127,18 @@ public class MainActivity extends AppCompatActivity {
             Intent toFirst = new Intent(MainActivity.this, FirstSignInActivity.class);
             startActivity(toFirst);
         }
+    }
+
+    /**
+     * Handles saving data into the app for future usages.
+     * @param outState Bundle in which to place your saved state.
+     *
+     */
+    @Override
+    protected void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        SharedPreferences preferences = this.getSharedPreferences("com.example.genzgpt", Context.MODE_PRIVATE);
+        preferences.edit().putBoolean("Test", hasSignedIn).apply();
+        outState.putBoolean("Test", hasSignedIn);
     }
 }
