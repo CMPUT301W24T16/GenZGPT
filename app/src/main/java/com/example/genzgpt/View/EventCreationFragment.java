@@ -129,9 +129,6 @@ public class EventCreationFragment extends Fragment {
     }
 
     private void createEvent() {
-        // Example user, replace with actual user data
-        User organizer = new User("123123", "Johb", "Doe", 123123123, "bob@gmail.com", false, "bob.com");
-
         String eventName = eventNameEditText.getText().toString();
         String location = locationEditText.getText().toString();
         if (TextUtils.isEmpty(eventName) || eventDateCalendar == null || TextUtils.isEmpty(location)) {
