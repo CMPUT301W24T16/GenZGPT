@@ -211,7 +211,7 @@ public class Firebase {
      * @param userID  ID of the event containing the image.
      * @param imageURL URL of the image to be deleted.
      */
-    public void deleteUserImage(String userID, String imageURL) {
+    public void deletUserImage(String userID, String imageURL) {
         // Delete the image data in Firestore
         db.collection("users").document(userID)
                 .update("imageURL", FieldValue.delete())
