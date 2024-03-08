@@ -1,4 +1,4 @@
-package com.example.genzgpt;
+package com.example.genzgpt.View;
 
 import static com.example.genzgpt.Controller.GalleryHandler.openGallery;
 
@@ -18,6 +18,7 @@ import androidx.fragment.app.DialogFragment;
 import com.example.genzgpt.Controller.Firebase;
 import com.example.genzgpt.Model.AppUser;
 import com.example.genzgpt.Model.User;
+import com.example.genzgpt.R;
 
 /**
  * A Dialog window used for when a User wants to edit their profile information.

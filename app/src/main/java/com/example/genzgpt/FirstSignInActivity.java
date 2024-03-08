@@ -14,6 +14,7 @@ import android.widget.Switch;
 import com.example.genzgpt.Controller.Firebase;
 import com.example.genzgpt.Model.AppUser;
 import com.example.genzgpt.Model.User;
+import com.example.genzgpt.View.AdminLoginFragment;
 
 public class FirstSignInActivity extends AppCompatActivity {
     Button profileButton;

@@ -1,4 +1,4 @@
-package com.example.genzgpt;
+package com.example.genzgpt.Controller;
 
 import android.Manifest;
 import android.app.Activity;
@@ -11,6 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import com.example.genzgpt.R;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnSuccessListener;

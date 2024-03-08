@@ -1,4 +1,4 @@
-package com.example.genzgpt;
+package com.example.genzgpt.View;
 
 import android.os.Bundle;
 
@@ -8,13 +8,15 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.genzgpt.R;
+
 /**
- * The home page for an administrator (unfinished)
+ * The profile that will manage all profiles for the Admin to view.
  * A simple {@link Fragment} subclass.
- * Use the {@link AdminHomeFragment#newInstance} factory method to
+ * Use the {@link AdminProfilesFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class AdminHomeFragment extends Fragment {
+public class AdminProfilesFragment extends Fragment {
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -26,9 +28,9 @@ public class AdminHomeFragment extends Fragment {
     private String mParam2;
 
     /**
-     * Empty public constructor for AdminHomeFragment.
+     * The required empty constructor for AdminProfilesFragment.
      */
-    public AdminHomeFragment() {
+    public AdminProfilesFragment() {
         // Required empty public constructor
     }
 
@@ -38,11 +40,11 @@ public class AdminHomeFragment extends Fragment {
      *
      * @param param1 Parameter 1.
      * @param param2 Parameter 2.
-     * @return A new instance of fragment AdminHomeFragment.
+     * @return A new instance of fragment AdminProfiles.
      */
     // TODO: Rename and change types and number of parameters
-    public static AdminHomeFragment newInstance(String param1, String param2) {
-        AdminHomeFragment fragment = new AdminHomeFragment();
+    public static AdminProfilesFragment newInstance(String param1, String param2) {
+        AdminProfilesFragment fragment = new AdminProfilesFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -51,7 +53,7 @@ public class AdminHomeFragment extends Fragment {
     }
 
     /**
-     * Handles programmatic creation of the AdminHomeFragment
+     * Handles creation of an instance of AdminProfilesFragment.
      * @param savedInstanceState If the fragment is being re-created from
      * a previous saved state, this is the state.
      */
@@ -65,7 +67,7 @@ public class AdminHomeFragment extends Fragment {
     }
 
     /**
-     * Handles visual creation of the AdminHomeFragment.
+     * Handles visual side of creating AdminProfilesFragment.
      * @param inflater The LayoutInflater object that can be used to inflate
      * any views in the fragment,
      * @param container If non-null, this is the parent view that the fragment's
@@ -75,12 +77,12 @@ public class AdminHomeFragment extends Fragment {
      * from a previous saved state as given here.
      *
      * @return
-     * The view for AdminHomeFragment.
+     * The View for the AdminProfilesFragment.
      */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_admin_home, container, false);
+        return inflater.inflate(R.layout.fragment_admin_profiles, container, false);
     }
 }
