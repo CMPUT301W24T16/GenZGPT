@@ -9,6 +9,18 @@ import java.util.List;
 
 public class Attendee extends Role {
     private List<Event> registeredEvents;
+
+    /**
+     * Creates an instance of the Attendee class for an Event.
+     * @param id
+     * A unique Attendee identifier.
+     *
+     * @param name
+     * The name of the attendee.
+     *
+     * @param email
+     * The email tied to that Attendee.
+     */
     public Attendee(String id, String name, String email) {
         super("Attendee");
         this.registeredEvents = new ArrayList<>();

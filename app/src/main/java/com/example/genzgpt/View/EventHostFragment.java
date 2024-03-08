@@ -12,6 +12,7 @@ import com.example.genzgpt.R;
 
 /**
  * A simple {@link Fragment} subclass.
+ * Serves as a display for the user's most recently accessed event that they are organizing.
  * Use the {@link EventHostFragment#newInstance} factory method to
  * create an instance of this fragment.
  */

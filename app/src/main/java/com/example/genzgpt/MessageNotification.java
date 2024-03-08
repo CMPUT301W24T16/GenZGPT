@@ -23,6 +23,9 @@ public class MessageNotification extends AppNotification {
      */
     protected String channelID = "Event Message";
 
+    /**
+     * @see com.example.genzgpt.AppNotification#notificationID
+     */
     protected int notificationID = 1;
 
     /**

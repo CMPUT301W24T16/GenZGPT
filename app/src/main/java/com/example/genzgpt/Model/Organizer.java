@@ -9,6 +9,9 @@ import java.util.List;
 public class Organizer extends Role {
     private List<Event> managedEvents;
 
+    /**
+     * Constructor for an Organizer Role.
+     */
     public Organizer() {
         super("Organizer");
         this.managedEvents = new ArrayList<>();

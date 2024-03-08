@@ -70,10 +70,20 @@ abstract class AppNotification {
         return channelName;
     }
 
+    /**
+     * A getter for the Channel Description of a specific AppNotification.
+     *
+     * @return
+     * The channel description for a notification.
+     */
     public String getChannelDescription() {
         return channelDescription;
     }
 
+    /**
+     * A getter for the notificationID for a specific
+     * @return
+     */
     public int getNotificationID() {
         return notificationID;
     }

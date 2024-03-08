@@ -22,6 +22,15 @@ import java.util.Locale;
 
 public class ImageManager {
 
+    /**
+     * Opens an activity that begins using the Camera.
+     *
+     * @param activity
+     * The current activity being used in the app.
+     *
+     * @param requestCode
+     * A code requesting for usage of the camera.
+     */
     public static void openCamera(Activity activity, int requestCode) {
         Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
 
@@ -40,6 +49,18 @@ public class ImageManager {
         }
     }
 
+    /**
+     * Attempts to delete an image from the device the app is being run on.
+     *
+     * @param imageUri
+     * An identifier for the image file being deleted.
+     *
+     * @param contentResolver
+     * A class to handle deleting the image from the device.
+     *
+     * @param profileImageView
+     * FIXME
+     */
     public static void deleteImage(Uri imageUri, ContentResolver contentResolver, ImageView profileImageView) {
         if (imageUri != null) {
             // Delete the image file from the device
@@ -57,12 +78,22 @@ public class ImageManager {
         }
     }
 
+    /**
+     * Opens the Image Gallery that exists on the current device.
+     *
+     * @param activity
+     * The activity currently being used by the app.
+     *
+     * @param requestCode
+     * The identifier for the request being made to the device.
+     */
     public static void openGallery(Activity activity, int requestCode) {
         Intent galleryIntent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         galleryIntent.setType("image/*");
         activity.startActivityForResult(galleryIntent, requestCode);
     }
 
+    // FIXME
     public static long getImageSize(Uri uri, ContentResolver contentResolver) {
         try {
             // Resolve the image size from the content resolver
@@ -78,6 +109,24 @@ public class ImageManager {
         return 0; // Return 0 if size retrieval fails
     }
 
+    /**
+     * Checks if an image is the default profile picture or not.
+     *
+     * @param imageUri
+     * An identifier for the image being checked.
+     *
+     * @param defaultImageResource
+     * FIXME
+     *
+     * @param resources
+     * FIXME
+     *
+     * @param packageName
+     * FIXME
+     *
+     * @return
+     * True if the image is a default image. False otherwise.
+     */
     // Only needed for EditProfilePic
     public static boolean isDefaultImage(Uri imageUri, int defaultImageResource, Resources resources, String packageName) {
         // Implement the logic to check if the current image is the default image
@@ -94,6 +143,12 @@ public class ImageManager {
         return imageUri.equals(defaultImageUri);
     }
 
+    /**
+     * Creates an image file.
+     *
+     * @return
+     * A temporary imagefile. (or nothing if an exception triggers).
+     */
     private static File createImageFile() {
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
         String imageFileName = "JPEG_" + timeStamp + "_";
@@ -107,6 +162,15 @@ public class ImageManager {
         }
     }
 
+    /**
+     * Shows a Toast based on information about this class and its methods.
+     *
+     * @param context
+     * The current context of the app necessary to invoke this method.
+     *
+     * @param message
+     * The message to be shown in the Toast.
+     */
     private static void showToast(Context context, String message) {
         Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
     }
