@@ -37,11 +37,10 @@ public class MainActivity extends AppCompatActivity {
     EventListFragment eventHost = new EventListFragment();
     UserProfileFragment userProfile = new UserProfileFragment();
     QRCodeFragment QRCodeActivity = new QRCodeFragment();
-
     public static boolean hasSignedIn = false;
 
 
-    // navListener was made using acknowledgement.
+    // navListener was made using acknowledgement 1.
     // Configure the buttons on the Navbar to work as intended.
     NavigationBarView.OnItemSelectedListener navListener = new NavigationBarView.OnItemSelectedListener() {
         @Override
@@ -112,6 +111,8 @@ public class MainActivity extends AppCompatActivity {
         // Go to another Activity if the user needs to put in their information.
         sendToFirstTime();
 
+        hasSignedIn = true;
+
         navBar = findViewById(R.id.bottomNavigationView);
 
         navBar.setOnItemSelectedListener(navListener);
@@ -123,7 +124,6 @@ public class MainActivity extends AppCompatActivity {
      */
     public void sendToFirstTime() {
         if (!hasSignedIn) {
-            hasSignedIn = true;
             Intent toFirst = new Intent(MainActivity.this, FirstSignInActivity.class);
             startActivity(toFirst);
         }
