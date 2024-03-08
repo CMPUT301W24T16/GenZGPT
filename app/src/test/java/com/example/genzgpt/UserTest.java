@@ -10,7 +10,7 @@ class UserTest {
 
     @Test
     void testAddRole() {
-        User user = new User("1", "John", "Doe", 1234567890, "john@example.com", false);
+        User user = new User("1", "John", "Doe", 1234567890, "john@example.com", false, "img");
         Role role = new ConcreteRole("Organizer");
         user.addRole(role);
         assertTrue(user.hasRole("Organizer"));
@@ -18,7 +18,7 @@ class UserTest {
 
     @Test
     void testHasRole() {
-        User user = new User("1", "John", "Doe", 1234567890, "john@example.com", false);
+        User user = new User("1", "John", "Doe", 1234567890, "john@example.com", false, "img");
         Role role = new ConcreteRole("Organizer");
         user.addRole(role);
         assertTrue(user.hasRole("Organizer"));
@@ -27,7 +27,7 @@ class UserTest {
 
     @Test
     void testGetters() {
-        User user = new User("1", "John", "Doe", 1234567890, "john@example.com", false);
+        User user = new User("1", "John", "Doe", 1234567890, "john@example.com", false, "img");
         assertEquals("1", user.getId());
         assertEquals("John", user.getFirstName());
         assertEquals("Doe", user.getLastName());
@@ -38,7 +38,7 @@ class UserTest {
 
     @Test
     void testSetters() {
-        User user = new User("1", "John", "Doe", 1234567890, "john@example.com", false);
+        User user = new User("1", "John", "Doe", 1234567890, "john@example.com", false, "img");
         user.setId("2");
         user.setName("Jane");
         user.setLastName("Smith");
@@ -56,7 +56,7 @@ class UserTest {
 
     @Test
     void testLoginAndLogout() {
-        User user = new User("1", "John", "Doe", 1234567890, "john@example.com", false);
+        User user = new User("1", "John", "Doe", 1234567890, "john@example.com", false, "img");
         user.login();
         // You can add assertions or test further login/logout logic if needed
         assertTrue(true); // Placeholder assertion

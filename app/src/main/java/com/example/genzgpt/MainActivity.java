@@ -10,10 +10,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.MenuItem;
-import android.view.View;
 
-import com.example.genzgpt.Controller.QRCodeFragment;
-import com.example.genzgpt.View.EventHostFragment;
+import com.example.genzgpt.View.QRCodeFragment;
 import com.example.genzgpt.View.EventListFragment;
 import com.example.genzgpt.View.MainPageFragment;
 import com.example.genzgpt.View.UserListFragment;

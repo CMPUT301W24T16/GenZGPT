@@ -1,4 +1,4 @@
-package com.example.genzgpt;
+package com.example.genzgpt.Model;
 
 import static androidx.core.app.NotificationCompat.VISIBILITY_PUBLIC;
 
@@ -6,6 +6,8 @@ import android.content.Context;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
+
+import com.example.genzgpt.R;
 
 /**
  * A notification containing a message from an event organizer specified for attendees.
@@ -18,12 +20,12 @@ public class MessageNotification extends AppNotification {
     private String eventName;
 
     /**
-     * @see com.example.genzgpt.AppNotification#channelID
+     * @see AppNotification#channelID
      */
     protected String channelID = "Event Message";
 
     /**
-     * @see com.example.genzgpt.AppNotification#notificationID
+     * @see AppNotification#notificationID
      */
     protected int notificationID = 1;
 

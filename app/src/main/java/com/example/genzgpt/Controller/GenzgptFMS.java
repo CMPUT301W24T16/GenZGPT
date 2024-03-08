@@ -1,4 +1,4 @@
-package com.example.genzgpt;
+package com.example.genzgpt.Controller;
 
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -8,6 +8,7 @@ import android.os.Build;
 import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
 
+import com.example.genzgpt.Model.AppNotification;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 

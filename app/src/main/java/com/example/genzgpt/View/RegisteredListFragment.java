@@ -27,10 +27,10 @@ import java.util.List;
  * A Fragment representing a list of attendees for a specific event.
  * It displays a list of attendees fetched from Firestore and allows navigation back to the previous screen.
  */
-public class AttendeeListFragment extends Fragment {
+public class RegisteredListFragment extends Fragment {
     private RecyclerView recyclerView;
     private UserAdapter userAdapter;
-    private List<User> attendeeList;
+    private List<User> registeredList;
     private Firebase firebase;
     private Event event;
 
@@ -38,7 +38,7 @@ public class AttendeeListFragment extends Fragment {
      * Constructs a new instance of AttendeeListFragment with a specific event.
      * @param event The event for which attendees will be listed.
      */
-    public AttendeeListFragment(Event event){
+    public RegisteredListFragment(Event event){
         this.event = event;
     };
 
@@ -52,21 +52,21 @@ public class AttendeeListFragment extends Fragment {
      */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.attendee_list_fragment, container, false);
+        View view = inflater.inflate(R.layout.registered_list_fragment, container, false);
 
         int spacingInPixels = 16; // Adjust the spacing as needed
-        recyclerView = view.findViewById(R.id.attendeesRecyclerView);
+        recyclerView = view.findViewById(R.id.registeredRecyclerView);
         recyclerView.addItemDecoration(new SpacingItemDecoration(spacingInPixels));
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
-        attendeeList = new ArrayList<>();
-        userAdapter = new UserAdapter(attendeeList);
+        registeredList = new ArrayList<>();
+        userAdapter = new UserAdapter(registeredList);
         recyclerView.setAdapter(userAdapter);
 
         firebase = new Firebase();
 
         // Fetch the list of attendees from Firestore and update the RecyclerView
-        fetchCheckedInAttendees(event.getEventName());
+        fetchRegisteredAttendees(event.getEventName());
 
         ImageView backArrowImageView = view.findViewById(R.id.backArrowImageView);
         backArrowImageView.setOnClickListener(new View.OnClickListener() {
@@ -86,21 +86,21 @@ public class AttendeeListFragment extends Fragment {
      * Fetches the list of attendees who have checked in for the event from Firestore and updates the UI accordingly.
      * @param eventName The name of the event to fetch attendees for.
      */
-    private void fetchCheckedInAttendees(String eventName) {
-        attendeeList.clear();
-        firebase.fetchCheckedInAttendees(eventName, new Firebase.OnCheckInAttendeesLoadedListener() {
+    private void fetchRegisteredAttendees(String eventName) {
+        registeredList.clear();
+        firebase.fetchRegisteredAttendees(eventName, new Firebase.OnRegisteredAttendeesLoadedListener() {
             @Override
-            public void onCheckInAttendeesLoaded(List<User> loadedAttendees) {
-                attendeeList.clear();
-                attendeeList.addAll(loadedAttendees);
+            public void onRegisteredAttendeesLoaded(List<User> loadedAttendees) {
+                registeredList.clear();
+                registeredList.addAll(loadedAttendees);
                 userAdapter.notifyDataSetChanged();
                 updateTotalCount();
             }
 
             @Override
-            public void onCheckInAttendeesLoadFailed(Exception e) {
+            public void onRegisteredAttendeesLoadFailed(Exception e) {
                 // Handle the error case
-                Log.e("AttendeeListFragment", "Failed to load users: " + e.getMessage());
+                Log.e("RegisteredListFragment", "Failed to load users: " + e.getMessage());
             }
         });
     }
@@ -112,17 +112,17 @@ public class AttendeeListFragment extends Fragment {
         if (getView() != null) {
             TextView tvTotalCount = getView().findViewById(R.id.number_of_attendees);
             // Correctly convert the size to a String
-            tvTotalCount.setText(String.valueOf(attendeeList.size()));
+            tvTotalCount.setText(String.valueOf(registeredList.size()));
         }
     }
     /**
      * Adapter class for managing the display of attendees in a RecyclerView.
      */
     private class UserAdapter extends RecyclerView.Adapter<UserViewHolder> {
-        private List<User> attendees;
+        private List<User> registered;
 
         public UserAdapter(List<User> attendees) {
-            this.attendees = attendees;
+            this.registered = attendees;
         }
 
         @Override
@@ -133,23 +133,23 @@ public class AttendeeListFragment extends Fragment {
 
         @Override
         public void onBindViewHolder(UserViewHolder holder, int position) {
-            User user = attendees.get(position);
+            User user = registered.get(position);
             holder.bind(user);
         }
 
         @Override
         public int getItemCount() {
-            return attendees.size();
+            return registered.size();
         }
 
         public void setUsers(List<User> newUsers) {
-            this.attendees.clear();
-            this.attendees.addAll(newUsers);
+            this.registered.clear();
+            this.registered.addAll(newUsers);
             notifyDataSetChanged();
         }
 
         public List<User> getUsers() {
-            return attendees;
+            return registered;
         }
     }
 
@@ -171,6 +171,4 @@ public class AttendeeListFragment extends Fragment {
             //checkInCount.setText("Checked In: " + user.getCheckInCount());
         }
     }
-
-
 }

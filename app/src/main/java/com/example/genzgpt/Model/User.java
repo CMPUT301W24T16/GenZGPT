@@ -18,7 +18,7 @@ public class User {
     private String firstName;
     private String email;
     private long phone;
-    private Boolean geolocation;
+    private boolean geolocation;
     private List<Role> roles; // Organizer/Attendee
     private String imageURL;
 
@@ -43,14 +43,14 @@ public class User {
      * @param geolocation
      * Whether or not the User wants geolocation tracking enabled.
      */
-    public User(String id, String firstName, String lastName, long phone, String email, Boolean geolocation, String imageURL) {
+    public User(String id, String firstName, String lastName, long phone, String email, boolean geolocation, String imageURL) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
         this.phone = phone;
         this.roles = new ArrayList<>();
-        this.geolocation = false;
+        this.geolocation = geolocation;
         this.imageURL = imageURL;
     }
 
@@ -72,13 +72,13 @@ public class User {
      * @param geolocation
      * Whether or not the User wants geolocation enabled
      */
-    public User(String firstName, String lastName, long phone, String email, Boolean geolocation, String imageURL) {
+    public User(String firstName, String lastName, long phone, String email, boolean geolocation, String imageURL) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
         this.phone = phone;
         this.roles = new ArrayList<>();
-        this.geolocation = false;
+        this.geolocation = geolocation;
 
     }
 
