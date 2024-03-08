@@ -41,16 +41,7 @@ public class Firebase {
     private String email;
     private final FirebaseFirestore db;
     //Handle Firebase interactions
-
-
-    /**
-     * Uploads an image to Firebase Storage and associates it with the specified event.
-     *
-     * @param id   ID of the event to associate with the image.
-     * @param imageUri  Uri of the image to upload.
-     * @param progressDialog Progress dialog for showing upload progress.
-     * @param context   Context for displaying toasts.
-     */
+    
     /**
      * Uploads an image to Firebase Storage and associates it with the specified event.
      *
@@ -114,7 +105,7 @@ public class Firebase {
 
 
     /**
-     * Uploads an image to Firebase Storage and associates it with the specified event.
+     * Uploads an image to Firebase Storage and associates it with the specified user.
      *
      * @param userID   ID of the event to associate with the image.
      * @param imageUri  Uri of the image to upload.
@@ -153,7 +144,7 @@ public class Firebase {
     }
 
     /**
-     * Update the Firestore document for the specified event with the image URL.
+     * Update the Firestore document for the specified user with the image URL.
      *
      * @param userID   ID of the event to update.
      * @param imageURL  URL of the uploaded image.
