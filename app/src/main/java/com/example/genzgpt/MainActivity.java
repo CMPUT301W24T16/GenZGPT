@@ -93,7 +93,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         // Go to another Activity if the user needs to put in their information.
-        // sendToFirstTime();
+        sendToFirstTime();
 
         navBar = findViewById(R.id.bottomNavigationView);
 

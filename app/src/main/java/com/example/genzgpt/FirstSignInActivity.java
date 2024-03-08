@@ -76,10 +76,7 @@ public class FirstSignInActivity extends AppCompatActivity {
 
         // Set the adminButton to send to the admin sign in page.
         adminButton.setOnClickListener( v -> {
-            getSupportFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.sign_in_container, adminSignIn)
-                    .commit();
+
         });
     }
 }
