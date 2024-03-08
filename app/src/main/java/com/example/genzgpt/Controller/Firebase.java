@@ -543,7 +543,7 @@ public class Firebase {
     public void deleteEvent(String eventName) {
         try {
             CollectionReference eventsRef = db.collection("events");
-            Query query = eventsRef.whereEqualTo("event_name", eventName);
+            Query query = eventsRef.whereEqualTo("eventName", eventName);
 
             query.get().addOnCompleteListener(task -> {
                 if (task.isSuccessful()) {
@@ -664,9 +664,9 @@ public class Firebase {
                     for (DocumentSnapshot document : querySnapshot.getDocuments()) {
                         // Extract event data from the document
                         String eventId = document.getId();
-                        String eventName = document.getString("event_name");
-                        Date eventDate = document.getDate("start_time");
-                        String location = document.getString("event_location");
+                        String eventName = document.getString("eventName");
+                        Date eventDate = document.getDate("eventDate");
+                        String location = document.getString("location");
                         Integer maxAttendees = document.getLong("maxAttendees") != null ? document.getLong("maxAttendees").intValue() : null;
                         String imageURL = document.getString("imageURL"); // Retrieve image URL
 
