@@ -16,6 +16,7 @@ import com.example.genzgpt.Controller.Firebase;
 import com.example.genzgpt.Model.User;
 import com.example.genzgpt.R;
 import com.example.genzgpt.View.SpacingItemDecoration;
+import com.example.genzgpt.Model.Event;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -26,6 +27,10 @@ public class AttendeeListFragment extends Fragment {
     private UserAdapter userAdapter;
     private List<User> attendeeList;
     private Firebase firebase;
+    private Event event;
+    public AttendeeListFragment(Event event){
+        this.event = event;
+    };
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -42,17 +47,17 @@ public class AttendeeListFragment extends Fragment {
 
         firebase = new Firebase();
 
-        // Fetch the list of users from Firebase and update the RecyclerView
-        fetchAttendees();
+        // Fetch the list of attendees from Firestore and update the RecyclerView
+        fetchCheckedInAttendees(event.getEventName());
 
         return view;
     }
 
-    private void fetchAttendees() {
+    private void fetchCheckedInAttendees(String eventName) {
         attendeeList.clear();
-        firebase.fetchAttendees(new Firebase.OnCheckInAttendeesLoadedListener() {
+        firebase.fetchCheckedInAttendees(eventName, new Firebase.OnCheckInAttendeesLoadedListener() {
             @Override
-            public void onUsersLoaded(List<User> loadedAttendees) {
+            public void onCheckInAttendeesLoaded(List<User> loadedAttendees) {
                 attendeeList.clear();
                 attendeeList.addAll(loadedAttendees);
                 userAdapter.notifyDataSetChanged();
@@ -60,7 +65,7 @@ public class AttendeeListFragment extends Fragment {
             }
 
             @Override
-            public void onUsersLoadFailed(Exception e) {
+            public void onCheckInAttendeesLoadFailed(Exception e) {
                 // Handle the error case
                 Log.e("AttendeeListFragment", "Failed to load users: " + e.getMessage());
             }
@@ -111,17 +116,17 @@ public class AttendeeListFragment extends Fragment {
 
     private class UserViewHolder extends RecyclerView.ViewHolder {
         private TextView personName;
-        private TextView checkInCount;
+        //private TextView checkInCount;
 
         public UserViewHolder(View itemView) {
             super(itemView);
             personName = itemView.findViewById(R.id.tvPersonName);
-            checkInCount = itemView.findViewById(R.id.tvCheckedInCount);
+            //checkInCount = itemView.findViewById(R.id.tvCheckedInCount);
         }
 
         public void bind(User user) {
             personName.setText(user.getFirstName()+user.getLastName());
-            checkInCount.setText("Checked In: " + user.getCheckInCount());
+            //checkInCount.setText("Checked In: " + user.getCheckInCount());
         }
     }
 }
