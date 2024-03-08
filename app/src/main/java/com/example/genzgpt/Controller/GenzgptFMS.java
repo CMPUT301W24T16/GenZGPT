@@ -8,7 +8,6 @@ import android.os.Build;
 import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
 
-import com.example.genzgpt.Model.AppNotification;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
@@ -37,6 +36,7 @@ public class GenzgptFMS extends FirebaseMessagingService {
      * @param context
      * The context of the application necessary to invoke this method.
      */
+    /*
     public void CreateNotification(AppNotification notification, @NonNull Context context) {
         NotificationCompat.Builder builder = notification.getBuilder(context);
 
@@ -53,4 +53,5 @@ public class GenzgptFMS extends FirebaseMessagingService {
 
         manager.notify(notification.getNotificationID(), builder.build());
     }
+     */
 }
