@@ -50,7 +50,7 @@ public class User {
         this.email = email;
         this.phone = phone;
         this.roles = new ArrayList<>();
-        this.geolocation = false;
+        this.geolocation = geolocation;
         this.imageURL = imageURL;
     }
 
@@ -78,7 +78,7 @@ public class User {
         this.email = email;
         this.phone = phone;
         this.roles = new ArrayList<>();
-        this.geolocation = false;
+        this.geolocation = geolocation;
 
     }
 

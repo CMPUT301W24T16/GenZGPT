@@ -15,6 +15,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.fragment.app.DialogFragment;
 
+import com.example.genzgpt.Controller.Firebase;
 import com.example.genzgpt.Model.User;
 
 /**
@@ -54,7 +55,7 @@ public class EditProfileFragment extends DialogFragment {
         editFirstName.setText(selectedUser.getFirstName());
         editLastName.setText(selectedUser.getLastName());
         editEmail.setText(selectedUser.getEmail());
-        //editPhone.setText(selectedUser.getPhone());
+        editPhone.setText(String.valueOf(selectedUser.getPhone()));
         if (selectedUser.isGeolocation()){
             geolocationSwitch.setChecked(Boolean.TRUE);
         }
@@ -80,17 +81,24 @@ public class EditProfileFragment extends DialogFragment {
         });
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         return builder.setView(view).setTitle("Edit Profile").setNegativeButton("Cancel", null).setPositiveButton("Save Changes", (dialog, which) ->{
+            Firebase firebase = new Firebase();
             String firstName = editFirstName.getText().toString();
             String lastName = editLastName.getText().toString();
             String emailName = editEmail.getText().toString();
             //May need to update if it is not a String object
             String phoneNum = editPhone.getText().toString();
+            long phone = Long.parseLong(phoneNum);
             SwitchCompat geoStatus = geolocationSwitch;
-            if (geoStatus.isChecked()){
+            boolean geoBool = geoStatus.isChecked();
+            if (geoBool == Boolean.TRUE){
                 geolocationName = "ON";
-            }else{
+            }
+            if(geoBool == Boolean.FALSE){
                 geolocationName = "OFF";
             }
+            User new_user = new User(null, firstName, lastName, phone, emailName, geoBool, null);
+            firebase.deleteUser(emailName);
+            firebase.createUser(new_user);
         }).create();
     }
 }
