@@ -7,17 +7,14 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.Toast;
 
 /**
- * The login page for an Admin. Currently not in use.
+ * The profile that will manage all profiles for the Admin to view.
  * A simple {@link Fragment} subclass.
- * Use the {@link AdminLoginFragment#newInstance} factory method to
+ * Use the {@link AdminProfilesFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class AdminLoginFragment extends Fragment {
+public class AdminProfilesFragment extends Fragment {
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -28,16 +25,10 @@ public class AdminLoginFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
-    EditText adminPassword;
-    Button loginButton;
-    Button returnButton;
-    View view;
-    private String correctPassword;
-
     /**
-     * The empty constructor for the AdminLoginFragment
+     * The required empty constructor for AdminProfilesFragment.
      */
-    public AdminLoginFragment() {
+    public AdminProfilesFragment() {
         // Required empty public constructor
     }
 
@@ -47,11 +38,11 @@ public class AdminLoginFragment extends Fragment {
      *
      * @param param1 Parameter 1.
      * @param param2 Parameter 2.
-     * @return A new instance of fragment AdminLoginFragment.
+     * @return A new instance of fragment AdminProfiles.
      */
     // TODO: Rename and change types and number of parameters
-    public static AdminLoginFragment newInstance(String param1, String param2) {
-        AdminLoginFragment fragment = new AdminLoginFragment();
+    public static AdminProfilesFragment newInstance(String param1, String param2) {
+        AdminProfilesFragment fragment = new AdminProfilesFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -60,8 +51,7 @@ public class AdminLoginFragment extends Fragment {
     }
 
     /**
-     * Handles creation of AdminLoginFragment programmatically.
-     *
+     * Handles creation of an instance of AdminProfilesFragment.
      * @param savedInstanceState If the fragment is being re-created from
      * a previous saved state, this is the state.
      */
@@ -72,29 +62,10 @@ public class AdminLoginFragment extends Fragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
-
-        adminPassword = view.findViewById(R.id.admin_password);
-        loginButton = view.findViewById(R.id.admin_signin_button);
-        returnButton = view.findViewById(R.id.return_button);
-
-        loginButton.setOnClickListener(v -> {
-            String password = adminPassword.getText().toString().trim();
-            if (password == correctPassword) {
-                // FIXME send to the admin login page
-            }
-            else {
-                //FIXME give some indication of failure (or not)
-            }
-        });
-
-        returnButton.setOnClickListener(v -> {
-            // FIXME send back to SignInFragment
-        });
     }
 
     /**
-     * Handles visual creation of the AdminLoginFragment.
-     *
+     * Handles visual side of creating AdminProfilesFragment.
      * @param inflater The LayoutInflater object that can be used to inflate
      * any views in the fragment,
      * @param container If non-null, this is the parent view that the fragment's
@@ -104,13 +75,12 @@ public class AdminLoginFragment extends Fragment {
      * from a previous saved state as given here.
      *
      * @return
-     * The finished version of the view for this fragment.
+     * The View for the AdminProfilesFragment.
      */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        view = inflater.inflate(R.layout.fragment_admin_login, container, false);
-        return view;
+        return inflater.inflate(R.layout.fragment_admin_profiles, container, false);
     }
 }

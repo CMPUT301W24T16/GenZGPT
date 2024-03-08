@@ -2,6 +2,7 @@ package com.example.genzgpt.View;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -177,25 +178,55 @@ public class EventListFragment extends Fragment {
             }
 
             itemView.setOnClickListener(v -> {
-                // Create a new instance of the fragment you want to inflate
-                AttendeeListFragment attendeeListFragment = new AttendeeListFragment(event);
+                // Context for creating AlertDialog
+                final Context context = v.getContext();
 
-                // Get the FragmentManager and start a new transaction
-                FragmentManager fragmentManager = ((AppCompatActivity) v.getContext()).getSupportFragmentManager();
-                FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+                // Options for the user to select
+                final CharSequence[] options = {"Registered Attendees", "Attendees", "Event Info","Cancel"};
 
-                // Replace the current fragment with the new fragment
-                fragmentTransaction.replace(R.id.BaseFragment, attendeeListFragment);
-                fragmentTransaction.addToBackStack(null);
+                // Creating AlertDialog.Builder
+                AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                builder.setTitle("Choose an option");
 
-                // Commit the transaction
-                fragmentTransaction.commit();
+                // Setting the options
+                builder.setItems(options, (dialog, item) -> {
+                    if (options[item].equals("Registered Attendees")) {
+                        // Navigate to RegisteredAttendeesFragment
+                        RegisteredListFragment registeredAttendeesFragment = new RegisteredListFragment(event);
+                        switchFragment(context, registeredAttendeesFragment);
+                    } else if (options[item].equals("Attendees")) {
+                        // Navigate to AttendeeListFragment
+                        AttendeeListFragment attendeeListFragment = new AttendeeListFragment(event);
+                        switchFragment(context, attendeeListFragment);
+                    } else if (options[item].equals("Event Info")) {
+                        // Navigate to AttendeeListFragment
+                        EventInfoFragment eventInfoFragment = new EventInfoFragment(event);
+                        switchFragment(context, eventInfoFragment);
+                    } else if (options[item].equals("Cancel")) {
+                        dialog.dismiss();
+                    }
+                });
+
+                // Showing the AlertDialog
+                builder.show();
             });
 
             itemView.setOnLongClickListener(v -> {
                 showDeleteEventDialog(event);
                 return true;
             });
+        }
+
+        private void switchFragment(Context context, Fragment fragment) {
+            FragmentManager fragmentManager = ((AppCompatActivity) context).getSupportFragmentManager();
+            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+
+            // Replace the current fragment with the new fragment
+            fragmentTransaction.replace(R.id.BaseFragment, fragment);
+            fragmentTransaction.addToBackStack(null);
+
+            // Commit the transaction
+            fragmentTransaction.commit();
         }
     }
 

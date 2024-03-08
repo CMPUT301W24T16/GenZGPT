@@ -491,6 +491,7 @@ public class Firebase {
             }
         });
     }
+
     /**
      * Creates a new event in the database.
      * @param organizer
