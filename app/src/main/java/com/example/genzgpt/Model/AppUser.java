@@ -32,6 +32,27 @@ public class AppUser extends User{
     }
 
     /**
+     * An alternate constructor for the AppUser that does not require an ID
+     *
+     * @param firstName
+     * The first name of the User of the App.
+     *
+     * @param lastName
+     * The last name of the User of the App.
+     *
+     * @param phone
+     * The phone number of the User of the App.
+     *
+     * @param email
+     * The email of the User of the App.
+     *
+     * @param geolocation
+     * A boolean indicating whether the user of the App allows for Geolocation.
+     */
+    public AppUser(String firstName, String lastName, long phone, String email, Boolean geolocation, String imageURL) {
+        super(firstName, lastName, phone, email, geolocation, imageURL);
+    }
+    /**
      * A static version of the getter for a User email. Used for getting the email as a Firebase
      * argument.
      *
