@@ -206,7 +206,7 @@ public class EventListFragment extends Fragment {
 
     private void deleteEventImage(Event event) {
         // Call deleteImage to delete the associated image
-        firebase.deleteImage(event.getEventId(), event.getImageURL());
+        firebase.deleteEventImage(event.getEventId(), event.getImageURL());
 
         // Remove the event from the RecyclerView
         int position = eventAdapter.getEvents().indexOf(event);
