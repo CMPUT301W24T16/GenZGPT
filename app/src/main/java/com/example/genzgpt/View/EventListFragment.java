@@ -182,7 +182,7 @@ public class EventListFragment extends Fragment {
                 final Context context = v.getContext();
 
                 // Options for the user to select
-                final CharSequence[] options = {"Registered Attendees", "Attendees", "Cancel"};
+                final CharSequence[] options = {"Registered Attendees", "Attendees", "Event Info","Cancel"};
 
                 // Creating AlertDialog.Builder
                 AlertDialog.Builder builder = new AlertDialog.Builder(context);
@@ -198,6 +198,10 @@ public class EventListFragment extends Fragment {
                         // Navigate to AttendeeListFragment
                         AttendeeListFragment attendeeListFragment = new AttendeeListFragment(event);
                         switchFragment(context, attendeeListFragment);
+                    } else if (options[item].equals("Event Info")) {
+                        // Navigate to AttendeeListFragment
+                        EventInfoFragment eventInfoFragment = new EventInfoFragment(event);
+                        switchFragment(context, eventInfoFragment);
                     } else if (options[item].equals("Cancel")) {
                         dialog.dismiss();
                     }

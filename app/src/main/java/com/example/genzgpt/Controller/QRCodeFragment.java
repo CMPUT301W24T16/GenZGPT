@@ -68,8 +68,7 @@ public class QRCodeFragment extends Fragment {
                         @Override
                         public void onEventLoaded(Event event) {
                             // Replace the current fragment with the EventInfoFragment
-                            EventInfoFragment eventInfoFragment = new EventInfoFragment();
-                            eventInfoFragment.setEvent(event);
+                            EventInfoFragment eventInfoFragment = new EventInfoFragment(event);
                             getFragmentManager().beginTransaction()
                                     .replace(R.id.BaseFragment, eventInfoFragment)
                                     .addToBackStack(null)
@@ -96,8 +95,7 @@ public class QRCodeFragment extends Fragment {
                             // Check the user in to the event
                             checkInUser(eventCode);
                             // Replace the current fragment with the EventInfoFragment
-                            EventInfoFragment eventInfoFragment = new EventInfoFragment();
-                            eventInfoFragment.setEvent(event);
+                            EventInfoFragment eventInfoFragment = new EventInfoFragment(event);
                             getFragmentManager().beginTransaction()
                                     .replace(R.id.BaseFragment, eventInfoFragment)
                                     .addToBackStack(null)
