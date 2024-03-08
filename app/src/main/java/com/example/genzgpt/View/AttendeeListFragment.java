@@ -87,7 +87,8 @@ public class AttendeeListFragment extends Fragment {
     private void updateTotalCount() {
         if (getView() != null) {
             TextView tvTotalCount = getView().findViewById(R.id.number_of_attendees);
-            tvTotalCount.setText(attendeeList.size());
+            // Correctly convert the size to a String
+            tvTotalCount.setText(String.valueOf(attendeeList.size()));
         }
     }
 
