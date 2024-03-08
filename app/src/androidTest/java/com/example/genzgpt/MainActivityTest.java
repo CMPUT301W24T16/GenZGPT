@@ -3,10 +3,6 @@ package com.example.genzgpt;
 import android.app.Instrumentation;
 import android.content.Intent;
 
-import androidx.fragment.app.testing.FragmentScenario;
-import androidx.fragment.app.testing.FragmentScenario.FragmentAction;
-import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
 import androidx.test.core.app.ActivityScenario;
 import androidx.test.core.app.ApplicationProvider;
 import androidx.test.espresso.Espresso;
@@ -19,7 +15,6 @@ import androidx.test.platform.app.InstrumentationRegistry;
 import androidx.test.rule.ActivityTestRule;
 
 import com.example.genzgpt.R;
-import com.example.genzgpt.FirstActivity;
 import com.example.genzgpt.View.MainPageFragment;
 import com.example.genzgpt.View.UserListFragment;
 import com.example.genzgpt.View.UserProfileFragment;
@@ -63,10 +58,6 @@ public class MainActivityTest {
         Espresso.onView(withId(R.id.events)).perform(ViewActions.click());
         Espresso.onView(withId(R.id.BaseFragment)).check(matches(isDisplayed()));
 
-        // Click on the "QR" tab
-//        Espresso.onView(withId(R.id.qr)).perform(ViewActions.click());
-//        Espresso.onView(withId(R.id.BaseFragment)).check(matches(isDisplayed()));
-
         // Click on the "Event Host" tab
         Espresso.onView(withId(R.id.event_host)).perform(ViewActions.click());
         Espresso.onView(withId(R.id.BaseFragment)).check(matches(isDisplayed()));
@@ -78,14 +69,17 @@ public class MainActivityTest {
 
     @Test
     public void testSendToFirstTime() {
-        // Mock the Intent to FirstActivity
-        Intents.intending(IntentMatchers.hasComponent(FirstActivity.class.getName()))
-                .respondWith(new Instrumentation.ActivityResult(0, null));
+        // Given
+        Intent toFirstIntent = new Intent(ApplicationProvider.getApplicationContext(), FirstSignInActivity.class);
 
-        // Perform the action that triggers the Intent to FirstActivity
-        activityTestRule.getActivity().sendToFirstTime();
+        // When
+        ActivityScenario.launch(MainActivity.class).onActivity(activity -> {
+            activity.hasSignedIn = false;
+            activity.sendToFirstTime();
+        });
 
-        // Verify that the Intent to FirstActivity was sent
-        Intents.intended(IntentMatchers.hasComponent(FirstActivity.class.getName()));
+        // Then
+        Intents.intended(IntentMatchers.hasComponent(toFirstIntent.getComponent()));
     }
+
 }
