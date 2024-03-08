@@ -16,7 +16,7 @@ class EventTest {
     @Test
     void testAddOrganizer() {
         Event event = createEventWithOrganizers();
-        User newOrganizer = new User("3", "Jane", "Doe", 123456789, "jane@example.com", false);
+        User newOrganizer = new User("3", "Jane", "Doe", 123456789, "jane@example.com", false, "img");
         event.addOrganizer(newOrganizer);
         List<User> organizers = event.getOrganizers();
         assertTrue(organizers.contains(newOrganizer));
@@ -33,7 +33,7 @@ class EventTest {
     @Test
     void testRegisterAttendee() {
         Event event = createEventWithOrganizers();
-        User attendee = new User("4", "Alice", "Johnson", 1234567890, "alice@example.com", false);
+        User attendee = new User("4", "Alice", "Johnson", 1234567890, "alice@example.com", false, "img");
         event.registerAttendee(attendee);
         List<User> registeredAttendees = event.getRegisteredAttendees();
         assertTrue(registeredAttendees.contains(attendee));
@@ -42,7 +42,7 @@ class EventTest {
     @Test
     void testCheckInAttendee() {
         Event event = createEventWithOrganizers();
-        User attendee = new User("4", "Alice", "Johnson", 1234567890, "alice@example.com", false);
+        User attendee = new User("4", "Alice", "Johnson", 1234567890, "alice@example.com", false, "img");
         event.registerAttendee(attendee);
         event.checkInAttendee(attendee);
         List<User> checkedInAttendees = event.getCheckedInAttendees();
@@ -52,7 +52,7 @@ class EventTest {
     @Test
     void testRemoveAttendee() {
         Event event = createEventWithOrganizers();
-        User attendee = new User("4", "Alice", "Johnson", 1234567890, "alice@example.com", false);
+        User attendee = new User("4", "Alice", "Johnson", 1234567890, "alice@example.com", false, "img");
         event.registerAttendee(attendee);
         event.removeAttendee(attendee);
         List<User> registeredAttendees = event.getRegisteredAttendees();
@@ -60,10 +60,10 @@ class EventTest {
     }
 
     private Event createEventWithOrganizers() {
-        Event event = new Event(1, "Sample Event", new Date(), "Sample Location", 50);
+        Event event = new Event("1", "Sample Event", new Date(), "Sample Location", 50, "img");
 
-        User organizer1 = new User("1", "John", "Doe", 1234567890, "john@example.com", false);
-        User organizer2 = new User("2", "Bob", "Smith", 168402749, "bob@example.com", false);
+        User organizer1 = new User("1", "John", "Doe", 1234567890, "john@example.com", false, "img");
+        User organizer2 = new User("2", "Bob", "Smith", 168402749, "bob@example.com", false, null);
 
         event.addOrganizer(organizer1);
         event.addOrganizer(organizer2);
