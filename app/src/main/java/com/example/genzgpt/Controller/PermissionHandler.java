@@ -9,7 +9,20 @@ import android.widget.Toast;
 import androidx.core.app.ActivityCompat;
 import com.example.genzgpt.Controller.ImageManager;
 
+/**
+ * A class that controls permission usage within an app.
+ */
 public class PermissionHandler {
+
+    /**
+     * Checks with the current device that the app has permission to use its Gallery feature.
+     *
+     * @param activity
+     * The Activity currently being accessed by the app.
+     *
+     * @param requestCode
+     * An identifier for the request being made.
+     */
     public static void checkAndRequestGalleryPermissions(Activity activity, int requestCode) {
         // Check if the app has the READ_EXTERNAL_STORAGE permission
         if (activity.checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
@@ -25,6 +38,15 @@ public class PermissionHandler {
         }
     }
 
+    /**
+     * Checks with the current device that the app has permission to use its Camera feature.
+     *
+     * @param activity
+     * The Activity currently being accessed by the app.
+     *
+     * @param requestCode
+     * An identifier for the request being made.
+     */
     public static void checkAndRequestCameraPermissions(Activity activity, int requestCode) {
         // Check if the app has the CAMERA permission
         if (activity.checkSelfPermission(Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED ||
@@ -41,6 +63,18 @@ public class PermissionHandler {
         }
     }
 
+    /**
+     * FIXME
+     * @param requestCode
+     *
+     * @param permissions
+     *
+     * @param grantResults
+     *
+     *
+     * @param context
+     * The current context of the application necessary to invoke this method.
+     */
     public static void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults, Context context) {
         if (requestCode == requestCode) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
@@ -57,6 +91,15 @@ public class PermissionHandler {
         }
     }
 
+    /**
+     * Show a toast for specific information about what the PermissionHandler is doing.
+     *
+     * @param context
+     * The current context of the app necessary to invoke this method.
+     *
+     * @param message
+     * The message to be displayed in the Toast.
+     */
     private static void showToast(Context context, String message) {
         Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
     }

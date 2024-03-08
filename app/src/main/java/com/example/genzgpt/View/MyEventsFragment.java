@@ -12,6 +12,7 @@ import com.example.genzgpt.R;
 
 /**
  * A simple {@link Fragment} subclass.
+ * Serves as a Display for the User's Events List
  * Use the {@link MyEventsFragment#newInstance} factory method to
  * create an instance of this fragment.
  */

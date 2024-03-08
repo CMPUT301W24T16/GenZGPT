@@ -12,6 +12,7 @@ import com.example.genzgpt.R;
 
 /**
  * A simple {@link Fragment} subclass.
+ * Serves as a display for the User's Main Page.
  * Use the {@link MainPageFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
