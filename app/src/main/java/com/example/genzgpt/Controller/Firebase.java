@@ -35,45 +35,19 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 
+/**
+ * This class is responsible for handling all interactions with Firebase.
+ */
 public class Firebase {
 
     private String email;
     private final FirebaseFirestore db;
     //Handle Firebase interactions
 
-    public static void uploadImageToFirebaseStorage(Uri imageUri, StorageReference storageReference, ProgressDialog progressDialog, Context context) {
-
-        final String randomKey = UUID.randomUUID().toString();
-        StorageReference imageRef = storageReference.child("images/" + randomKey);
-
-        // Upload the image to Firebase Storage
-        imageRef.putFile(imageUri)
-                .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                    @Override
-                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                        // Image successfully uploaded
-                        progressDialog.dismiss();
-                        showToast(context, "Profile picture uploaded to Firebase Storage");
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        progressDialog.dismiss();
-                        showToast(context, "Failed to get download URL: " + e.getMessage());
-                    }
-                })
-                .addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
-                    @Override
-                    public void onProgress(@NonNull UploadTask.TaskSnapshot snapshot) {
-                        double progressPercent = (100.00 * snapshot.getBytesTransferred() / snapshot.getTotalByteCount());
-                        progressDialog.setMessage("Percentage: " + (int) progressPercent + "%");
-                    }
-                });
-    }
-
     /**
+
      * Uploads an image to Firebase Storage and associates it with the specified event.
      *
      * @param eventID   ID of the event to associate with the image.
@@ -133,17 +107,81 @@ public class Firebase {
                     Log.e("Firebase", "Error updating image URL: " + e.getMessage());
                 });
     }
+
+
+    /**
+     * Uploads an image to Firebase Storage and associates it with the specified user.
+     *
+     * @param userID   ID of the event to associate with the image.
+     * @param imageUri  Uri of the image to upload.
+     * @param progressDialog Progress dialog for showing upload progress.
+     * @param context   Context for displaying toasts.
+     */
+    public static void uploadImageForUser(String userID, Uri imageUri, ProgressDialog progressDialog, Context context) {
+        StorageReference storageRef = FirebaseStorage.getInstance().getReference();
+        StorageReference imageRef = storageRef.child("user_images/" + userID);
+
+        // Upload the image to Firebase Storage
+        imageRef.putFile(imageUri)
+                .addOnSuccessListener(taskSnapshot -> {
+                    // Image successfully uploaded
+                    progressDialog.dismiss();
+
+                    // Get the download URL of the uploaded image
+                    imageRef.getDownloadUrl()
+                            .addOnSuccessListener(uri -> {
+                                String imageURL = uri.toString();
+                                updateUserImageURL(userID, imageURL);
+                                showToast(context, "Image uploaded and associated with the event");
+                            })
+                            .addOnFailureListener(e -> {
+                                showToast(context, "Failed to get image download URL: " + e.getMessage());
+                            });
+                })
+                .addOnFailureListener(e -> {
+                    progressDialog.dismiss();
+                    showToast(context, "Failed to upload image: " + e.getMessage());
+                })
+                .addOnProgressListener(snapshot -> {
+                    double progressPercent = (100.00 * snapshot.getBytesTransferred() / snapshot.getTotalByteCount());
+                    progressDialog.setMessage("Percentage: " + (int) progressPercent + "%");
+                });
+    }
+
+    /**
+     * Update the Firestore document for the specified user with the image URL.
+     *
+     * @param userID   ID of the event to update.
+     * @param imageURL  URL of the uploaded image.
+     */
+    private static void updateUserImageURL(String userID, String imageURL) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        DocumentReference eventRef = db.collection("users").document(userID);
+
+        // Update the 'imageURL' field in the document
+        eventRef.update("imageURL", imageURL)
+                .addOnSuccessListener(aVoid -> {
+                    // Image URL successfully updated in Firestore
+                    Log.i("Firebase", "Image URL updated successfully");
+                })
+                .addOnFailureListener(e -> {
+                    // Handle the error
+                    Log.e("Firebase", "Error updating image URL: " + e.getMessage());
+                });
+    }
+
+
     private static void showToast(Context context, String message) {
         Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
     }
 
     /**
-     * Delete an image from Firestore and Firebase Storage.
+     * Delete an Event image from Firestore and Firebase Storage.
      *
      * @param eventId  ID of the event containing the image.
      * @param imageURL URL of the image to be deleted.
      */
-    public void deleteImage(String eventId, String imageURL) {
+    public void deleteEventImage(String eventId, String imageURL) {
         // Delete the image data in Firestore
         db.collection("events").document(eventId)
                 .update("imageURL", FieldValue.delete())
@@ -168,87 +206,176 @@ public class Firebase {
     }
 
     /**
+     * Delete an Event image from Firestore and Firebase Storage.
+     *
+     * @param userID  ID of the event containing the image.
+     * @param imageURL URL of the image to be deleted.
+     */
+    public void deletUserImage(String userID, String imageURL) {
+        // Delete the image data in Firestore
+        db.collection("users").document(userID)
+                .update("imageURL", FieldValue.delete())
+                .addOnSuccessListener(aVoid -> {
+                    Log.i("Firebase", "Image URL deleted from Firestore");
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("Firebase", "Error deleting image URL from Firestore: " + e.getMessage());
+                });
+
+        // Delete the image file from Firebase Storage
+        if (imageURL != null && !imageURL.isEmpty()) {
+            StorageReference storageReference = FirebaseStorage.getInstance().getReferenceFromUrl(imageURL);
+            storageReference.delete()
+                    .addOnSuccessListener(aVoid -> {
+                        Log.i("Firebase", "Image deleted from Firebase Storage");
+                    })
+                    .addOnFailureListener(e -> {
+                        Log.e("Firebase", "Error deleting image from Firebase Storage: " + e.getMessage());
+                    });
+        }
+    }
+    /**
      * Retrieves the user data from Firebase.
      * @return the user details for a particular email.
      * @param email
      */
-    public User getUserData(String email) {
-        try {
-            DocumentSnapshot document = db.collection("users")
-                    .document(email)
-                    .get()
-                    .getResult();
+    public void getUserData(String email, OnUserLoadedListener listener) {
+        db.collection("users")
+                .document(email)
+                .get()
+                .addOnSuccessListener(document -> {
+                    if (document.exists()) {
+                        String firstName = document.getString("firstName");
+                        String lastName = document.getString("lastName");
+                        Long phoneNumber = document.getLong("phoneNumber");
+                        boolean geolocation = Boolean.TRUE.equals(document.getBoolean("geolocation"));
+                        String userID = document.getId();
+                        String imageURL = document.getString("imageURL");
 
-            if (document.exists()) {
-                String firstName = document.getString("firstName");
-                String lastName = document.getString("lastName");
-                Long phoneNumber = document.getLong("phoneNumber");
-                boolean geolocation = Boolean.TRUE.equals(document.getBoolean("geolocation"));
-                String userID = document.getId();
+                        User user = new User(userID, firstName, lastName, phoneNumber, email, geolocation, imageURL);
+                        listener.onUserLoaded(user);
+                    } else {
+                        listener.onUserNotFound();
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("Firebase", "Error fetching user data: " + e.getMessage());
+                    listener.onUserLoadFailed(e);
+                });
+    }
 
-                return new User(userID, firstName, lastName, phoneNumber, email, geolocation);
-            } else {
-                return null;
-            }
-        } catch (Exception e) {
-            return null;
-        }
-    } //fixme need to utilize get user data. Store emails in the firebase lists?
+    public interface OnUserLoadedListener {
+        void onUserLoaded(User user);
+        void onUserNotFound();
+        void onUserLoadFailed(Exception e);
+    }
 
     /**
      * Retrieves the list of events from the database.
      * @return the event details for a particular event name.
      * @param eventName
      */
-    public Event getEventData(String eventName) {
-        try {
-            QuerySnapshot querySnapshot = db.collection("events")
-                    .whereEqualTo("eventName", eventName)
-                    .get()
-                    .getResult();
+    public void getEventData(String eventName, OnEventLoadedListener listener) {
+        db.collection("events")
+                .whereEqualTo("eventName", eventName)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        QuerySnapshot querySnapshot = task.getResult();
+                        if (!querySnapshot.isEmpty()) {
+                            DocumentSnapshot document = querySnapshot.getDocuments().get(0);
+                            String eventId = document.getId();
+                            Date eventDate = document.getDate("eventDate");
+                            String location = document.getString("location");
+                            Integer maxAttendees = document.getLong("maxAttendees") != null ? document.getLong("maxAttendees").intValue() : null;
+                            String imageURL = document.getString("imageURL");
 
-            if (!querySnapshot.isEmpty()) {
-                DocumentSnapshot document = querySnapshot.getDocuments().get(0);
-                String eventId = document.getId();
-                Date eventDate = document.getDate("eventDate");
-                String location = document.getString("location");
-                Integer maxAttendees = document.getLong("maxAttendees") != null ? document.getLong("maxAttendees").intValue() : null;
-                String imageURL = document.getString("imageURL");
+                            Event event = new Event(eventId, eventName, eventDate, location, 0, imageURL);
+                            event.setMaxAttendees(maxAttendees);
 
-                Event event = new Event(eventId, eventName, eventDate, location, 0, imageURL);
-                event.setMaxAttendees(maxAttendees);
+                            List<String> organizerEmails = (List<String>) document.get("organizers");
+                            if (organizerEmails != null && !organizerEmails.isEmpty()) {
+                                for (String email : organizerEmails) {
+                                    getUserData(email, new OnUserLoadedListener() {
+                                        @Override
+                                        public void onUserLoaded(User user) {
+                                            event.addOrganizer(user);
+                                            if (event.getOrganizers().size() == organizerEmails.size()) {
+                                                fetchRegisteredAttendees(eventName, new OnRegisteredAttendeesLoadedListener() {
+                                                    @Override
+                                                    public void onRegisteredAttendeesLoaded(List<User> registeredAttendees) {
+                                                        event.setRegisteredAttendees(registeredAttendees);
+                                                        fetchCheckedInAttendees(eventName, new OnCheckInAttendeesLoadedListener() {
+                                                            @Override
+                                                            public void onCheckInAttendeesLoaded(List<User> checkedInAttendees) {
+                                                                event.setCheckedInAttendees(checkedInAttendees);
+                                                                listener.onEventLoaded(event);
+                                                            }
 
-                List<Map<String, Object>> organizerMaps = (List<Map<String, Object>>) document.get("organizers");
-                if (organizerMaps != null) {
-                    for (Map<String, Object> organizerMap : organizerMaps) {
-                        User organizer = createUserFromMap(organizerMap);
-                        event.addOrganizer(organizer);
+                                                            @Override
+                                                            public void onCheckInAttendeesLoadFailed(Exception e) {
+                                                                listener.onEventLoadFailed(e);
+                                                            }
+                                                        });
+                                                    }
+
+                                                    @Override
+                                                    public void onRegisteredAttendeesLoadFailed(Exception e) {
+                                                        listener.onEventLoadFailed(e);
+                                                    }
+                                                });
+                                            }
+                                        }
+
+                                        @Override
+                                        public void onUserNotFound() {
+                                            Log.d("Firebase", "User not found");
+                                        }
+
+                                        @Override
+                                        public void onUserLoadFailed(Exception e) {
+                                            listener.onEventLoadFailed(e);
+                                        }
+                                    });
+                                }
+                            } else {
+                                fetchRegisteredAttendees(eventName, new OnRegisteredAttendeesLoadedListener() {
+                                    @Override
+                                    public void onRegisteredAttendeesLoaded(List<User> registeredAttendees) {
+                                        event.setRegisteredAttendees(registeredAttendees);
+                                        fetchCheckedInAttendees(eventName, new OnCheckInAttendeesLoadedListener() {
+                                            @Override
+                                            public void onCheckInAttendeesLoaded(List<User> checkedInAttendees) {
+                                                event.setCheckedInAttendees(checkedInAttendees);
+                                                listener.onEventLoaded(event);
+                                            }
+
+                                            @Override
+                                            public void onCheckInAttendeesLoadFailed(Exception e) {
+                                                listener.onEventLoadFailed(e);
+                                            }
+                                        });
+                                    }
+
+                                    @Override
+                                    public void onRegisteredAttendeesLoadFailed(Exception e) {
+                                        listener.onEventLoadFailed(e);
+                                    }
+                                });
+                            }
+                        } else {
+                            listener.onEventNotFound();
+                        }
+                    } else {
+                        listener.onEventLoadFailed(task.getException());
                     }
-                }
+                });
+    }
 
-                List<Map<String, Object>> registeredAttendeeMaps = (List<Map<String, Object>>) document.get("registeredAttendees");
-                if (registeredAttendeeMaps != null) {
-                    for (Map<String, Object> attendeeMap : registeredAttendeeMaps) {
-                        User attendee = createUserFromMap(attendeeMap);
-                        event.registerAttendee(attendee);
-                    }
-                }
-
-                List<Map<String, Object>> checkedInAttendeeMaps = (List<Map<String, Object>>) document.get("checkedInAttendees");
-                if (checkedInAttendeeMaps != null) {
-                    for (Map<String, Object> attendeeMap : checkedInAttendeeMaps) {
-                        User attendee = createUserFromMap(attendeeMap);
-                        event.checkInAttendee(attendee);
-                    }
-                }
-
-                return event;
-            } else {
-                return null;
-            }
-        } catch (Exception e) {
-            return null;
-        }
+    public interface OnEventLoadedListener {
+        void onEventLoaded(Event event);
+        void onEventNotFound();
+        void onEventLoadFailed(Exception e);
     }
 
     /**
@@ -263,8 +390,9 @@ public class Firebase {
         String email = (String) userMap.get("email");
         Long phoneNumber = (Long) userMap.get("phoneNumber");
         boolean geolocation = (boolean) userMap.get("geolocation");
+        String imageURL = (String) userMap.get("imageURL");
 
-        return new User(userId, firstName, lastName, phoneNumber, email, geolocation);
+        return new User(userId, firstName, lastName, phoneNumber, email, geolocation, imageURL);
     }
 
     /**
@@ -401,6 +529,9 @@ public class Firebase {
         this.email = email;
     }
 
+    /**
+     * firebase constructor
+     */
     public Firebase() {
         db = FirebaseFirestore.getInstance();
     }
@@ -497,13 +628,14 @@ public class Firebase {
                     List<User> userList = new ArrayList<>();
                     for (DocumentSnapshot document : querySnapshot.getDocuments()) {
                         // Extract user data from the document
-                        String userID = document.getId();
+                        String userID = document.getId(); //comment this out if we get rid of userID
                         String firstName = document.getString("firstName");
                         String lastName = document.getString("lastName");
                         String email = document.getString("email");
                         Long phoneNumber = document.getLong("phoneNumber");
                         boolean geolocation = document.getBoolean("geolocation") != null && Boolean.TRUE.equals(document.getBoolean("geolocation"));
-                        User user = new User(userID, firstName, lastName, phoneNumber, email, geolocation);
+                        String imageURL = document.getString("imageURL");
+                        User user = new User(userID, firstName, lastName, phoneNumber, email, geolocation, imageURL);
                         userList.add(user);
                     }
                     listener.onUsersLoaded(userList);
@@ -557,6 +689,12 @@ public class Firebase {
         void onEventsLoadFailed(Exception e);
     }
 
+    /**
+     * Retrieves the list of checked-in attendees for a specific event from the database.
+     * @param eventName
+     * @return list of checked-in attendees
+     * asynchronous method
+     */
     public void fetchCheckedInAttendees(String eventName, OnCheckInAttendeesLoadedListener listener) {
         CollectionReference eventsRef = db.collection("events");
         Query query = eventsRef.whereEqualTo("eventName", eventName);
@@ -572,15 +710,35 @@ public class Firebase {
                     // Create a list to store the User objects
                     List<User> checkedInAttendees = new ArrayList<>();
 
+                    // Create a counter to keep track of loaded users
+                    AtomicInteger loadedUserCount = new AtomicInteger(0);
+
                     // Iterate through the list of attendee emails and fetch their user data
                     for (String email : checkedInAttendeesEmails) {
-                        User user = getUserData(email);
-                        if (user != null) {
-                            checkedInAttendees.add(user);
-                        }
-                    }
+                        getUserData(email, new OnUserLoadedListener() {
+                            @Override
+                            public void onUserLoaded(User user) {
+                                checkedInAttendees.add(user);
+                                if (loadedUserCount.incrementAndGet() == checkedInAttendeesEmails.size()) {
+                                    // All users have been loaded
+                                    listener.onCheckInAttendeesLoaded(checkedInAttendees);
+                                }
+                            }
 
-                    listener.onCheckInAttendeesLoaded(checkedInAttendees);
+                            @Override
+                            public void onUserNotFound() {
+                                if (loadedUserCount.incrementAndGet() == checkedInAttendeesEmails.size()) {
+                                    // All users have been loaded
+                                    listener.onCheckInAttendeesLoaded(checkedInAttendees);
+                                }
+                            }
+
+                            @Override
+                            public void onUserLoadFailed(Exception e) {
+                                listener.onCheckInAttendeesLoadFailed(e);
+                            }
+                        });
+                    }
                 } else {
                     // No events found with the specified name
                     listener.onCheckInAttendeesLoadFailed(new Exception("No events found with the name: " + eventName));
@@ -592,11 +750,18 @@ public class Firebase {
         });
     }
 
+
     public interface OnCheckInAttendeesLoadedListener {
         void onCheckInAttendeesLoaded(List<User> checkedInAttendees);
         void onCheckInAttendeesLoadFailed(Exception e);
     }
 
+    /**
+     * Retrieves the list of registered attendees for a specific event from the database.
+     * @param eventName
+     * @return list of registered attendees
+     * asynchronous method
+     */
     public void fetchRegisteredAttendees(String eventName, OnRegisteredAttendeesLoadedListener listener) {
         CollectionReference eventsRef = db.collection("events");
         Query query = eventsRef.whereEqualTo("eventName", eventName);
@@ -612,15 +777,38 @@ public class Firebase {
                     // Create a list to store the User objects
                     List<User> registeredAttendees = new ArrayList<>();
 
+                    // Create an AtomicInteger to keep track of the number of loaded users
+                    AtomicInteger loadedUserCount = new AtomicInteger(0);
+
                     // Iterate through the list of attendee emails and fetch their user data
                     for (String email : registeredAttendeesEmails) {
-                        User user = getUserData(email);
-                        if (user != null) {
-                            registeredAttendees.add(user);
-                        }
+                        getUserData(email, new OnUserLoadedListener() {
+                            @Override
+                            public void onUserLoaded(User user) {
+                                registeredAttendees.add(user);
+                                if (loadedUserCount.incrementAndGet() == registeredAttendeesEmails.size()) {
+                                    listener.onRegisteredAttendeesLoaded(registeredAttendees);
+                                }
+                            }
+
+                            @Override
+                            public void onUserNotFound() {
+                                if (loadedUserCount.incrementAndGet() == registeredAttendeesEmails.size()) {
+                                    listener.onRegisteredAttendeesLoaded(registeredAttendees);
+                                }
+                            }
+
+                            @Override
+                            public void onUserLoadFailed(Exception e) {
+                                listener.onRegisteredAttendeesLoadFailed(e);
+                            }
+                        });
                     }
 
-                    listener.onRegisteredAttendeesLoaded(registeredAttendees);
+                    // If there are no registered attendees, call the onRegisteredAttendeesLoaded callback immediately
+                    if (registeredAttendeesEmails.isEmpty()) {
+                        listener.onRegisteredAttendeesLoaded(registeredAttendees);
+                    }
                 } else {
                     // No events found with the specified name
                     listener.onRegisteredAttendeesLoadFailed(new Exception("No events found with the name: " + eventName));
