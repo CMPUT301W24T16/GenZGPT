@@ -13,7 +13,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.genzgpt.Controller.Firebase;
-import com.example.genzgpt.EditProfileFragment;
 import com.example.genzgpt.Model.AppUser;
 import com.example.genzgpt.Model.User;
 import com.example.genzgpt.R;

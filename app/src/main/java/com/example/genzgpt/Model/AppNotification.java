@@ -1,4 +1,4 @@
-package com.example.genzgpt;
+package com.example.genzgpt.Model;
 
 import android.content.Context;
 
