@@ -136,6 +136,37 @@ public class Firebase {
     private static void showToast(Context context, String message) {
         Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
     }
+
+    /**
+     * Delete an image from Firestore and Firebase Storage.
+     *
+     * @param eventId  ID of the event containing the image.
+     * @param imageURL URL of the image to be deleted.
+     */
+    public void deleteImage(String eventId, String imageURL) {
+        // Delete the image data in Firestore
+        db.collection("events").document(eventId)
+                .update("imageURL", FieldValue.delete())
+                .addOnSuccessListener(aVoid -> {
+                    Log.i("Firebase", "Image URL deleted from Firestore");
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("Firebase", "Error deleting image URL from Firestore: " + e.getMessage());
+                });
+
+        // Delete the image file from Firebase Storage
+        if (imageURL != null && !imageURL.isEmpty()) {
+            StorageReference storageReference = FirebaseStorage.getInstance().getReferenceFromUrl(imageURL);
+            storageReference.delete()
+                    .addOnSuccessListener(aVoid -> {
+                        Log.i("Firebase", "Image deleted from Firebase Storage");
+                    })
+                    .addOnFailureListener(e -> {
+                        Log.e("Firebase", "Error deleting image from Firebase Storage: " + e.getMessage());
+                    });
+        }
+    }
+
     /**
      * Retrieves the user data from Firebase.
      * @return the user details for a particular email.

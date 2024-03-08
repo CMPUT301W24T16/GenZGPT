@@ -155,4 +155,16 @@ public class EventListFragment extends Fragment {
             eventAdapter.notifyItemRemoved(position);
         }
     }
+
+    private void deleteEventImage(Event event) {
+        // Call deleteImage to delete the associated image
+        firebase.deleteImage(event.getEventId(), event.getImageURL());
+
+        // Remove the event from the RecyclerView
+        int position = eventAdapter.getEvents().indexOf(event);
+        if (position != -1) {
+            eventAdapter.getEvents().remove(position);
+            eventAdapter.notifyItemRemoved(position);
+        }
+    }
 }
