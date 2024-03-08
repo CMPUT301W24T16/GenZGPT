@@ -129,7 +129,7 @@ public class UserListFragment extends Fragment {
         builder.setTitle("Delete User")
                 .setMessage("Are you sure you want to delete this user?")
                 .setPositiveButton("Delete", (dialog, which) -> {
-                    deleteUserImage(user);
+                    deleteUser(user);
                 })
                 .setNegativeButton("Cancel", (dialog, which) -> {
                     dialog.dismiss();
