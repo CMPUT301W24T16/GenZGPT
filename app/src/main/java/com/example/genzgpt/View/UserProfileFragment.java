@@ -61,9 +61,8 @@ public class UserProfileFragment extends Fragment {
         userEmail = view.findViewById(R.id.email_text);
         userTheme = view.findViewById(R.id.theme_text);
         userGeolocation = view.findViewById(R.id.geolocation_text);
-       if (user != null) {
             Bind(user);
-       }
+
       /*  editButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

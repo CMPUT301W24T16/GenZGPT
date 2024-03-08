@@ -196,7 +196,7 @@ public class UserListFragment extends Fragment {
 
     private void deleteUserImage(User user) {
         // Call deleteImage to delete the associated image
-        firebase.deletUserImage(user.getId(), user.getImageURL());
+        firebase.deleteUserImage(user.getId(), user.getImageURL());
 
         // Remove the event from the RecyclerView
         int position = userAdapter.getUsers().indexOf(user);
