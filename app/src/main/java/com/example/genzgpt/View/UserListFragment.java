@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.genzgpt.Controller.Firebase;
+import com.example.genzgpt.Model.Event;
 import com.example.genzgpt.Model.User;
 import com.example.genzgpt.R;
 
@@ -128,7 +129,7 @@ public class UserListFragment extends Fragment {
         builder.setTitle("Delete User")
                 .setMessage("Are you sure you want to delete this user?")
                 .setPositiveButton("Delete", (dialog, which) -> {
-                    deleteUser(user);
+                    deleteUserImage(user);
                 })
                 .setNegativeButton("Cancel", (dialog, which) -> {
                     dialog.dismiss();
@@ -138,6 +139,18 @@ public class UserListFragment extends Fragment {
 
     private void deleteUser(User user) {
         firebase.deleteUser(user.getEmail());
+        int position = userAdapter.getUsers().indexOf(user);
+        if (position != -1) {
+            userAdapter.getUsers().remove(position);
+            userAdapter.notifyItemRemoved(position);
+        }
+    }
+
+    private void deleteUserImage(User user) {
+        // Call deleteImage to delete the associated image
+        firebase.deletUserImage(user.getId(), user.getImageURL());
+
+        // Remove the event from the RecyclerView
         int position = userAdapter.getUsers().indexOf(user);
         if (position != -1) {
             userAdapter.getUsers().remove(position);
