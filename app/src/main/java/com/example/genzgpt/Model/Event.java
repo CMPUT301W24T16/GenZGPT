@@ -13,12 +13,14 @@ import java.util.stream.Collectors;
  * Class representing an Event
  */
 public class Event {
-    private Integer eventId;
+    private String eventId;
     private String eventName;
     private Date eventDate;
     private String location;
     private List<User> organizers;
     private AttendeeManager attendeeManager;
+    private String imageURL;
+
 
     /**
      * Constructor to create a new Event.
@@ -28,13 +30,14 @@ public class Event {
      * @param location The location of the event.
      * @param maxAttendees The maximum number of attendees for the event, or null if no limit.
      */
-    public Event(Integer eventId, String eventName, Date eventDate, String location, Integer maxAttendees) {
+    public Event(String eventId, String eventName, Date eventDate, String location, Integer maxAttendees, String imageURL) {
         this.eventId = eventId;
         this.eventName = eventName;
         this.eventDate = eventDate;
         this.location = location;
         this.organizers = new ArrayList<>();
         this.attendeeManager = new AttendeeManager(maxAttendees); // Initialize AttendeeManager
+        this.imageURL = imageURL;
     }
 
     /**
@@ -62,24 +65,13 @@ public class Event {
         this.location = newLocation;
     }
 
-    // A list of getters and setters for information about the Event.
 
-    /**
-     * A getter for the Event's ID.
-     * @return
-     * The Event's ID
-     */
-    public Integer getEventId() {
+    // Getters and Setters for event properties
+    public String getEventId() {
         return eventId;
     }
 
-    /**
-     * A setter for the ID of an Event.
-     *
-     * @param eventId
-     * The ID to set for the Event.
-     */
-    public void setEventId(int eventId) {
+    public void setEventId(String eventId) {
         this.eventId = eventId;
     }
 
@@ -256,6 +248,16 @@ public class Event {
         attendeeManager.removeAttendee(user);
     }
 
+    public String getImageURL() {
+        return imageURL;
+    }
 
+    public void setCheckedInAttendees(List<User> checkedInAttendees) {
+        attendeeManager.setCheckedInAttendees(checkedInAttendees);
+    }
+
+    public void setRegisteredAttendees(List<User> registeredAttendees) {
+        attendeeManager.setRegisteredAttendees(registeredAttendees);
+    }
 
 }

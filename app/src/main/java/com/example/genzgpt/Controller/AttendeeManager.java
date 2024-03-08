@@ -132,4 +132,9 @@ public class AttendeeManager {
         this.maxAttendees = maxAttendees;
     }
 
+    public void setCheckedInAttendees(List<User> checkedInAttendees) {
+        this.checkedInAttendees = checkedInAttendees;
+    }
+    public void setRegisteredAttendees(List<User> registeredAttendees){
+        this.registeredAttendees = registeredAttendees;}
 }
