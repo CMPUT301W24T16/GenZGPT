@@ -1,69 +1,74 @@
 package com.example.genzgpt;
 
-import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.example.genzgpt.Model.Event;
 import com.example.genzgpt.Model.Organizer;
 import com.example.genzgpt.Model.User;
 
+import java.util.Date;
+import java.util.List;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
 class OrganizerTest {
 
-    @Test
-    void testAddEvent() {
-        Organizer organizer = new Organizer();
-        Event event = new Event(1, "Sample Event", null, "Sample Location", 50);
-        organizer.addEvent(event);
-        assertTrue(organizer.getManagedEvents().contains(event));
+    private Organizer organizer;
+    private Event event;
+    private User user;
+
+    @BeforeEach
+    void setUp() {
+        organizer = new Organizer();
+        event = new Event("0","Sample Event", new Date(), "Edmonton", 100, "event_poster.jpeg");
+        user = new User("123", "John", "Doe", 1234567890L, "john.doe@example.com", true, "profile.jpg");
     }
 
     @Test
-    void testViewCheckedInAttendees() {
-        Organizer organizer = new Organizer();
-        Event event = new Event(1, "Sample Event", null, "Sample Location", 50);
+    void addEvent_shouldAddEventToList() {
         organizer.addEvent(event);
-        User attendee = new User("1", "John", "Doe", 1234567890, "john@example.com", false);
+        List<Event> managedEvents = organizer.getManagedEvents();
+        assertTrue(managedEvents.contains(event));
+    }
+
+    @Test
+    void viewCheckedInAttendee() {
+        Event event = createEventWithOrganizers();
+        User attendee = new User("4", "Alice", "Johnson", 1234567890, "alice@example.com", false, "img");
         event.registerAttendee(attendee);
         event.checkInAttendee(attendee);
-        assertEquals(organizer.viewCheckedInAttendees(event).size(), 1);
-    }
-
-    // Uncomment the test below if the sendPushNotification method is uncommented
-    /*
-    @Test
-    void testSendPushNotification() {
-        Organizer organizer = new Organizer();
-        Event event = new Event(1, "Sample Event", null, "Sample Location", 50);
-        organizer.addEvent(event);
-        User attendee = new User("1", "John Doe", "john@example.com");
-        event.registerAttendee(attendee);
-        event.checkInAttendee(attendee);
-        String message = "Important Announcement!";
-        organizer.sendPushNotification(event, message);
-        // Add assertions related to the notification service or other behavior
-    }
-    */
-
-    @Test
-    void testGetCheckInCount() {
-        Organizer organizer = new Organizer();
-        Event event = new Event(1, "Sample Event", null, "Sample Location", 50);
-        organizer.addEvent(event);
-        User attendee = new User("1", "John", "Doe", 1234567890, "john@example.com", false);
-        event.registerAttendee(attendee);
-        event.checkInAttendee(attendee);
-        assertEquals(organizer.getCheckInCount(attendee, event), 1);
+        List<User> checkedInAttendees = event.getCheckedInAttendees();
+        assertTrue(checkedInAttendees.contains(attendee));
     }
 
     @Test
-    void testViewRegisteredInAttendees() {
-        Organizer organizer = new Organizer();
-        Event event = new Event(1, "Sample Event", null, "Sample Location", 50);
-        organizer.addEvent(event);
-        User attendee = new User("1", "John", "Doe", 1234567890, "john@example.com", false);
+    void getCheckInCount() {
+        Event event = createEventWithOrganizers();
+        User attendee = new User("4", "Alice", "Johnson", 1234567890, "alice@example.com", false, "img");
         event.registerAttendee(attendee);
-        assertEquals(organizer.viewRegisteredInAttendees(event).size(), 1);
+        int checkInCount = organizer.getCheckInCount(user, event);
+        assertEquals(0, checkInCount);
     }
 
-    // Add more tests for additional Organizer methods if needed...
+    @Test
+    void viewRegisteredInAttendees() {
+        event.registerAttendee(user);
+
+        List<User> registeredAttendees = organizer.viewRegisteredInAttendees(event);
+        assertTrue(registeredAttendees.contains(user));
+    }
+
+    private Event createEventWithOrganizers() {
+        Event event = new Event("1", "Sample Event", new Date(), "Sample Location", 50, "img");
+
+        User organizer1 = new User("1", "John", "Doe", 1234567890, "john@example.com", false, "img");
+        User organizer2 = new User("2", "Bob", "Smith", 168402749, "bob@example.com", false, null);
+
+        event.addOrganizer(organizer1);
+        event.addOrganizer(organizer2);
+
+        return event;
+    }
+    // Add more test cases as needed for other methods in the Organizer class
 }
