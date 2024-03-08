@@ -89,12 +89,14 @@ public class EditProfileFragment extends DialogFragment {
             String phoneNum = editPhone.getText().toString();
             long phone = Long.parseLong(phoneNum);
             SwitchCompat geoStatus = geolocationSwitch;
-            if (geoStatus.isChecked()){
+            boolean geoBool = geoStatus.isChecked();
+            if (geoBool == Boolean.TRUE){
                 geolocationName = "ON";
-            }else{
+            }
+            if(geoBool == Boolean.FALSE){
                 geolocationName = "OFF";
             }
-            User new_user = new User(firstName, lastName, phone, emailName, geoStatus.isChecked(), null);
+            User new_user = new User(null, firstName, lastName, phone, emailName, geoBool, null);
             firebase.deleteUser(emailName);
             firebase.createUser(new_user);
         }).create();
