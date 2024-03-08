@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <!-- Header with title and total -->
+    <LinearLayout
+        android:id="@+id/header"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <!-- Back Arrow -->
+        <ImageButton
+            android:id="@+id/back_arrow"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:src="@drawable/ic_back_arrow"
+            android:contentDescription="backButton" />
+
+        <!-- Title -->
+        <TextView
+            android:id="@+id/tvAttendeesTitle"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="wrap_content"
+            android:text="Attendees"
+            android:textSize="20sp"
+            android:layout_marginStart="16dp"
+            android:gravity="center_vertical" />
+
+        <!-- Total Count -->
+        <TextView
+            android:id="@+id/tvTotalCount"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Total: 0"
+            android:textSize="16sp" />
+    </LinearLayout>
+
+    <!-- RecyclerView for the list of attendees -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvAttendees"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/header"
+        android:divider="@android:color/darker_gray"
+        android:dividerHeight="0.5dp"
+        android:scrollbars="vertical" />
+
+</RelativeLayout>
+
