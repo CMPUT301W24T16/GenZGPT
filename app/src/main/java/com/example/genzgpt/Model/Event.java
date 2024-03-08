@@ -252,4 +252,12 @@ public class Event {
         return imageURL;
     }
 
+    public void setCheckedInAttendees(List<User> checkedInAttendees) {
+        attendeeManager.setCheckedInAttendees(checkedInAttendees);
+    }
+
+    public void setRegisteredAttendees(List<User> registeredAttendees) {
+        attendeeManager.setRegisteredAttendees(registeredAttendees);
+    }
+
 }

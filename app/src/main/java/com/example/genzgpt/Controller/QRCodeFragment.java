@@ -63,33 +63,59 @@ public class QRCodeFragment extends Fragment {
             } else {
                 qrCodeResult = result.getContents();
                 if (qrCodeResult.startsWith("0")) {
-                    // Replace the current fragment with the EventInfoFragment
                     eventCode = qrCodeResult.substring(1);
-                    Event event = firebase.getEventData(eventCode);
-                    if (event != null) {
-                        // Replace the current fragment with the EventInfoFragment
-                        EventInfoFragment eventInfoFragment = new EventInfoFragment();
-                        eventInfoFragment.setEvent(event);
-                        getFragmentManager().beginTransaction()
-                                .replace(R.id.BaseFragment, eventInfoFragment)
-                                .addToBackStack(null)
-                                .commit();
-                    }
+                    firebase.getEventData(eventCode, new Firebase.OnEventLoadedListener() {
+                        @Override
+                        public void onEventLoaded(Event event) {
+                            // Replace the current fragment with the EventInfoFragment
+                            EventInfoFragment eventInfoFragment = new EventInfoFragment();
+                            eventInfoFragment.setEvent(event);
+                            getFragmentManager().beginTransaction()
+                                    .replace(R.id.BaseFragment, eventInfoFragment)
+                                    .addToBackStack(null)
+                                    .commit();
+                        }
+
+                        @Override
+                        public void onEventNotFound() {
+                            // Handle the case when the event is not found
+                            Log.d("QRCodeFragment", "Event not found");
+                        }
+
+                        @Override
+                        public void onEventLoadFailed(Exception e) {
+                            // Handle the case when loading the event data fails
+                            Log.e("QRCodeFragment", "Failed to load event data", e);
+                        }
+                    });
                 } else if (qrCodeResult.startsWith("1")) {
-                    // Check the user in to the event
-                    checkInUser(qrCodeResult.substring(1)); // Pass the code following the 1
-                    // Replace the current fragment with the EventInfoFragment
                     eventCode = qrCodeResult.substring(1);
-                    Event event = firebase.getEventData(eventCode);
-                    if (event != null) {
-                        // Replace the current fragment with the EventInfoFragment
-                        EventInfoFragment eventInfoFragment = new EventInfoFragment();
-                        eventInfoFragment.setEvent(event);
-                        getFragmentManager().beginTransaction()
-                                .replace(R.id.BaseFragment, eventInfoFragment)
-                                .addToBackStack(null)
-                                .commit();
-                    }
+                    firebase.getEventData(eventCode, new Firebase.OnEventLoadedListener() {
+                        @Override
+                        public void onEventLoaded(Event event) {
+                            // Check the user in to the event
+                            checkInUser(eventCode);
+                            // Replace the current fragment with the EventInfoFragment
+                            EventInfoFragment eventInfoFragment = new EventInfoFragment();
+                            eventInfoFragment.setEvent(event);
+                            getFragmentManager().beginTransaction()
+                                    .replace(R.id.BaseFragment, eventInfoFragment)
+                                    .addToBackStack(null)
+                                    .commit();
+                        }
+
+                        @Override
+                        public void onEventNotFound() {
+                            // Handle the case when the event is not found
+                            Log.d("QRCodeFragment", "Event not found");
+                        }
+
+                        @Override
+                        public void onEventLoadFailed(Exception e) {
+                            // Handle the case when loading the event data fails
+                            Log.e("QRCodeFragment", "Failed to load event data", e);
+                        }
+                    });
                 }
             }
         } else {
