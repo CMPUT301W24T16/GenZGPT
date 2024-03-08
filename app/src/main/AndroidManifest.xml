@@ -24,7 +24,7 @@
         android:theme="@style/Theme.GenZGPT"
         tools:targetApi="31">
         <activity
-            android:name=".Admin"
+            android:name=".AdminActivity"
             android:exported="false" />
         <activity
             android:name=".FirstSignInActivity"
