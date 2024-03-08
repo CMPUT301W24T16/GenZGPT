@@ -260,4 +260,15 @@ public class Event {
         attendeeManager.setRegisteredAttendees(registeredAttendees);
     }
 
+    public Map<String, Object> toMap() {
+        Map<String, Object> eventMap = new HashMap<>();
+        eventMap.put("eventName", eventName);
+        eventMap.put("eventDate", eventDate);
+        eventMap.put("location", location);
+        eventMap.put("maxAttendees", getMaxAttendees());
+        eventMap.put("imageURL", imageURL);
+
+        return eventMap;
+    }
+
 }
