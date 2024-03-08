@@ -26,12 +26,24 @@ import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * A simple {@link Fragment} subclass.
+ * Serves as a Display for the User's Events List
+ * Use the {@link MyEventsFragment#newInstance} factory method to
+ * create an instance of this fragment.
+ */
 public class EventListFragment extends Fragment {
     private RecyclerView recyclerView;
     private EventAdapter eventAdapter;
     private List<Event> eventList;
     private Firebase firebase;
 
+    /**
+     * Use this factory method to create a new instance of
+     * this fragment using the provided parameters.
+     *
+     * @return A new instance of fragment EventListFragment.
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.event_list_fragment, container, false);
@@ -53,6 +65,9 @@ public class EventListFragment extends Fragment {
         return view;
     }
 
+    /**
+     * Fetches the list of events from Firestore and updates the RecyclerView
+     */
     private void fetchEvents() {
         eventList.clear();
         firebase.fetchEvents(new Firebase.OnEventsLoadedListener() {
@@ -74,44 +89,68 @@ public class EventListFragment extends Fragment {
     private class EventAdapter extends RecyclerView.Adapter<EventViewHolder> {
         private List<Event> events;
 
+        /**
+         * Constructor for the EventAdapter
+         */
         public EventAdapter(List<Event> events) {
             this.events = events;
         }
 
+        /**
+         * Creates a new view holder and inflates the view
+         */
         @Override
         public EventViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_event, parent, false);
             return new EventViewHolder(itemView);
         }
 
+        /**
+         * Binds the event data to the view holder
+         */
         @Override
         public void onBindViewHolder(EventViewHolder holder, int position) {
             Event event = events.get(position);
             holder.bind(event);
         }
 
+        /**
+         * Returns the number of items in the list
+         */
         @Override
         public int getItemCount() {
             return events.size();
         }
 
+        /**
+         * Updates the list of events
+         */
         public void setEvents(List<Event> newEvents) {
             this.events.clear();
             this.events.addAll(newEvents);
             notifyDataSetChanged();
         }
 
+        /**
+         * Returns the list of events
+         */
         public List<Event> getEvents() {
             return events;
         }
     }
 
+    /**
+     * View holder for the event
+     */
     private class EventViewHolder extends RecyclerView.ViewHolder {
         private TextView eventName;
         private TextView eventstart;
         private TextView eventLocation;
         private ImageView eventImage;
 
+        /**
+         * Constructor for the EventViewHolder
+         */
         public EventViewHolder(View itemView) {
             super(itemView);
             eventName = itemView.findViewById(R.id.event_name);
@@ -120,6 +159,9 @@ public class EventListFragment extends Fragment {
             eventImage = itemView.findViewById(R.id.imageView); // Add ImageView for the image
         }
 
+        /**
+         * Binds the event data to the view holder
+         */
         public void bind(Event event) {
             eventName.setText(event.getEventName());
             eventstart.setText(event.getEventDate().toString());
@@ -156,6 +198,9 @@ public class EventListFragment extends Fragment {
         }
     }
 
+    /**
+     * Shows a dialog to confirm the deletion of the event
+     */
     private void showDeleteEventDialog(Event event) {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle("Delete Event")
@@ -169,8 +214,23 @@ public class EventListFragment extends Fragment {
                 .show();
     }
 
+    /**
+     * Deletes the event from Firestore and updates the RecyclerView
+     */
     private void deleteEvent(Event event) {
         firebase.deleteEvent(event.getEventName());
+        int position = eventAdapter.getEvents().indexOf(event);
+        if (position != -1) {
+            eventAdapter.getEvents().remove(position);
+            eventAdapter.notifyItemRemoved(position);
+        }
+    }
+
+    private void deleteEventImage(Event event) {
+        // Call deleteImage to delete the associated image
+        firebase.deleteEventImage(event.getEventId(), event.getImageURL());
+
+        // Remove the event from the RecyclerView
         int position = eventAdapter.getEvents().indexOf(event);
         if (position != -1) {
             eventAdapter.getEvents().remove(position);
