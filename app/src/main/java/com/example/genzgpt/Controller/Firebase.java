@@ -42,36 +42,6 @@ public class Firebase {
     private final FirebaseFirestore db;
     //Handle Firebase interactions
 
-    public static void uploadImageToFirebaseStorage(Uri imageUri, StorageReference storageReference, ProgressDialog progressDialog, Context context) {
-
-        final String randomKey = UUID.randomUUID().toString();
-        StorageReference imageRef = storageReference.child("images/" + randomKey);
-
-        // Upload the image to Firebase Storage
-        imageRef.putFile(imageUri)
-                .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                    @Override
-                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                        // Image successfully uploaded
-                        progressDialog.dismiss();
-                        showToast(context, "Profile picture uploaded to Firebase Storage");
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        progressDialog.dismiss();
-                        showToast(context, "Failed to get download URL: " + e.getMessage());
-                    }
-                })
-                .addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
-                    @Override
-                    public void onProgress(@NonNull UploadTask.TaskSnapshot snapshot) {
-                        double progressPercent = (100.00 * snapshot.getBytesTransferred() / snapshot.getTotalByteCount());
-                        progressDialog.setMessage("Percentage: " + (int) progressPercent + "%");
-                    }
-                });
-    }
 
     /**
      * Uploads an image to Firebase Storage and associates it with the specified event.
@@ -81,7 +51,7 @@ public class Firebase {
      * @param progressDialog Progress dialog for showing upload progress.
      * @param context   Context for displaying toasts.
      */
-    public static void uploadImageForEvent(String eventID, Uri imageUri, ProgressDialog progressDialog, Context context) {
+    public static void uploadImage(String eventID, Uri imageUri, ProgressDialog progressDialog, Context context) {
         StorageReference storageRef = FirebaseStorage.getInstance().getReference();
         StorageReference imageRef = storageRef.child("event_images/" + eventID);
 
@@ -95,7 +65,7 @@ public class Firebase {
                     imageRef.getDownloadUrl()
                             .addOnSuccessListener(uri -> {
                                 String imageURL = uri.toString();
-                                updateEventImageURL(eventID, imageURL);
+                                updateImageURL(eventID, imageURL);
                                 showToast(context, "Image uploaded and associated with the event");
                             })
                             .addOnFailureListener(e -> {
@@ -118,7 +88,7 @@ public class Firebase {
      * @param eventID   ID of the event to update.
      * @param imageURL  URL of the uploaded image.
      */
-    private static void updateEventImageURL(String eventID, String imageURL) {
+    private static void updateImageURL(String eventID, String imageURL) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         DocumentReference eventRef = db.collection("events").document(eventID);
 
