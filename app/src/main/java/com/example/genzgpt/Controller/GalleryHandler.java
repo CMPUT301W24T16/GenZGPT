@@ -6,6 +6,7 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.provider.MediaStore;
+import android.util.Log;
 
 public class GalleryHandler {
     public static final int REQUEST_PICK_IMAGE = 1;
@@ -39,7 +40,7 @@ public class GalleryHandler {
     }
 
     public static Uri handleGalleryResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_PICK_IMAGE && resultCode == Activity.RESULT_OK && data != null) {
+        if (resultCode == Activity.RESULT_OK && data != null) {
             return data.getData();
         }
         return null;

@@ -42,7 +42,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class Firebase {
 
-    private String email;
+    private String userEmail;
     private final FirebaseFirestore db;
     //Handle Firebase interactions
 
@@ -272,6 +272,47 @@ public class Firebase {
     }
 
     /**
+     * Uploads an image to Firebase Storage and retrieves the download URL.
+     *
+     * @param imagePath           Path to store the image in Firebase Storage.
+     * @param imageUri            Uri of the image to upload.
+     * @param onUploadCompleteListener Callback for handling upload completion.
+     */
+    public static void uploadImageAndGetUrl(String imagePath, Uri imageUri, OnUploadCompleteListener onUploadCompleteListener) {
+        StorageReference storageRef = FirebaseStorage.getInstance().getReference();
+        StorageReference imageRef = storageRef.child(imagePath);
+
+        // Upload the image to Firebase Storage
+        imageRef.putFile(imageUri)
+                .addOnSuccessListener(taskSnapshot -> {
+                    // Image successfully uploaded
+                    imageRef.getDownloadUrl()
+                            .addOnSuccessListener(uri -> {
+                                // Get the download URL
+                                String imageURL = uri.toString();
+                                onUploadCompleteListener.onUploadComplete(imageURL);
+                            })
+                            .addOnFailureListener(e -> {
+                                // Handle failure to get download URL
+                                onUploadCompleteListener.onUploadFailed(e.getMessage());
+                            });
+                })
+                .addOnFailureListener(e -> {
+                    // Handle failure to upload image
+                    onUploadCompleteListener.onUploadFailed(e.getMessage());
+                });
+    }
+
+    /**
+     * Callback interface for handling upload completion.
+     */
+    public interface OnUploadCompleteListener {
+        void onUploadComplete(String imageURL);
+        void onUploadFailed(String errorMessage);
+    }
+
+
+    /**
      * Retrieves the list of events from the database.
      * @return the event details for a particular event name.
      * @param eventName
@@ -377,6 +418,18 @@ public class Firebase {
         void onEventLoaded(Event event);
         void onEventNotFound();
         void onEventLoadFailed(Exception e);
+    }
+
+    public void addEvent(Event event) {
+        // Create a new document with a generated ID
+        db.collection("events")
+                .add(event.toMap())
+                .addOnSuccessListener(documentReference -> {
+                    Log.i("Firebase", "Event added with ID: " + documentReference.getId());
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("Firebase", "Error adding event: " + e.getMessage());
+                });
     }
 
     /**
@@ -531,7 +584,7 @@ public class Firebase {
      * @param email
      */
     private void setEmail(String email){
-        this.email = email;
+        this.userEmail = email;
     }
 
     /**
