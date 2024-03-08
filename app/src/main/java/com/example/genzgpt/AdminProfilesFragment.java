@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 /**
+ * The profile that will manage all profiles for the Admin to view.
  * A simple {@link Fragment} subclass.
  * Use the {@link AdminProfilesFragment#newInstance} factory method to
  * create an instance of this fragment.
@@ -24,6 +25,9 @@ public class AdminProfilesFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
+    /**
+     * The required empty constructor for AdminProfilesFragment.
+     */
     public AdminProfilesFragment() {
         // Required empty public constructor
     }
@@ -46,6 +50,11 @@ public class AdminProfilesFragment extends Fragment {
         return fragment;
     }
 
+    /**
+     * Handles creation of an instance of AdminProfilesFragment.
+     * @param savedInstanceState If the fragment is being re-created from
+     * a previous saved state, this is the state.
+     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,6 +64,19 @@ public class AdminProfilesFragment extends Fragment {
         }
     }
 
+    /**
+     * Handles visual side of creating AdminProfilesFragment.
+     * @param inflater The LayoutInflater object that can be used to inflate
+     * any views in the fragment,
+     * @param container If non-null, this is the parent view that the fragment's
+     * UI should be attached to.  The fragment should not add the view itself,
+     * but this can be used to generate the LayoutParams of the view.
+     * @param savedInstanceState If non-null, this fragment is being re-constructed
+     * from a previous saved state as given here.
+     *
+     * @return
+     * The View for the AdminProfilesFragment.
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
