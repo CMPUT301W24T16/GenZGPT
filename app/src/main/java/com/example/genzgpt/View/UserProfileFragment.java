@@ -117,11 +117,11 @@ public class UserProfileFragment extends Fragment {
     public void Bind(User user){
         userFirstName.setText(user.getFirstName());
         userLastName.setText(user.getLastName());
-        userPhoneNumber.setText("123-456-7890");
+        userPhoneNumber.setText(String.valueOf(user.getPhone()));
         userEmail.setText(user.getEmail());
         userBanner.setText(user.getFirstName() + " " + user.getLastName());
         userTheme.setText("Black and White");
-        if (user.isGeolocation()){
+        if (user.isGeolocation() == Boolean.TRUE){
             userGeolocation.setText("ON");
         }else{
             userGeolocation.setText("OFF");
