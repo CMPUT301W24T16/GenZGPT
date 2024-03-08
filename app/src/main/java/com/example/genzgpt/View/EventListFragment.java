@@ -213,7 +213,7 @@ public class EventListFragment extends Fragment {
 
     private void navigateToEventCreationFragment() {
         getParentFragmentManager().beginTransaction()
-                .replace(R.id.flFragment, new EventCreationFragment())
+                .replace(R.id.BaseFragment, new EventCreationFragment())
                 .addToBackStack(null) // This line is crucial
                 .commit();
     }
