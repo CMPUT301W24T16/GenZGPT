@@ -9,7 +9,7 @@
     <ImageView
         android:id="@+id/backArrowImageView"
         android:layout_width="wrap_content"
-        android:layout_height="34dp"
+        android:layout_height="48dp"
         android:src="@drawable/ic_back_arrow"
         android:contentDescription="@string/back" />
 

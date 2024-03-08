@@ -241,10 +241,11 @@ public class Firebase {
      */
     public void getUserData(String email, OnUserLoadedListener listener) {
         db.collection("users")
-                .document(email)
+                .whereEqualTo("email", email)
                 .get()
-                .addOnSuccessListener(document -> {
-                    if (document.exists()) {
+                .addOnSuccessListener(querySnapshot -> {
+                    if (!querySnapshot.isEmpty()) {
+                        DocumentSnapshot document = querySnapshot.getDocuments().get(0);
                         String firstName = document.getString("firstName");
                         String lastName = document.getString("lastName");
                         Long phoneNumber = document.getLong("phoneNumber");
@@ -487,7 +488,6 @@ public class Firebase {
      * @param userEmail
      */
     public void addUserToCheckedInAttendees(String eventName, String userEmail) {
-        //fixme get rid of context
         try {
             CollectionReference eventsRef = db.collection("events");
             Query query = eventsRef.whereEqualTo("eventName", eventName);
