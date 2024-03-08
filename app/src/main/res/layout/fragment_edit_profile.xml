@@ -111,13 +111,13 @@
         android:textColor="@android:color/white"
         android:textSize="20sp"
         app:layout_constraintBottom_toTopOf="@+id/geolocation_tracking_text"
-        app:layout_constraintEnd_toStartOf="@id/edit_theme"
+        app:layout_constraintEnd_toStartOf="@id/edit_theme_button"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/edit_phone_number"
         app:layout_constraintVertical_bias="1.0" />
 
     <Button
-        android:id="@+id/edit_theme"
+        android:id="@+id/edit_theme_button"
         android:layout_width="158dp"
         android:layout_height="57dp"
         android:layout_marginTop="32dp"
@@ -150,7 +150,7 @@
         app:layout_constraintBottom_toTopOf="@id/save_changes_button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/geolocation_tracking_text"
-        app:layout_constraintTop_toBottomOf="@id/edit_theme" />
+        app:layout_constraintTop_toBottomOf="@id/edit_theme_button" />
 
     <Button
         android:id="@+id/save_changes_button"

@@ -8,78 +8,80 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.TextView;
 
+import com.example.genzgpt.Controller.Firebase;
+import com.example.genzgpt.EditProfileFragment;
+import com.example.genzgpt.Model.User;
+import static com.example.genzgpt.Model.appUser.user_email;
 import com.example.genzgpt.R;
 
 /**
  * A simple {@link Fragment} subclass.
  * Serves as a display for a User's Profile
- * Use the {@link UserProfileFragment#newInstance} factory method to
+ * Use the {@link UserProfileFragment} factory method to
  * create an instance of this fragment.
  */
 public class UserProfileFragment extends Fragment {
     private Button editButton;
-    private View profileInfo;
-    private View userBanner;
-    private View userPicture;
-
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    //private static final String ARG_PARAM1 = "param1";
-    //private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    //private String mParam1;
-    //private String mParam2;
+    private TextView userBanner;
+    private ImageView userPicture;
+    private TextView userFirstName;
+    private TextView userLastName;
+    private TextView userPhoneNumber;
+    private TextView userEmail;
+    private TextView userTheme;
+    private TextView userGeolocation;
+    private Firebase firebase;
 
     public UserProfileFragment() {
         // Required empty public constructor
-        super(R.layout.fragment_user_profile);
-    }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment UserProfileFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static UserProfileFragment newInstance(String param1, String param2) {
-        UserProfileFragment fragment = new UserProfileFragment();
-        Bundle args = new Bundle();
-        //args.putString(ARG_PARAM1, param1);
-        //args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
     }
-
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            //mParam1 = getArguments().getString(ARG_PARAM1);
-           // mParam2 = getArguments().getString(ARG_PARAM2);
-        }
-
-        //FIXME:
-        // need to add these ids to the xml file for this fragment
-        //editButton = View.findViewById(R.id.edit_profile_button);
-        //profileInfo = View.findViewById(R.id.user_profile);
-        //userBanner = View.findViewById(R.id.profile_header);
-        //userPicture = View.findViewById(R.id.profile_picture);
-
-        // editButton.setOnClickListener( v -> {
-        //      new EditProfileFragment().show(getSupportFragmentManager(), "Profile Information");
-        // });
     }
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        firebase = new Firebase();
+        User user = firebase.getUserData("dvtaylor@ualberta.ca");
+
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_user_profile, container, false);
+        View view = inflater.inflate(R.layout.fragment_user_profile, container, false);
+        //Initialize all variables
+        editButton = view.findViewById(R.id.edit_profile_button);
+        userBanner = view.findViewById(R.id.profile_header);
+        userPicture = view.findViewById(R.id.profile_picture);
+        userFirstName = view.findViewById(R.id.first_name_text);
+        userLastName = view.findViewById(R.id.last_name_text);
+        userPhoneNumber = view.findViewById(R.id.phone_number_text);
+        userEmail = view.findViewById(R.id.email_text);
+        userTheme = view.findViewById(R.id.theme_text);
+        userGeolocation = view.findViewById(R.id.geolocation_text);
+       if (user != null) {
+            Bind(user);
+       }
+      /*  editButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new EditProfileFragment().show(getParentFragmentManager(), "Edit Profile");
+            }
+        });*/
+        return view;
+    }
+    public void Bind(User user){
+        userFirstName.setText(user.getFirstName());
+        userLastName.setText(user.getLastName());
+        //userPhoneNumber.setText(user.getPhone());
+        userEmail.setText(user.getEmail());
+        if (user.isGeolocation()){
+            userGeolocation.setText("ON");
+        }else{
+            userGeolocation.setText("OFF");
+        }
 
     }
 }
