@@ -55,6 +55,34 @@ public class User {
     }
 
     /**
+     * An alternate constructor for a User. Allows for a user without an ID to be created.
+     *
+     * @param firstName
+     * The first name of the User
+     *
+     * @param lastName
+     * The last name of the User
+     *
+     * @param phone
+     * The phone number of the User
+     *
+     * @param email
+     * The email of the User
+     *
+     * @param geolocation
+     * Whether or not the User wants geolocation enabled
+     */
+    public User(String firstName, String lastName, long phone, String email, Boolean geolocation, String imageURL) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.phone = phone;
+        this.roles = new ArrayList<>();
+        this.geolocation = false;
+
+    }
+
+    /**
      * Adds a role to a User.
      *
      * @param role
