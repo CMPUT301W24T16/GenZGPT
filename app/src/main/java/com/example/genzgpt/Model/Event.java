@@ -19,6 +19,8 @@ public class Event {
     private String location;
     private List<User> organizers;
     private AttendeeManager attendeeManager;
+    private String imageURL;
+
 
     /**
      * Constructor to create a new Event.
@@ -28,13 +30,14 @@ public class Event {
      * @param location The location of the event.
      * @param maxAttendees The maximum number of attendees for the event, or null if no limit.
      */
-    public Event(String eventId, String eventName, Date eventDate, String location, Integer maxAttendees) {
+    public Event(String eventId, String eventName, Date eventDate, String location, Integer maxAttendees, String imageURL) {
         this.eventId = eventId;
         this.eventName = eventName;
         this.eventDate = eventDate;
         this.location = location;
         this.organizers = new ArrayList<>();
         this.attendeeManager = new AttendeeManager(maxAttendees); // Initialize AttendeeManager
+        this.imageURL = imageURL;
     }
 
     /**
@@ -245,6 +248,8 @@ public class Event {
         attendeeManager.removeAttendee(user);
     }
 
-
+    public String getImageURL() {
+        return imageURL;
+    }
 
 }
