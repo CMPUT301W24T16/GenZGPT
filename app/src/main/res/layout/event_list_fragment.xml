@@ -40,7 +40,7 @@
         android:drawablePadding="10dp"
         android:background="@drawable/round_outline"
         android:textColorHint="@color/white"
-        android:hint="Search My Events"
+        android:hint="Search All Events"
         android:inputType="text"
         android:padding="12dp"
         android:ems="10"
