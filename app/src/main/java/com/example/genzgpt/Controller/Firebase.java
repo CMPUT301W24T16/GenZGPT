@@ -269,7 +269,6 @@ public class Firebase {
         void onUserNotFound();
         void onUserLoadFailed(Exception e);
     }
-        //fixme need to utilize get user data. Store emails in the firebase lists?
 
     /**
      * Retrieves the list of events from the database.
