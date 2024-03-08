@@ -34,15 +34,37 @@ public class UserProfileFragment extends Fragment {
     private TextView userTheme;
     private TextView userGeolocation;
     private Firebase firebase;
-    private User user;
+    private User userCurrent;
 
+    /**
+     * Empty required constructor
+     */
     public UserProfileFragment() {
         // Required empty public constructor
     }
+
+    /**
+     * Just a super to make the fragment show properly
+     * @param savedInstanceState If the fragment is being re-created from
+     * a previous saved state, this is the state.
+     */
     @Override
     public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
     }
+
+    /**
+     * Creates the view for the user profile
+     * @param inflater The LayoutInflater object that can be used to inflate
+     * any views in the fragment,
+     * @param container If non-null, this is the parent view that the fragment's
+     * UI should be attached to.  The fragment should not add the view itself,
+     * but this can be used to generate the LayoutParams of the view.
+     * @param savedInstanceState If non-null, this fragment is being re-constructed
+     * from a previous saved state as given here.
+     *
+     * @return view
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -63,6 +85,7 @@ public class UserProfileFragment extends Fragment {
             @Override
             public void onUserLoaded(User user) {
                 Bind(user);
+                userCurrent = user;
             }
             @Override
             public void onUserNotFound() {
@@ -74,19 +97,30 @@ public class UserProfileFragment extends Fragment {
             }
         });
 
-      /*  editButton.setOnClickListener(new View.OnClickListener() {
+        editButton.setOnClickListener(new View.OnClickListener() {
+            /**
+             * Opens the dialog fragment for editing a user profile
+             * @param v The view that was clicked.
+             */
             @Override
             public void onClick(View v) {
-                new EditProfileFragment().show(getParentFragmentManager(), "Edit Profile");
+                new EditProfileFragment(userCurrent).show(getParentFragmentManager(), "Edit Profile");
             }
-        });*/
+        });
         return view;
     }
+
+    /**
+     * Gets the user data from the firebase
+     * @param user
+     */
     public void Bind(User user){
         userFirstName.setText(user.getFirstName());
         userLastName.setText(user.getLastName());
         userPhoneNumber.setText("123-456-7890");
         userEmail.setText(user.getEmail());
+        userBanner.setText(user.getFirstName() + " " + user.getLastName());
+        userTheme.setText("Black and White");
         if (user.isGeolocation()){
             userGeolocation.setText("ON");
         }else{

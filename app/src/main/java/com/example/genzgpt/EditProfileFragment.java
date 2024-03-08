@@ -23,9 +23,22 @@ import com.example.genzgpt.Model.User;
 public class EditProfileFragment extends DialogFragment {
     private String geolocationName;
     private User selectedUser;
+
+    /**
+     * Creates a profile fragment
+     * @param user
+     */
     public EditProfileFragment(User user){
         this.selectedUser = user;
     }
+
+    /**
+     * Creates a Dialog for editing the user profile
+     * @param savedInstanceState The last saved instance state of the Fragment,
+     * or null if this is a freshly created Fragment.
+     *
+     * @return Dialog object
+     */
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState){
@@ -46,12 +59,20 @@ public class EditProfileFragment extends DialogFragment {
             geolocationSwitch.setChecked(Boolean.TRUE);
         }
         editProfilePicture.setOnClickListener(new View.OnClickListener() {
+            /**
+             * Should open the gallery to edit profile picture
+             * @param v The view that was clicked.
+             */
             @Override
             public void onClick(View v) {
                 openGallery(getActivity());
             }
         });
         deleteProfilePicture.setOnClickListener(new View.OnClickListener() {
+            /**
+             * should delete the profile picture from the user (will set to default photo)
+             * @param v The view that was clicked.
+             */
             @Override
             public void onClick(View v) {
                 selectedUser.setImageURL("ic_launcher.xml");
