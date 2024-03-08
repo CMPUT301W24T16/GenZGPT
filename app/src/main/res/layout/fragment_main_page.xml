@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--The formatting for the main home page of the app for a user.
+    ISSUES: COMPLETELY UNFINISHED NEEDS WORK-->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"

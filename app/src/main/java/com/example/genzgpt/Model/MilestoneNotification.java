@@ -12,8 +12,7 @@ import com.example.genzgpt.R;
 /**
  * The contents of a notification that an attendee shall receive after reaching a milestone
  * number of attendees at their event.
- *
- * FIXME: See AppNotification.java FIXME
+ * FIXME: Currently does nothing in the app
  */
 public class MilestoneNotification extends AppNotification{
     /**

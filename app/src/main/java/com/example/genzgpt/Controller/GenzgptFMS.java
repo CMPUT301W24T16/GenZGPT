@@ -14,7 +14,7 @@ import com.google.firebase.messaging.RemoteMessage;
 
 /**
  * This class handles the Firebase Messaging Service for this app
- * FIXME: Can we just send some version of the appNotification to the firebase, receive, then use CreateNotification on that?
+ * FIXME: Currently does nothing
  */
 public class GenzgptFMS extends FirebaseMessagingService {
 
