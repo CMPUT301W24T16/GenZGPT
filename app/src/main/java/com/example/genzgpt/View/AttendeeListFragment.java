@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
@@ -49,6 +50,17 @@ public class AttendeeListFragment extends Fragment {
 
         // Fetch the list of attendees from Firestore and update the RecyclerView
         fetchCheckedInAttendees(event.getEventName());
+
+        ImageView backArrowImageView = view.findViewById(R.id.backArrowImageView);
+        backArrowImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Perform action on back arrow click, typically go back
+                if (getActivity() != null) {
+                    getActivity().onBackPressed();
+                }
+            }
+        });
 
         return view;
     }
