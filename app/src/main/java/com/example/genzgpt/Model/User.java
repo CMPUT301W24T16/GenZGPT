@@ -20,6 +20,7 @@ public class User {
     private long phone;
     private Boolean geolocation;
     private List<Role> roles; // Organizer/Attendee
+    private String imageURL;
 
     /**
      * The constructor for a User.
@@ -42,7 +43,7 @@ public class User {
      * @param geolocation
      * Whether or not the User wants geolocation tracking enabled.
      */
-    public User(String id, String firstName, String lastName, long phone, String email, Boolean geolocation) {
+    public User(String id, String firstName, String lastName, long phone, String email, Boolean geolocation, String imageURL) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
@@ -50,6 +51,7 @@ public class User {
         this.phone = phone;
         this.roles = new ArrayList<>();
         this.geolocation = false;
+        this.imageURL = imageURL;
     }
 
     /**
@@ -229,5 +231,9 @@ public class User {
      */
     public void logout() {
         // Logout implementation
+    }
+
+    public String getImageURL() {
+        return imageURL;
     }
 }

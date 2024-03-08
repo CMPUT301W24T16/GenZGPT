@@ -36,44 +36,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+/**
+ * This class is responsible for handling all interactions with Firebase.
+ */
 public class Firebase {
 
     private String email;
     private final FirebaseFirestore db;
     //Handle Firebase interactions
 
-    public static void uploadImageToFirebaseStorage(Uri imageUri, StorageReference storageReference, ProgressDialog progressDialog, Context context) {
-
-        final String randomKey = UUID.randomUUID().toString();
-        StorageReference imageRef = storageReference.child("images/" + randomKey);
-
-        // Upload the image to Firebase Storage
-        imageRef.putFile(imageUri)
-                .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                    @Override
-                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                        // Image successfully uploaded
-                        progressDialog.dismiss();
-                        showToast(context, "Profile picture uploaded to Firebase Storage");
-                    }
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        progressDialog.dismiss();
-                        showToast(context, "Failed to get download URL: " + e.getMessage());
-                    }
-                })
-                .addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
-                    @Override
-                    public void onProgress(@NonNull UploadTask.TaskSnapshot snapshot) {
-                        double progressPercent = (100.00 * snapshot.getBytesTransferred() / snapshot.getTotalByteCount());
-                        progressDialog.setMessage("Percentage: " + (int) progressPercent + "%");
-                    }
-                });
-    }
-
     /**
+
      * Uploads an image to Firebase Storage and associates it with the specified event.
      *
      * @param eventID   ID of the event to associate with the image.
@@ -133,17 +106,81 @@ public class Firebase {
                     Log.e("Firebase", "Error updating image URL: " + e.getMessage());
                 });
     }
+
+
+    /**
+     * Uploads an image to Firebase Storage and associates it with the specified user.
+     *
+     * @param userID   ID of the event to associate with the image.
+     * @param imageUri  Uri of the image to upload.
+     * @param progressDialog Progress dialog for showing upload progress.
+     * @param context   Context for displaying toasts.
+     */
+    public static void uploadImageForUser(String userID, Uri imageUri, ProgressDialog progressDialog, Context context) {
+        StorageReference storageRef = FirebaseStorage.getInstance().getReference();
+        StorageReference imageRef = storageRef.child("user_images/" + userID);
+
+        // Upload the image to Firebase Storage
+        imageRef.putFile(imageUri)
+                .addOnSuccessListener(taskSnapshot -> {
+                    // Image successfully uploaded
+                    progressDialog.dismiss();
+
+                    // Get the download URL of the uploaded image
+                    imageRef.getDownloadUrl()
+                            .addOnSuccessListener(uri -> {
+                                String imageURL = uri.toString();
+                                updateUserImageURL(userID, imageURL);
+                                showToast(context, "Image uploaded and associated with the event");
+                            })
+                            .addOnFailureListener(e -> {
+                                showToast(context, "Failed to get image download URL: " + e.getMessage());
+                            });
+                })
+                .addOnFailureListener(e -> {
+                    progressDialog.dismiss();
+                    showToast(context, "Failed to upload image: " + e.getMessage());
+                })
+                .addOnProgressListener(snapshot -> {
+                    double progressPercent = (100.00 * snapshot.getBytesTransferred() / snapshot.getTotalByteCount());
+                    progressDialog.setMessage("Percentage: " + (int) progressPercent + "%");
+                });
+    }
+
+    /**
+     * Update the Firestore document for the specified user with the image URL.
+     *
+     * @param userID   ID of the event to update.
+     * @param imageURL  URL of the uploaded image.
+     */
+    private static void updateUserImageURL(String userID, String imageURL) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        DocumentReference eventRef = db.collection("users").document(userID);
+
+        // Update the 'imageURL' field in the document
+        eventRef.update("imageURL", imageURL)
+                .addOnSuccessListener(aVoid -> {
+                    // Image URL successfully updated in Firestore
+                    Log.i("Firebase", "Image URL updated successfully");
+                })
+                .addOnFailureListener(e -> {
+                    // Handle the error
+                    Log.e("Firebase", "Error updating image URL: " + e.getMessage());
+                });
+    }
+
+
     private static void showToast(Context context, String message) {
         Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
     }
 
     /**
-     * Delete an image from Firestore and Firebase Storage.
+     * Delete an Event image from Firestore and Firebase Storage.
      *
      * @param eventId  ID of the event containing the image.
      * @param imageURL URL of the image to be deleted.
      */
-    public void deleteImage(String eventId, String imageURL) {
+    public void deleteEventImage(String eventId, String imageURL) {
         // Delete the image data in Firestore
         db.collection("events").document(eventId)
                 .update("imageURL", FieldValue.delete())
@@ -168,6 +205,35 @@ public class Firebase {
     }
 
     /**
+     * Delete an Event image from Firestore and Firebase Storage.
+     *
+     * @param userID  ID of the event containing the image.
+     * @param imageURL URL of the image to be deleted.
+     */
+    public void deletUserImage(String userID, String imageURL) {
+        // Delete the image data in Firestore
+        db.collection("users").document(userID)
+                .update("imageURL", FieldValue.delete())
+                .addOnSuccessListener(aVoid -> {
+                    Log.i("Firebase", "Image URL deleted from Firestore");
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("Firebase", "Error deleting image URL from Firestore: " + e.getMessage());
+                });
+
+        // Delete the image file from Firebase Storage
+        if (imageURL != null && !imageURL.isEmpty()) {
+            StorageReference storageReference = FirebaseStorage.getInstance().getReferenceFromUrl(imageURL);
+            storageReference.delete()
+                    .addOnSuccessListener(aVoid -> {
+                        Log.i("Firebase", "Image deleted from Firebase Storage");
+                    })
+                    .addOnFailureListener(e -> {
+                        Log.e("Firebase", "Error deleting image from Firebase Storage: " + e.getMessage());
+                    });
+        }
+    }
+    /**
      * Retrieves the user data from Firebase.
      * @return the user details for a particular email.
      * @param email
@@ -185,8 +251,9 @@ public class Firebase {
                 Long phoneNumber = document.getLong("phoneNumber");
                 boolean geolocation = Boolean.TRUE.equals(document.getBoolean("geolocation"));
                 String userID = document.getId();
+                String imageURL = document.getString("imageURL");
 
-                return new User(userID, firstName, lastName, phoneNumber, email, geolocation);
+                return new User(userID, firstName, lastName, phoneNumber, email, geolocation, imageURL);
             } else {
                 return null;
             }
@@ -263,8 +330,9 @@ public class Firebase {
         String email = (String) userMap.get("email");
         Long phoneNumber = (Long) userMap.get("phoneNumber");
         boolean geolocation = (boolean) userMap.get("geolocation");
+        String imageURL = (String) userMap.get("imageURL");
 
-        return new User(userId, firstName, lastName, phoneNumber, email, geolocation);
+        return new User(userId, firstName, lastName, phoneNumber, email, geolocation, imageURL);
     }
 
     /**
@@ -401,6 +469,9 @@ public class Firebase {
         this.email = email;
     }
 
+    /**
+     * firebase constructor
+     */
     public Firebase() {
         db = FirebaseFirestore.getInstance();
     }
@@ -498,13 +569,14 @@ public class Firebase {
                     List<User> userList = new ArrayList<>();
                     for (DocumentSnapshot document : querySnapshot.getDocuments()) {
                         // Extract user data from the document
-                        String userID = document.getId();
+                        String userID = document.getId(); //comment this out if we get rid of userID
                         String firstName = document.getString("firstName");
                         String lastName = document.getString("lastName");
                         String email = document.getString("email");
                         Long phoneNumber = document.getLong("phoneNumber");
                         boolean geolocation = document.getBoolean("geolocation") != null && Boolean.TRUE.equals(document.getBoolean("geolocation"));
-                        User user = new User(userID, firstName, lastName, phoneNumber, email, geolocation);
+                        String imageURL = document.getString("imageURL");
+                        User user = new User(userID, firstName, lastName, phoneNumber, email, geolocation, imageURL);
                         userList.add(user);
                     }
                     listener.onUsersLoaded(userList);
@@ -555,6 +627,12 @@ public class Firebase {
         void onEventsLoadFailed(Exception e);
     }
 
+    /**
+     * Retrieves the list of checked-in attendees for a specific event from the database.
+     * @param eventName
+     * @return list of checked-in attendees
+     * asynchronous method
+     */
     public void fetchCheckedInAttendees(String eventName, OnCheckInAttendeesLoadedListener listener) {
         CollectionReference eventsRef = db.collection("events");
         Query query = eventsRef.whereEqualTo("eventName", eventName);
@@ -590,11 +668,18 @@ public class Firebase {
         });
     }
 
+
     public interface OnCheckInAttendeesLoadedListener {
         void onCheckInAttendeesLoaded(List<User> checkedInAttendees);
         void onCheckInAttendeesLoadFailed(Exception e);
     }
 
+    /**
+     * Retrieves the list of registered attendees for a specific event from the database.
+     * @param eventName
+     * @return list of registered attendees
+     * asynchronous method
+     */
     public void fetchRegisteredAttendees(String eventName, OnRegisteredAttendeesLoadedListener listener) {
         CollectionReference eventsRef = db.collection("events");
         Query query = eventsRef.whereEqualTo("eventName", eventName);

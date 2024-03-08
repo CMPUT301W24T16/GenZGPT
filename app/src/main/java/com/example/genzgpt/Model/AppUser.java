@@ -26,8 +26,8 @@ public class AppUser extends User{
      * @param geolocation
      * A boolean indicating whether the user of the App allows for Geolocation.
      */
-    public AppUser(String id, String firstName, String lastName, long phone, String email, Boolean geolocation) {
-        super(id, firstName, lastName, phone, email, geolocation);
+    public AppUser(String id, String firstName, String lastName, long phone, String email, Boolean geolocation, String imageURL) {
+        super(id, firstName, lastName, phone, email, geolocation, imageURL);
         userEmail = email;
     }
 
