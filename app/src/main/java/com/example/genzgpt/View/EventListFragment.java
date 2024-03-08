@@ -1,14 +1,17 @@
 package com.example.genzgpt.View;
 
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -39,6 +42,9 @@ public class EventListFragment extends Fragment {
         eventList = new ArrayList<>();
         eventAdapter = new EventAdapter(eventList);
         recyclerView.setAdapter(eventAdapter);
+
+        Button createEventButton = view.findViewById(R.id.addEventButton);
+        createEventButton.setOnClickListener(v -> navigateToEventCreationFragment());
 
         firebase = new Firebase();
 
@@ -124,7 +130,7 @@ public class EventListFragment extends Fragment {
             if (event.getImageURL() != null && !event.getImageURL().isEmpty()) {
                 Picasso.get()
                         .load(event.getImageURL())
-//                        .resize(200, 200) // Specify the desired width and height
+                        // .resize(200, 200) // Specify the desired width and height
                         .into(eventImage);
             }
 
@@ -154,6 +160,14 @@ public class EventListFragment extends Fragment {
             eventAdapter.getEvents().remove(position);
             eventAdapter.notifyItemRemoved(position);
         }
+
+    }
+
+    private void navigateToEventCreationFragment() {
+        getParentFragmentManager().beginTransaction()
+                .replace(R.id.flFragment, new EventCreationFragment())
+                .addToBackStack(null) // This line is crucial
+                .commit();
     }
 
     private void deleteEventImage(Event event) {
@@ -167,4 +181,5 @@ public class EventListFragment extends Fragment {
             eventAdapter.notifyItemRemoved(position);
         }
     }
+
 }

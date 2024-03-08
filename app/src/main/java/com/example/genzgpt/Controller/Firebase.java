@@ -412,7 +412,7 @@ public class Firebase {
     public void deleteEvent(String eventName) {
         try {
             CollectionReference eventsRef = db.collection("events");
-            Query query = eventsRef.whereEqualTo("event_name", eventName);
+            Query query = eventsRef.whereEqualTo("eventName", eventName);
 
             query.get().addOnCompleteListener(task -> {
                 if (task.isSuccessful()) {
@@ -530,16 +530,20 @@ public class Firebase {
                 .addOnSuccessListener(querySnapshot -> {
                     List<Event> eventList = new ArrayList<>();
                     for (DocumentSnapshot document : querySnapshot.getDocuments()) {
-                        // Extract event data from the document
-                        String eventId = document.getId();
-                        String eventName = document.getString("event_name");
-                        Date eventDate = document.getDate("start_time");
-                        String location = document.getString("event_location");
-                        Integer maxAttendees = document.getLong("maxAttendees") != null ? document.getLong("maxAttendees").intValue() : null;
-                        String imageURL = document.getString("imageURL"); // Retrieve image URL
+                        // Make sure field names here match exactly with those in your Firestore database
+                        String eventId = document.getString("eventId"); // Assuming you store eventId
+                        String eventName = document.getString("eventName");
+                        Date eventDate = document.getDate("eventDate"); // Ensure this is stored as a Timestamp in Firestore
+                        String location = document.getString("location");
+                        Long maxAttendeesLong = document.getLong("maxAttendees");
+                        Integer maxAttendees = maxAttendeesLong != null ? maxAttendeesLong.intValue() : null;
+                        String imageURL = document.getString("imageURL"); // Make sure this field exists and is named exactly like this in Firestore
 
-                        Event event = new Event(eventId, eventName, eventDate, location, maxAttendees, imageURL);
-                        eventList.add(event);
+                        // Check for nulls to avoid adding incomplete events
+                        if (eventName != null && eventDate != null && location != null) {
+                            Event event = new Event(eventId, eventName, eventDate, location, maxAttendees, imageURL);
+                            eventList.add(event);
+                        }
                     }
                     listener.onEventsLoaded(eventList);
                 })
