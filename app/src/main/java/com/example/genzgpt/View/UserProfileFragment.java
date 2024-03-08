@@ -14,7 +14,6 @@ import android.widget.TextView;
 import com.example.genzgpt.Controller.Firebase;
 import com.example.genzgpt.EditProfileFragment;
 import com.example.genzgpt.Model.User;
-import static com.example.genzgpt.Model.appUser.user_email;
 import com.example.genzgpt.R;
 
 /**
