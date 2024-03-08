@@ -67,13 +67,14 @@ public class FirstActivity extends AppCompatActivity {
             String currentTheme = theme.toString();
             boolean geo = geolocation.isActivated();
 
+            String imageURL = null;
             // FIXME: User has no id, yet I need an id for the user.
-            User newUser = new User(firstName, lastName, phone, email, geo);
+            User newUser = new User(firstName, lastName, phone, email, geo, imageURL);
 
             Firebase firebase = new Firebase();
             firebase.createUser(newUser);
 
-            AppUser user = new AppUser(firstName, lastName, phone, email, geo);
+            AppUser user = new AppUser(firstName, lastName, phone, email, geo, imageURL);
 
             finish();
         });
