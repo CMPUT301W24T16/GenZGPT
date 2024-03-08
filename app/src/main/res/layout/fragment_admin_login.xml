@@ -8,7 +8,7 @@
     tools:context=".AdminLoginFragment"
     android:background="#D9D9D9">
 
-    <TextView
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/sign_in_container"
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -17,14 +17,12 @@
         android:layout_marginEnd="15dp"
         android:layout_marginBottom="15dp"
         android:background="@drawable/round_outline"
-        android:text=""
-        android:textColorHint="#FFFFFF"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintVertical_bias="1.0">
 
     <TextView
         android:id="@+id/gpt_title"
@@ -88,4 +86,5 @@
         app:layout_constraintStart_toStartOf="@+id/sign_in_container"
         app:layout_constraintTop_toBottomOf="@+id/admin_signin_button"
         app:layout_constraintVertical_bias="0.571" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

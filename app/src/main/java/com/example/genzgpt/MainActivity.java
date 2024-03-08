@@ -33,7 +33,6 @@ public class MainActivity extends AppCompatActivity {
     EventListFragment eventHost = new EventListFragment();
     UserProfileFragment userProfile = new UserProfileFragment();
     QRCodeFragment QRCodeActivity = new QRCodeFragment();
-    SignInFragment signIn = new SignInFragment();
 
     public static boolean hasSignedIn = false;
 
@@ -94,6 +93,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         // Go to another Activity if the user needs to put in their information.
+        // sendToFirstTime();
 
         navBar = findViewById(R.id.bottomNavigationView);
 
@@ -104,11 +104,11 @@ public class MainActivity extends AppCompatActivity {
     /**
      * Sends the user to a first time sign in if they have need to do this already.
      */
-    public boolean sendToFirstTime() {
+    public void sendToFirstTime() {
         if (!hasSignedIn) {
             hasSignedIn = true;
-            return true;
+            Intent toFirst = new Intent(MainActivity.this, FirstSignInActivity.class);
+            startActivity(toFirst);
         }
-        return false;
     }
 }

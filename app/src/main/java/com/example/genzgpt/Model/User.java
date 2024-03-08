@@ -72,7 +72,7 @@ public class User {
      * @param geolocation
      * Whether or not the User wants geolocation enabled
      */
-    public User(String firstName, String lastName, long phone, String email, Boolean geolocation) {
+    public User(String firstName, String lastName, long phone, String email, Boolean geolocation, String imageURL) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;

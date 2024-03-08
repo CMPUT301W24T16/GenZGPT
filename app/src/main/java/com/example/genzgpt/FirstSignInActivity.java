@@ -3,25 +3,18 @@ package com.example.genzgpt;
 import static java.lang.Long.parseLong;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.SwitchCompat;
 
 import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Switch;
 
-import androidx.fragment.app.Fragment;
-
 import com.example.genzgpt.Controller.Firebase;
 import com.example.genzgpt.Model.AppUser;
 import com.example.genzgpt.Model.User;
 
-public class SignInFragment extends Fragment {
-
+public class FirstSignInActivity extends AppCompatActivity {
     Button profileButton;
     Button adminButton;
     EditText profileFirstName;
@@ -30,12 +23,11 @@ public class SignInFragment extends Fragment {
     EditText phoneNumber;
     Spinner theme;
     Switch geolocation;
-
-
+    AdminLoginFragment adminSignIn = new AdminLoginFragment();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_first);
+        setContentView(R.layout.activity_first_sign_in);
 
         adminButton = findViewById(R.id.admin_button);
         profileButton = findViewById(R.id.user_profile_button);
@@ -71,7 +63,7 @@ public class SignInFragment extends Fragment {
             boolean geo = geolocation.isActivated();
 
             String imageURL = null;
-            // FIXME: User has no id, yet I need an id for the user.
+
             User newUser = new User(firstName, lastName, phone, email, geo, imageURL);
 
             Firebase firebase = new Firebase();
@@ -84,13 +76,10 @@ public class SignInFragment extends Fragment {
 
         // Set the adminButton to send to the admin sign in page.
         adminButton.setOnClickListener( v -> {
-            //FIXME need to send to AdminLoginFragment
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.sign_in_container, adminSignIn)
+                    .commit();
         });
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        view = inflater.inflate(R.layout.fragment_sign_in, container, false);
-        return view;
     }
 }
