@@ -4,6 +4,7 @@ import static java.lang.Long.parseLong;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
@@ -76,7 +77,8 @@ public class FirstSignInActivity extends AppCompatActivity {
 
         // Set the adminButton to send to the admin sign in page.
         adminButton.setOnClickListener( v -> {
-
+            Intent toAdmin = new Intent(FirstSignInActivity.this, AdminActivity.class);
+            startActivity(toAdmin);
         });
     }
 }

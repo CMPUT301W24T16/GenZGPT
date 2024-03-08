@@ -400,39 +400,44 @@ public class Firebase {
      * @param user
      */
     public void createUser(User user) {
-        try {
-            // Check if the user already exists
-            DocumentReference userRef = db.collection("users").document(user.getEmail());
-            DocumentSnapshot userSnapshot = userRef.get().getResult();
+        // Check if the user already exists
+        DocumentReference userRef = db.collection("users").document(user.getEmail());
+        userRef.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                DocumentSnapshot userSnapshot = task.getResult();
+                if (userSnapshot.exists()) {
+                    // User already exists, handle accordingly (e.g., throw an exception or return an error)
+                    Log.e("Firebase", "User with ID " + user.getEmail() + " already exists");
+                    // Optionally, you can throw an exception or invoke a callback to handle the error
+                } else {
+                    // Create a new user document
+                    Map<String, Object> userData = new HashMap<>();
+                    userData.put("id", user.getId());
+                    userData.put("firstName", user.getFirstName());
+                    userData.put("lastName", user.getLastName());
+                    userData.put("email", user.getEmail());
+                    userData.put("phoneNumber", user.getPhone());
+                    userData.put("geolocation", user.isGeolocation());
+                    userData.put("imageURL", user.getImageURL());
 
-            if (userSnapshot.exists()) {
-                // User already exists, handle accordingly (e.g., throw an exception or return an error)
-                throw new IllegalArgumentException("User with ID " + user.getEmail() + " already exists");
+                    userRef.set(userData)
+                            .addOnSuccessListener(aVoid -> {
+                                // User created successfully
+                                Log.i("Firebase", "User created successfully");
+                            })
+                            .addOnFailureListener(e -> {
+                                // Error occurred while creating the user
+                                Log.e("Firebase", "Error creating user: " + e.getMessage());
+                            });
+                }
             } else {
-                // Create a new user document
-                Map<String, Object> userData = new HashMap<>();
-                userData.put("id", user.getId());
-                userData.put("firstName", user.getFirstName());
-                userData.put("lastName", user.getLastName());
-                userData.put("email", user.getEmail());
-                userData.put("phoneNumber", user.getPhone());
-                userData.put("geolocation", user.isGeolocation());
-
-                userRef.set(userData)
-                        .addOnSuccessListener(aVoid -> {
-                            // User created successfully
-                            Log.i("Firebase", "User created successfully");
-                        })
-                        .addOnFailureListener(e -> {
-                            // Error occurred while creating the user
-                            Log.e("Firebase", "Error creating user: " + e.getMessage());
-                        });
+                // Error occurred while checking if the user exists
+                Log.e("Firebase", "Error checking user existence: " + task.getException().getMessage());
+                // Optionally, you can throw an exception or invoke a callback to handle the error
             }
-        } catch (Exception e) {
-            // Handle any exceptions that occur during the process
-            System.err.println("Error creating user: " + e.getMessage());
-        }
+        });
     }
+
     /**
      * Creates a new event in the database.
      * @param organizer
