@@ -50,7 +50,7 @@ public class AttendeeListFragment extends Fragment {
 
     private void fetchAttendees() {
         attendeeList.clear();
-        firebase.fetchAttendees(new Firebase.OnUsersLoadedListener() {
+        firebase.fetchAttendees(new Firebase.OnCheckInAttendeesLoadedListener() {
             @Override
             public void onUsersLoaded(List<User> loadedAttendees) {
                 attendeeList.clear();
