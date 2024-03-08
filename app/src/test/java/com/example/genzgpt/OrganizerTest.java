@@ -70,5 +70,4 @@ class OrganizerTest {
 
         return event;
     }
-    // Add more test cases as needed for other methods in the Organizer class
 }

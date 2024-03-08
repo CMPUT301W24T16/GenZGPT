@@ -37,7 +37,5 @@ class AppUserTest {
         AppUser.setUserEmail("new.email@example.com");
         assertEquals("new.email@example.com", AppUser.getAppUserEmail());
     }
-
-    // Add more test cases as needed for other methods in the AppUser class
 }
 
