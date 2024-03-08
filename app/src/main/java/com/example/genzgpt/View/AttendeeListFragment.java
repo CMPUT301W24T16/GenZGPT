@@ -138,7 +138,7 @@ public class AttendeeListFragment extends Fragment {
         }
 
         public void bind(User user) {
-            personName.setText(user.getFirstName()+user.getLastName());
+            personName.setText(user.getFirstName()+" "+user.getLastName());
             //checkInCount.setText("Checked In: " + user.getCheckInCount());
         }
     }
