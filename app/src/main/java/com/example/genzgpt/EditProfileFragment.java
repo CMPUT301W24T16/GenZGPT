@@ -98,9 +98,9 @@ public class EditProfileFragment extends DialogFragment {
                 geolocationName = "OFF";
             }
             User new_user = new User(null, firstName, lastName, phone, emailName, geoBool, null);
-            firebase.deleteUser(emailName);
-            firebase.createUser(new_user);
-            AppUser.setUserEmail(emailName);
+                firebase.deleteUser(emailName);
+                firebase.createUser(new_user);
+                AppUser.setUserEmail(emailName);
         }).create();
     }
 }
