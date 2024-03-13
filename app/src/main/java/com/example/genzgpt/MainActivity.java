@@ -91,7 +91,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
 
         // currently does nothing
         if (savedInstanceState != null) {
@@ -107,14 +106,19 @@ public class MainActivity extends AppCompatActivity {
         }
 
         // Go to another Activity if the user needs to put in their information.
+        // Putting this before setContentView will stop Main Activity from showing initially
         sendToFirstTime();
 
-        hasSignedIn = true;
+        // FIXME THIS IS A TEMPORARY SOLUTION AND STILL LOOKS WEIRD ON APP STARTUP
+        // Set the view to the main part of the app if all the previous steps went through
+        if (hasSignedIn) {
+            setContentView(R.layout.activity_main);
 
-        navBar = findViewById(R.id.bottomNavigationView);
+            navBar = findViewById(R.id.bottomNavigationView);
 
-        navBar.setOnItemSelectedListener(navListener);
-        navBar.setSelectedItemId(R.id.home);
+            navBar.setOnItemSelectedListener(navListener);
+            navBar.setSelectedItemId(R.id.home);
+        }
     }
 
     /**

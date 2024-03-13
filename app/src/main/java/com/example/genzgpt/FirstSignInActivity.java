@@ -60,6 +60,7 @@ public class FirstSignInActivity extends AppCompatActivity {
                 email = "userperson@mailsite.com";
             }
 
+
             long phone = parseLong(phoneNumber.getText().toString());
             String currentTheme = theme.toString();
             boolean geo = geolocation.isActivated();
@@ -71,8 +72,11 @@ public class FirstSignInActivity extends AppCompatActivity {
             Firebase firebase = new Firebase();
             firebase.createUser(newUser);
 
-            AppUser user = new AppUser(firstName, lastName, phone, email, geo, imageURL);
-            user.setUserEmail(email);
+            // Set the static value of UserEmail to the provided email address
+            AppUser.setUserEmail(email);
+
+            // notify the Main Activity that a successful sign in has occurred
+            MainActivity.hasSignedIn = true;
             finish();
         });
 
