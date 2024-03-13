@@ -14,6 +14,7 @@ import com.example.genzgpt.Controller.Firebase;
 import com.example.genzgpt.Model.Event;
 import com.example.genzgpt.R;
 import com.squareup.picasso.Picasso;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 public class EventInfoFragment extends Fragment {
 

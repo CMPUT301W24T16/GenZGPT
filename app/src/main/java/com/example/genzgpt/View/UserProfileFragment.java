@@ -1,4 +1,5 @@
 package com.example.genzgpt.View;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import android.os.Bundle;
 
@@ -68,7 +69,8 @@ public class UserProfileFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        firebase = new Firebase();
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        firebase = new Firebase(db);
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_user_profile, container, false);
         //Initialize all variables
