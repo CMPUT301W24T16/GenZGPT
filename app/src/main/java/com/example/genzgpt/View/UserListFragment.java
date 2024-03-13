@@ -20,7 +20,6 @@ import com.example.genzgpt.R;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import com.google.firebase.firestore.FirebaseFirestore;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -53,8 +52,7 @@ public class UserListFragment extends Fragment {
         userAdapter = new UserAdapter(userList);
         recyclerView.setAdapter(userAdapter);
 
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        firebase = new Firebase(db);
+        firebase = new Firebase();
 
         // Fetch the list of users from Firestore and update the RecyclerView
         fetchUsers();

@@ -27,7 +27,6 @@ import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
-import com.google.firebase.firestore.FirebaseFirestore;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -60,8 +59,7 @@ public class EventListFragment extends Fragment {
         eventAdapter = new EventAdapter(eventList);
         recyclerView.setAdapter(eventAdapter);
 
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        firebase = new Firebase(db);
+        firebase = new Firebase();
 
         Button createEventButton = view.findViewById(R.id.addEventButton);
 

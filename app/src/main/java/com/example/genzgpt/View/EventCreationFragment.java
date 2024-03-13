@@ -25,7 +25,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentResultListener;
-import com.google.firebase.firestore.FirebaseFirestore;
 
 import com.example.genzgpt.Controller.GalleryHandler;
 import com.example.genzgpt.Controller.ImageViewUpdater;
@@ -152,7 +151,7 @@ public class EventCreationFragment extends Fragment {
                     );
 
                     // Add the new event to Firebase
-                    Firebase firebase = new Firebase(db);
+                    Firebase firebase = new Firebase();
                     firebase.addEvent(newEvent);
 
                     getParentFragmentManager().popBackStack();

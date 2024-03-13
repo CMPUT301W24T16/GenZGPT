@@ -43,13 +43,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class Firebase {
 
     private String userEmail;
-    private FirebaseFirestore db;
+    private final FirebaseFirestore db;
     //Handle Firebase interactions
-
-    // Constructor that accepts a FirebaseFirestore instance
-    public Firebase(FirebaseFirestore db) {
-        this.db = db;
-    }
 
     /**
 
