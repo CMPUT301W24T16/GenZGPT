@@ -89,12 +89,10 @@ public class UserProfileFragment extends Fragment {
                 Bind(user);
                 userCurrent = user;
             }
-
             @Override
             public void onUserNotFound() {
                 Log.d("Firebase", "User not found.");
             }
-
             @Override
             public void onUserLoadFailed(Exception e) {
                 Log.e("Firebase", "User retrieval failed.");
@@ -115,7 +113,6 @@ public class UserProfileFragment extends Fragment {
             }
             return view;
         }
-
     /**
      * Gets the user data from the firebase
      * @param user
@@ -133,6 +130,5 @@ public class UserProfileFragment extends Fragment {
         if (user.isGeolocation() == Boolean.FALSE){
             userGeolocation.setText("OFF");
         }
-
     }
 }

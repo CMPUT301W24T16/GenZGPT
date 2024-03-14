@@ -9,7 +9,6 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -44,10 +43,11 @@ public class GeolocationTracking extends Activity {
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
-        if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            //Permission is not granted, so request it.
-            checkPermission(android.Manifest.permission.ACCESS_COARSE_LOCATION, GeolocationTracking.RequestCode.COARSE_LOCATION_PERMISSION);
-            checkPermission(android.Manifest.permission.ACCESS_FINE_LOCATION, GeolocationTracking.RequestCode.FINE_LOCATION_PERMISSION);
+        if (!checkPermission(Manifest.permission.ACCESS_FINE_LOCATION) && !checkPermission(Manifest.permission.ACCESS_COARSE_LOCATION)){
+            //Permission is not granted.
+            Toast.makeText(this, "Geolocation permissions are not enabled.", Toast.LENGTH_SHORT).show();
+            checkPermission(android.Manifest.permission.ACCESS_COARSE_LOCATION);
+            checkPermission(android.Manifest.permission.ACCESS_FINE_LOCATION);
         } else {
             fusedLocationClient.getLastLocation().addOnSuccessListener(this, new OnSuccessListener<Location>() {
                 /**
@@ -79,38 +79,31 @@ public class GeolocationTracking extends Activity {
      *
      */
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults){
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == GeolocationTracking.RequestCode.COARSE_LOCATION_PERMISSION || requestCode == GeolocationTracking.RequestCode.FINE_LOCATION_PERMISSION){
-            if (grantResults.length > 0){
-                for (int i = 0; i < grantResults.length; i++){
-                    if (grantResults[i] == PackageManager.PERMISSION_GRANTED){
+        if (requestCode == GeolocationTracking.RequestCode.COARSE_LOCATION_PERMISSION || requestCode == GeolocationTracking.RequestCode.FINE_LOCATION_PERMISSION) {
+            if (grantResults.length > 0) {
+                for (int i = 0; i < grantResults.length; i++) {
+                    if (grantResults[i] == PackageManager.PERMISSION_GRANTED) {
                         Toast.makeText(this, "Permission granted", Toast.LENGTH_SHORT).show();
 
-                    }else{
+                    } else {
                         Toast.makeText(this, "Permission denied", Toast.LENGTH_SHORT).show();
                     }
                 }
-            } else{
-                Toast.makeText(this, "Please select a permission", Toast.LENGTH_SHORT).show();
-                checkPermission(android.Manifest.permission.ACCESS_COARSE_LOCATION, GeolocationTracking.RequestCode.COARSE_LOCATION_PERMISSION);
-                checkPermission(android.Manifest.permission.ACCESS_FINE_LOCATION, GeolocationTracking.RequestCode.FINE_LOCATION_PERMISSION);
             }
         }
     }
-
     /**
      * This method will ask for permissions if they are not already granted.
      * @param permission
      * @param requestCode
      */
-    public void checkPermission(String permission, int requestCode){
-        if (ContextCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_DENIED){
+    public void requestPermission(String permission, int requestCode){
             ActivityCompat.requestPermissions(this, permissions, requestCode);
-        }
-        else{
-            Toast.makeText(this, "Permission already granted", Toast.LENGTH_SHORT).show();
-        }
+    }
+    public boolean checkPermission(String permission){
+        return ActivityCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_GRANTED;
     }
 }
 
