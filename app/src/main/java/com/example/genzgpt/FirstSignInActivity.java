@@ -1,5 +1,6 @@
 package com.example.genzgpt;
 
+import static java.lang.Character.isLetter;
 import static java.lang.Long.parseLong;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -10,6 +11,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Switch;
+import android.widget.Toast;
 
 import com.example.genzgpt.Controller.Firebase;
 import com.example.genzgpt.Model.AppUser;
@@ -26,6 +28,8 @@ public class FirstSignInActivity extends AppCompatActivity {
     Spinner theme;
     Switch geolocation;
     AdminLoginFragment adminSignIn = new AdminLoginFragment();
+    private boolean isValidProfile = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,38 +50,57 @@ public class FirstSignInActivity extends AppCompatActivity {
         profileButton.setOnClickListener( v -> {
             // Get the information for a user profile.
             String firstName = profileFirstName.getText().toString().trim();
-            if (firstName.isEmpty()) {
-                firstName = "Firstname";
-            }
-
             String lastName = profileLastName.getText().toString().trim();
-            if (lastName.isEmpty()) {
-                lastName = "lastname";
-            }
-
             String email = emailAddress.getText().toString().trim();
-            if (email.isEmpty()) {
-                email = "userperson@mailsite.com";
-            }
+            String phoneStr = phoneNumber.getText().toString();
 
-
-            long phone = parseLong(phoneNumber.getText().toString());
             String currentTheme = theme.toString();
+
             boolean geo = geolocation.isActivated();
 
+            // FIXME Put procedural generation here
             String imageURL = null;
 
-            User newUser = new User(firstName, lastName, phone, email, geo, imageURL);
+            boolean isValidFirst = isValidName(firstName);
+            boolean isValidLast = isValidName(lastName);
+            boolean isValidPhone = isValidPhone(phoneStr);
+            boolean isValidEmail = isValidEmail(email);
 
-            Firebase firebase = new Firebase();
-            firebase.createUser(newUser);
+            // Ensure all the necessary sign in parameters have been met
+            if (!isValidFirst) {
+                Toast.makeText(this,
+                        "Please ensure first name is filled out and only has letters.",
+                        Toast.LENGTH_SHORT).show();
+            }
+            else if (!isValidLast) {
+                Toast.makeText(this,
+                        "Please ensure last name is filled out and only has letters.",
+                        Toast.LENGTH_SHORT).show();
+            }
+            else if (!isValidEmail) {
+                Toast.makeText(this,
+                        "Please ensure email is filled out and is a valid email address.",
+                        Toast.LENGTH_SHORT).show();
+            }
+            else if (!isValidPhone) {
+                Toast.makeText(this,
+                        "Please ensure phone number is correct number of digits.",
+                        Toast.LENGTH_SHORT).show();
+            }
+            else {
+                User newUser = new User(firstName, lastName, parseLong(phoneStr), email, geo,
+                        imageURL);
 
-            // Set the static value of UserEmail to the provided email address
-            AppUser.setUserEmail(email);
+                Firebase firebase = new Firebase();
+                firebase.createUser(newUser);
 
-            // notify the Main Activity that a successful sign in has occurred
-            MainActivity.hasSignedIn = true;
-            finish();
+                // Set the static value of UserEmail to the provided email address
+                AppUser.setUserEmail(email);
+
+                // notify the Main Activity that a successful sign in has occurred
+                MainActivity.hasSignedIn = true;
+                finish();
+            }
         });
 
         // Set the adminButton to send to the admin sign in page.
@@ -85,5 +108,30 @@ public class FirstSignInActivity extends AppCompatActivity {
             Intent toAdmin = new Intent(FirstSignInActivity.this, AdminActivity.class);
             startActivity(toAdmin);
         });
+    }
+
+    private boolean isValidName(String name) {
+        if (name.isEmpty()) {
+            return false;
+        }
+
+        for (int i = 0; i < name.length(); i++) {
+            char letter = name.charAt(i);
+            if (!isLetter(letter)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private boolean isValidPhone(String phone) {
+        // FIXME May want to change number from 10
+        return (phone.length() == 4 || phone.length() >= 10);
+    }
+
+    private boolean isValidEmail(String email) {
+        // FIXME NEED TO GET JAVA EMAIL package
+        return (!email.isEmpty());
     }
 }

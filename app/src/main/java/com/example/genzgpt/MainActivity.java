@@ -9,8 +9,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 
+import com.example.genzgpt.Model.AppUser;
 import com.example.genzgpt.View.QRCodeFragment;
 import com.example.genzgpt.View.EventListFragment;
 import com.example.genzgpt.View.MainPageFragment;
@@ -35,7 +37,7 @@ public class MainActivity extends AppCompatActivity {
     EventListFragment eventHost = new EventListFragment();
     UserProfileFragment userProfile = new UserProfileFragment();
     QRCodeFragment QRCodeActivity = new QRCodeFragment();
-    public static boolean hasSignedIn = false;
+    public static boolean hasSignedIn;
 
 
     // navListener was made using acknowledgement 1.
@@ -91,34 +93,26 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
 
-        // currently does nothing
-        if (savedInstanceState != null) {
-            if (savedInstanceState.containsKey("Test")) {
-                hasSignedIn = savedInstanceState.getBoolean("Test");
-            }
-        }
+        // Get information that should be stored between runs of the app
+        SharedPreferences preferences = this.getSharedPreferences("com.example.genzgpt",
+                Context.MODE_PRIVATE);
 
         // Confirm whether or not a user has signed in on this application.
-        SharedPreferences preferences = this.getSharedPreferences("com.example.genzgpt", Context.MODE_PRIVATE);
-        if (preferences.contains("Test")) {
-            hasSignedIn = preferences.getBoolean("Test", false);
+        hasSignedIn = preferences.getBoolean("signIn", true);
+        if (preferences.contains("email")) {
+            AppUser.setUserEmail(preferences.getString("email", null));
         }
 
         // Go to another Activity if the user needs to put in their information.
         // Putting this before setContentView will stop Main Activity from showing initially
         sendToFirstTime();
 
-        // FIXME THIS IS A TEMPORARY SOLUTION AND STILL LOOKS WEIRD ON APP STARTUP
-        // Set the view to the main part of the app if all the previous steps went through
-        if (hasSignedIn) {
-            setContentView(R.layout.activity_main);
+        navBar = findViewById(R.id.bottomNavigationView);
 
-            navBar = findViewById(R.id.bottomNavigationView);
-
-            navBar.setOnItemSelectedListener(navListener);
-            navBar.setSelectedItemId(R.id.home);
-        }
+        navBar.setOnItemSelectedListener(navListener);
+        navBar.setSelectedItemId(R.id.home);
     }
 
     /**
@@ -139,8 +133,10 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
-        SharedPreferences preferences = this.getSharedPreferences("com.example.genzgpt", Context.MODE_PRIVATE);
-        preferences.edit().putBoolean("Test", hasSignedIn).apply();
-        outState.putBoolean("Test", hasSignedIn);
+        SharedPreferences preferences = this.getSharedPreferences("com.example.genzgpt",
+                Context.MODE_PRIVATE);
+        preferences.edit().putBoolean("signIn", hasSignedIn).apply();
+        preferences.edit().putString("email", AppUser.getAppUserEmail()).apply();
     }
+
 }
