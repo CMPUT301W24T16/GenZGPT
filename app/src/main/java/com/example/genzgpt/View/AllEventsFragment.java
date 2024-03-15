@@ -1,5 +1,6 @@
 package com.example.genzgpt.View;
 
+import android.os.Bundle;
 import android.util.Log;
 
 import androidx.fragment.app.Fragment;
@@ -16,6 +17,9 @@ import java.util.List;
  * create an instance of this fragment.
  */
 public class AllEventsFragment extends EventsFragment {
+    public AllEventsFragment() {
+        // required empty constructor
+    }
 
     /**
      * Fetches all events from Firestore and updates the RecyclerView
@@ -38,4 +42,8 @@ public class AllEventsFragment extends EventsFragment {
         });
     }
 
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+    }
 }

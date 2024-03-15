@@ -75,6 +75,11 @@ public class MyEventsFragment extends EventsFragment {
         return fragment;
     }
 
+    /**
+     * Handles creation of an instance of MyEvents
+     * @param savedInstanceState If the fragment is being re-created from
+     * a previous saved state, this is the state.
+     */
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
