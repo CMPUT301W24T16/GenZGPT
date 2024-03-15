@@ -9,7 +9,7 @@ import android.view.MenuItem;
 import com.example.genzgpt.View.AdminEventsFragment;
 import com.example.genzgpt.View.AdminHomeFragment;
 import com.example.genzgpt.View.AdminProfilesFragment;
-import com.example.genzgpt.View.EventListFragment;
+import com.example.genzgpt.View.UserListFragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
 
@@ -25,10 +25,9 @@ import com.google.android.material.navigation.NavigationBarView;
 public class AdminActivity extends AppCompatActivity {
     BottomNavigationView adminBar;
 
-    // FIXME Separate this into AdminEventListFragment() and UserEventListFragment() using extends
     AdminEventsFragment adminEvents = new AdminEventsFragment();
     AdminHomeFragment adminHome = new AdminHomeFragment();
-    AdminProfilesFragment adminProfiles = new AdminProfilesFragment();
+    UserListFragment adminProfiles = new UserListFragment();
 
     // adminListener was made with Acknowledgements 1.
     NavigationBarView.OnItemSelectedListener adminListener = new NavigationBarView.OnItemSelectedListener() {
