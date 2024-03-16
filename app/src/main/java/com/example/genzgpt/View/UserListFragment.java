@@ -23,6 +23,7 @@ import java.util.List;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 /**
+ * FIXME CAN WE GET ADMINPROFILESFRAGMENT DELETED AND REFACTOR THIS TO BE ADMINPROFILESFRAGMENT?
  * A simple {@link Fragment} subclass.
  * Serves as a Display for the User's List
  * Use the {@link UserListFragment} factory method to
