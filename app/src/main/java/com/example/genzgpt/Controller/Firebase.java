@@ -460,9 +460,8 @@ public class Firebase {
             if (task.isSuccessful()) {
                 DocumentSnapshot userSnapshot = task.getResult();
                 if (userSnapshot.exists()) {
-                    // User already exists, handle accordingly (e.g., throw an exception or return an error)
                     Log.e("Firebase", "User with ID " + user.getEmail() + " already exists");
-                    // Optionally, you can throw an exception or invoke a callback to handle the error
+                    // Optionally, anymore error handling can be done here
                 } else {
                     // Create a new user document
                     Map<String, Object> userData = new HashMap<>();
@@ -500,7 +499,6 @@ public class Firebase {
             } else {
                 // Error occurred while checking if the user exists
                 Log.e("Firebase", "Error checking user existence: " + task.getException().getMessage());
-                // Optionally, you can throw an exception or invoke a callback to handle the error
             }
         });
     }
