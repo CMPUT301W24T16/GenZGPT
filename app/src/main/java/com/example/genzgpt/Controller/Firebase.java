@@ -441,52 +441,55 @@ public class Firebase {
      * @param user
      */
     public void createUser(User user, OnUserCreatedListener listener) {
-        // Check if the user already exists
-        DocumentReference userRef = db.collection("users").document();
-        userRef.get().addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                DocumentSnapshot userSnapshot = task.getResult();
-                if (userSnapshot.exists()) {
-                    Log.e("Firebase", "User with ID " + userRef.getId() + " already exists");
-                    listener.onUserAlreadyExists();
-                } else {
-                    // Create a new user document
-                    Map<String, Object> userData = new HashMap<>();
-                    userData.put("firstName", user.getFirstName());
-                    userData.put("lastName", user.getLastName());
-                    userData.put("email", user.getEmail());
-                    userData.put("phoneNumber", user.getPhone());
-                    userData.put("geolocation", user.isGeolocation());
-                    userData.put("imageURL", user.getImageURL());
+        // Check if the email is already used
+        db.collection("users")
+                .whereEqualTo("email", user.getEmail())
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        QuerySnapshot emailSnapshot = task.getResult();
+                        if (emailSnapshot != null && !emailSnapshot.isEmpty()) {
+                            Log.e("Firebase", "Email " + user.getEmail() + " is already used");
+                            listener.onEmailAlreadyExists();
+                        } else {
+                            // Create a new user document
+                            DocumentReference userRef = db.collection("users").document();
+                            Map<String, Object> userData = new HashMap<>();
+                            userData.put("firstName", user.getFirstName());
+                            userData.put("lastName", user.getLastName());
+                            userData.put("email", user.getEmail());
+                            userData.put("phoneNumber", user.getPhone());
+                            userData.put("geolocation", user.isGeolocation());
+                            userData.put("imageURL", user.getImageURL());
 
-                    userRef.set(userData)
-                            .addOnSuccessListener(aVoid -> {
-                                // User created successfully
-                                Log.i("Firebase", "User created successfully");
+                            userRef.set(userData)
+                                    .addOnSuccessListener(aVoid -> {
+                                        // User created successfully
+                                        Log.i("Firebase", "User created successfully");
 
-                                // Retrieve the ID of the newly created user
-                                String userId = userRef.getId();
+                                        // Retrieve the ID of the newly created user
+                                        String userId = userRef.getId();
 
-                                // Return the user ID through the callback
-                                listener.onUserCreated(userId);
-                            })
-                            .addOnFailureListener(e -> {
-                                // Error occurred while creating the user
-                                Log.e("Firebase", "Error creating user: " + e.getMessage());
-                                listener.onUserCreationFailed(e);
-                            });
-                }
-            } else {
-                // Error occurred while checking if the user exists
-                Log.e("Firebase", "Error checking user existence: " + task.getException().getMessage());
-                listener.onUserCreationFailed(task.getException());
-            }
-        });
+                                        // Return the user ID through the callback
+                                        listener.onUserCreated(userId);
+                                    })
+                                    .addOnFailureListener(e -> {
+                                        // Error occurred while creating the user
+                                        Log.e("Firebase", "Error creating user: " + e.getMessage());
+                                        listener.onUserCreationFailed(e);
+                                    });
+                        }
+                    } else {
+                        // Error occurred while checking if the email is already used
+                        Log.e("Firebase", "Error checking email existence: " + task.getException().getMessage());
+                        listener.onUserCreationFailed(task.getException());
+                    }
+                });
     }
 
     public interface OnUserCreatedListener {
         void onUserCreated(String userId);
-        void onUserAlreadyExists();
+        void onEmailAlreadyExists();
         void onUserCreationFailed(Exception e);
     }
 
