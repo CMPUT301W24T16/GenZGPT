@@ -7,6 +7,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
@@ -101,11 +102,17 @@ public class EditProfileFragment extends DialogFragment {
             if (checkPermissions()) {
                 geoBool = geolocationSwitch.isChecked();
             }
-
-            User new_user = new User(null, firstName, lastName, phone, emailName, geoBool, null);
-            firebase.deleteUser(emailName);
-            firebase.createUser(new_user);
-            AppUser.setUserEmail(emailName);
+            User new_user = new User(selectedUser.getId(), firstName,lastName, phone, emailName, geoBool, selectedUser.getImageURL());
+            firebase.updateUser(new_user, new Firebase.OnUserUpdatedListener() {
+                @Override
+                public void onUserUpdated() {
+                    Toast.makeText(getContext(),"Successfully updated user information!", Toast.LENGTH_SHORT).show();
+                }
+                @Override
+                public void onUserUpdateFailed(Exception e) {
+                    Log.e("Firebase", "Error updating user information.");
+                }
+            });
         }).create();
     }
     private boolean checkPermissions() {
