@@ -65,6 +65,7 @@ dependencies {
     androidTestImplementation("androidx.test.espresso:espresso-intents:3.4.0")
     androidTestImplementation("org.mockito:mockito-core:3.12.4")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
+    implementation ("com.facebook.shimmer:shimmer:0.5.0")
 
 
 }

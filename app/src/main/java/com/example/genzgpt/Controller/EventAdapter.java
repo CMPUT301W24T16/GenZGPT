@@ -39,7 +39,13 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> 
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
         String dateString = dateFormat.format(event.getEventDate());
         holder.eventDate.setText(dateString);
-//        Picasso.get().load(event.getImageURL()).into(holder.eventImage);
+        if (event.getImageURL() != null && !event.getImageURL().isEmpty()) {
+            Picasso.get()
+                    .load(event.getImageURL())
+                    .placeholder(R.drawable.ic_launcher_foreground)
+                    .into(holder.eventImage);
+        }
+
     }
 
     @Override
