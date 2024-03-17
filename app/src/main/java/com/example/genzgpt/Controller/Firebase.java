@@ -894,5 +894,55 @@ public class Firebase {
         void onRegisteredAttendeesLoadFailed(Exception e);
     }
 
+    public void updateUser(User user, OnUserUpdatedListener listener) {
+        String userId = user.getId();
+        DocumentReference userRef = db.collection("users").document(userId);
 
+        Map<String, Object> updates = new HashMap<>();
+        updates.put("firstName", user.getFirstName());
+        updates.put("lastName", user.getLastName());
+        updates.put("email", user.getEmail());
+        updates.put("phoneNumber", user.getPhone());
+        updates.put("geolocation", user.isGeolocation());
+        updates.put("imageURL", user.getImageURL());
+
+        userRef.update(updates)
+                .addOnSuccessListener(aVoid -> {
+                    Log.d("Firebase", "User updated successfully");
+                    listener.onUserUpdated();
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("Firebase", "Error updating user: " + e.getMessage());
+                    listener.onUserUpdateFailed(e);
+                });
+    }
+
+    public interface OnUserUpdatedListener {
+        void onUserUpdated();
+        void onUserUpdateFailed(Exception e);
+    }
+
+    public void updateEvent(String eventId, String newEventName, Date newEventDate, String newLocation, OnEventUpdatedListener listener) {
+        DocumentReference eventRef = db.collection("events").document(eventId);
+
+        Map<String, Object> updates = new HashMap<>();
+        updates.put("eventName", newEventName);
+        updates.put("eventDate", newEventDate);
+        updates.put("location", newLocation);
+
+        eventRef.update(updates)
+                .addOnSuccessListener(aVoid -> {
+                    Log.d("Firebase", "Event updated successfully");
+                    listener.onEventUpdated();
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("Firebase", "Error updating event: " + e.getMessage());
+                    listener.onEventUpdateFailed(e);
+                });
+    }
+
+    public interface OnEventUpdatedListener {
+        void onEventUpdated();
+        void onEventUpdateFailed(Exception e);
+    }
 }
