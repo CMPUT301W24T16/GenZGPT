@@ -1,10 +1,8 @@
 package com.example.genzgpt.View;
 
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,7 +11,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
@@ -29,22 +26,29 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * A simple {@link Fragment} subclass.
- * Serves as a Display for the User's Events List
- * Use the {@link MyEventsFragment#newInstance} factory method to
- * create an instance of this fragment.
+ * The basis for any fragment that handles showing a collection of events.
  */
-public class EventListFragment extends Fragment {
-    private RecyclerView recyclerView;
-    private EventAdapter eventAdapter;
-    private List<Event> eventList;
-    private Firebase firebase;
+abstract class EventsFragment extends Fragment {
+    protected RecyclerView recyclerView;
+    protected EventAdapter eventAdapter;
+    protected List<Event> eventList;
+    protected Firebase firebase;
+
+    // All EventsFragment subclasses will fetchEvents, but which they fetch will differ.
+    abstract protected void fetchEvents();
 
     /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
+     *  Handles the visual creation of the AdminEventsFragment.
+     *  @param inflater The LayoutInflater object that can be used to inflate
+     *  any views in the fragment,
+     *  @param container If non-null, this is the parent view that the fragment's
+     *  UI should be attached to.  The fragment should not add the view itself,
+     *  but this can be used to generate the LayoutParams of the view.
+     *  @param savedInstanceState If non-null, this fragment is being re-constructed
+     *  from a previous saved state as given here.
      *
-     * @return A new instance of fragment EventListFragment.
+     * @return
+     * A View for an EventsFragment
      */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -61,14 +65,6 @@ public class EventListFragment extends Fragment {
 
         firebase = new Firebase();
 
-        Button createEventButton = view.findViewById(R.id.addEventButton);
-
-        createEventButton.setOnClickListener(v -> {
-            // Navigate to EventCreationFragment
-            EventCreationFragment eventCreationFragment = new EventCreationFragment();
-            switchFragment(eventCreationFragment);
-        });
-
         // Fetch the list of events from Firestore and update the RecyclerView
         fetchEvents();
 
@@ -78,41 +74,22 @@ public class EventListFragment extends Fragment {
     /**
      * Switches the current fragment to the new fragment
      */
-    private void switchFragment(EventCreationFragment eventCreationFragment) {
+    protected void switchFragment(Fragment fragment, int idToReplace) {
         FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 
         // Replace the current fragment with the new fragment
-        fragmentTransaction.replace(R.id.BaseFragment, eventCreationFragment);
+        fragmentTransaction.replace(idToReplace, fragment);
         fragmentTransaction.addToBackStack(null);
 
         // Commit the transaction
         fragmentTransaction.commit();
     }
 
-
     /**
-     * Fetches the list of events from Firestore and updates the RecyclerView
+     * Allows for an Event to be handled by the RecyclerView in an EventsFragment
      */
-    private void fetchEvents() {
-        eventList.clear();
-        firebase.fetchEvents(new Firebase.OnEventsLoadedListener() {
-            @Override
-            public void onEventsLoaded(List<Event> loadedEvents) {
-                eventList.clear();
-                eventList.addAll(loadedEvents);
-                eventAdapter.notifyDataSetChanged();
-            }
-
-            @Override
-            public void onEventsLoadFailed(Exception e) {
-                // Handle the error case
-                Log.e("EventListFragment", "Failed to load events: " + e.getMessage());
-            }
-        });
-    }
-
-    private class EventAdapter extends RecyclerView.Adapter<EventViewHolder> {
+    protected class EventAdapter extends RecyclerView.Adapter<EventViewHolder> {
         private List<Event> events;
 
         /**
@@ -149,7 +126,7 @@ public class EventListFragment extends Fragment {
         }
 
         /**
-         * Updates the list of events
+         * Updates the list of events in the EventAdapter
          */
         public void setEvents(List<Event> newEvents) {
             this.events.clear();
@@ -158,7 +135,7 @@ public class EventListFragment extends Fragment {
         }
 
         /**
-         * Returns the list of events
+         * Returns the list of events in the EventAdapter
          */
         public List<Event> getEvents() {
             return events;
@@ -166,13 +143,13 @@ public class EventListFragment extends Fragment {
     }
 
     /**
-     * View holder for the event
+     * View holder for an Event
      */
-    private class EventViewHolder extends RecyclerView.ViewHolder {
-        private TextView eventName;
-        private TextView eventstart;
-        private TextView eventLocation;
-        private ImageView eventImage;
+    protected class EventViewHolder extends RecyclerView.ViewHolder {
+        protected TextView eventName;
+        protected TextView eventstart;
+        protected TextView eventLocation;
+        protected ImageView eventImage;
 
         /**
          * Constructor for the EventViewHolder
@@ -187,6 +164,7 @@ public class EventListFragment extends Fragment {
 
         /**
          * Binds the event data to the view holder
+         * This Version is designed for MainActivity EventsFragments
          */
         public void bind(Event event) {
             eventName.setText(event.getEventName());
@@ -217,15 +195,15 @@ public class EventListFragment extends Fragment {
                     if (options[item].equals("Registered Attendees")) {
                         // Navigate to RegisteredAttendeesFragment
                         RegisteredListFragment registeredAttendeesFragment = new RegisteredListFragment(event);
-                        switchFragment(context, registeredAttendeesFragment);
+                        switchFragment(context, registeredAttendeesFragment, R.id.BaseFragment);
                     } else if (options[item].equals("Attendees")) {
                         // Navigate to AttendeeListFragment
                         AttendeeListFragment attendeeListFragment = new AttendeeListFragment(event);
-                        switchFragment(context, attendeeListFragment);
+                        switchFragment(context, attendeeListFragment, R.id.BaseFragment);
                     } else if (options[item].equals("Event Info")) {
                         // Navigate to AttendeeListFragment
                         EventInfoFragment eventInfoFragment = new EventInfoFragment(event);
-                        switchFragment(context, eventInfoFragment);
+                        switchFragment(context, eventInfoFragment, R.id.BaseFragment);
                     } else if (options[item].equals("Cancel")) {
                         dialog.dismiss();
                     }
@@ -234,20 +212,24 @@ public class EventListFragment extends Fragment {
                 // Showing the AlertDialog
                 builder.show();
             });
-
-            itemView.setOnLongClickListener(v -> {
-                showDeleteEventDialog(event);
-                return true;
-            });
         }
 
 
-        private void switchFragment(Context context, Fragment fragment) {
+        /**
+         * A re-usable switch between two different fragments.
+         * @param context
+         * The information needed to switch fragments from the app.
+         * @param fragment
+         * The fragment that will be switched to.
+         * @param idToReplace
+         * The id of the fragment being replaced in the switch.
+         */
+        protected void switchFragment(Context context, Fragment fragment, int idToReplace) {
             FragmentManager fragmentManager = ((AppCompatActivity) context).getSupportFragmentManager();
             FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 
             // Replace the current fragment with the new fragment
-            fragmentTransaction.replace(R.id.BaseFragment, fragment);
+            fragmentTransaction.replace(idToReplace, fragment);
             fragmentTransaction.addToBackStack(null);
 
             // Commit the transaction
@@ -255,43 +237,4 @@ public class EventListFragment extends Fragment {
         }
     }
 
-    /**
-     * Shows a dialog to confirm the deletion of the event
-     */
-    private void showDeleteEventDialog(Event event) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setTitle("Delete Event")
-                .setMessage("Are you sure you want to delete this event?")
-                .setPositiveButton("Delete", (dialog, which) -> {
-                    deleteEvent(event);
-                })
-                .setNegativeButton("Cancel", (dialog, which) -> {
-                    dialog.dismiss();
-                })
-                .show();
-    }
-
-    /**
-     * Deletes the event from Firestore and updates the RecyclerView
-     */
-    private void deleteEvent(Event event) {
-        firebase.deleteEvent(event.getEventName());
-        int position = eventAdapter.getEvents().indexOf(event);
-        if (position != -1) {
-            eventAdapter.getEvents().remove(position);
-            eventAdapter.notifyItemRemoved(position);
-        }
-    }
-
-    private void deleteEventImage(Event event) {
-        // Call deleteImage to delete the associated image
-        firebase.deleteEventImage(event.getEventId(), event.getImageURL());
-
-        // Remove the event from the RecyclerView
-        int position = eventAdapter.getEvents().indexOf(event);
-        if (position != -1) {
-            eventAdapter.getEvents().remove(position);
-            eventAdapter.notifyItemRemoved(position);
-        }
-    }
 }

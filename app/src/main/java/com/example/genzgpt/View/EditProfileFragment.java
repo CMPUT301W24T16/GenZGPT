@@ -1,4 +1,4 @@
-package com.example.genzgpt;
+package com.example.genzgpt.View;
 
 import static com.example.genzgpt.Controller.GalleryHandler.openGallery;
 
@@ -24,6 +24,7 @@ import androidx.fragment.app.DialogFragment;
 import com.example.genzgpt.Controller.Firebase;
 import com.example.genzgpt.Model.AppUser;
 import com.example.genzgpt.Model.User;
+import com.example.genzgpt.R;
 
 /**
  * A Dialog window used for when a User wants to edit their profile information.
@@ -104,10 +105,14 @@ public class EditProfileFragment extends DialogFragment {
             User new_user = new User(null, firstName, lastName, phone, emailName, geoBool, null);
             firebase.deleteUser(emailName);
             firebase.createUser(new_user);
-                AppUser.setUserEmail(emailName);
+            AppUser.setUserEmail(emailName);
         }).create();
     }
     private boolean checkPermissions() {
-        return ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
+        if (getActivity() != null) {
+            return ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
+        }else{
+            return false;
+        }
     }
 }
