@@ -5,6 +5,7 @@ package com.example.genzgpt.Model;
  */
 public class AppUser extends User{
     private static String userId;
+    private static String userEmail;
 
     /**
      * A constructor for the AppUser Class.
@@ -70,4 +71,13 @@ public class AppUser extends User{
         userId = _userId;
     }
 
+    //FIXME THIS SHOULD NOT BE NECESSARY ANYMORE
+    public static void setUserEmail(String _userEmail) {
+        userEmail = _userEmail;
+    }
+
+    //FIXME THIS SHOULD NOT BE NECESSARY ANYMORE
+    public static String getAppUserEmail() {
+        return userEmail;
+    }
 }

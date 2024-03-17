@@ -81,7 +81,7 @@ public class UserProfileFragment extends Fragment {
         userEmail = view.findViewById(R.id.email_text);
         userTheme = view.findViewById(R.id.theme_text);
         userGeolocation = view.findViewById(R.id.geolocation_text);
-        String appUser = AppUser.getAppUserEmail();
+        String appUser = AppUser.getUserId();
         firebase.getUserData(appUser, new Firebase.OnUserLoadedListener() {
             @Override
             public void onUserLoaded(User user) {
