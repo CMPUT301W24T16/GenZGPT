@@ -697,7 +697,7 @@ public class Firebase {
                     List<User> userList = new ArrayList<>();
                     for (DocumentSnapshot document : querySnapshot.getDocuments()) {
                         // Extract user data from the document
-                        String userID = document.getId(); //comment this out if we get rid of userID
+                        String userID = document.getString("id");
                         String firstName = document.getString("firstName");
                         String lastName = document.getString("lastName");
                         String email = document.getString("email");
