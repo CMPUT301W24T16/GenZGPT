@@ -237,23 +237,23 @@ public class Firebase {
     /**
      * Retrieves the user data from Firebase.
      * @return the user details for a particular email.
-     * @param email
+     * @param userId
      */
-    public void getUserData(String email, OnUserLoadedListener listener) {
+    public void getUserData(String userId, OnUserLoadedListener listener) {
         db.collection("users")
-                .whereEqualTo("email", email)
+                .whereEqualTo("id", userId)
                 .get()
                 .addOnSuccessListener(querySnapshot -> {
                     if (!querySnapshot.isEmpty()) {
                         DocumentSnapshot document = querySnapshot.getDocuments().get(0);
                         String firstName = document.getString("firstName");
                         String lastName = document.getString("lastName");
+                        String email = document.getString("email");
                         Long phoneNumber = document.getLong("phoneNumber");
                         boolean geolocation = Boolean.TRUE.equals(document.getBoolean("geolocation"));
-                        String userID = document.getId();
                         String imageURL = document.getString("imageURL");
 
-                        User user = new User(userID, firstName, lastName, phoneNumber, email, geolocation, imageURL);
+                        User user = new User(userId, firstName, lastName, phoneNumber, email, geolocation, imageURL);
                         listener.onUserLoaded(user);
                     } else {
                         listener.onUserNotFound();
@@ -460,13 +460,11 @@ public class Firebase {
             if (task.isSuccessful()) {
                 DocumentSnapshot userSnapshot = task.getResult();
                 if (userSnapshot.exists()) {
-                    // User already exists, handle accordingly (e.g., throw an exception or return an error)
                     Log.e("Firebase", "User with ID " + user.getEmail() + " already exists");
-                    // Optionally, you can throw an exception or invoke a callback to handle the error
+                    // Optionally, anymore error handling can be done here
                 } else {
                     // Create a new user document
                     Map<String, Object> userData = new HashMap<>();
-                    userData.put("id", user.getId());
                     userData.put("firstName", user.getFirstName());
                     userData.put("lastName", user.getLastName());
                     userData.put("email", user.getEmail());
@@ -478,6 +476,20 @@ public class Firebase {
                             .addOnSuccessListener(aVoid -> {
                                 // User created successfully
                                 Log.i("Firebase", "User created successfully");
+
+                                // Retrieve the ID of the newly created user
+                                String userId = userRef.getId();
+
+                                // Update the user document with the ID field
+                                userRef.update("userId", userId)
+                                        .addOnSuccessListener(aVoid1 -> {
+                                            // ID field added successfully
+                                            Log.i("Firebase", "User ID added successfully");
+                                        })
+                                        .addOnFailureListener(e -> {
+                                            // Error occurred while adding the ID field
+                                            Log.e("Firebase", "Error adding user ID: " + e.getMessage());
+                                        });
                             })
                             .addOnFailureListener(e -> {
                                 // Error occurred while creating the user
@@ -487,7 +499,6 @@ public class Firebase {
             } else {
                 // Error occurred while checking if the user exists
                 Log.e("Firebase", "Error checking user existence: " + task.getException().getMessage());
-                // Optionally, you can throw an exception or invoke a callback to handle the error
             }
         });
     }
@@ -538,9 +549,9 @@ public class Firebase {
     /**
      * Adds a user to the list of registered attendees for a specific event.
      * @param eventName
-     * @param userEmail
+     * @param userId
      */
-    public void addUserToCheckedInAttendees(String eventName, String userEmail) {
+    public void addUserToCheckedInAttendees(String eventName, String userId) {
         try {
             CollectionReference eventsRef = db.collection("events");
             Query query = eventsRef.whereEqualTo("eventName", eventName);
@@ -554,7 +565,7 @@ public class Firebase {
                         String eventId = eventDocument.getId();
 
                         DocumentReference eventRef = db.collection("events").document(eventId);
-                        eventRef.update("checkedInAttendees", FieldValue.arrayUnion(userEmail))
+                        eventRef.update("checkedInAttendees", FieldValue.arrayUnion(userId))
                                 .addOnSuccessListener(aVoid -> {
                                     // User added to checkedInAttendees successfully
                                     Log.i("Firebase", "User added to checkedInAttendees successfully");
@@ -638,12 +649,12 @@ public class Firebase {
 
     /**
      * Deletes a user from the database.
-     * @param userEmail
+     * @param userId
      */
-    public void deleteUser(String userEmail) {
+    public void deleteUser(String userId) {
         try {
             CollectionReference usersRef = db.collection("users");
-            Query query = usersRef.whereEqualTo("email", userEmail);
+            Query query = usersRef.whereEqualTo("id", userId);
 
             query.get().addOnCompleteListener(task -> {
                 if (task.isSuccessful()) {
@@ -661,8 +672,8 @@ public class Firebase {
                                     });
                         }
                     } else {
-                        // No users found with the specified email
-                        Log.i("Firebase", "No users found with the email: " + userEmail);
+                        // No users found with the specified ID
+                        Log.i("Firebase", "No users found with the ID: " + userId);
                     }
                 } else {
                     // Error occurred while querying users
@@ -686,7 +697,7 @@ public class Firebase {
                     List<User> userList = new ArrayList<>();
                     for (DocumentSnapshot document : querySnapshot.getDocuments()) {
                         // Extract user data from the document
-                        String userID = document.getId(); //comment this out if we get rid of userID
+                        String userID = document.getString("id");
                         String firstName = document.getString("firstName");
                         String lastName = document.getString("lastName");
                         String email = document.getString("email");
@@ -763,7 +774,7 @@ public class Firebase {
                 if (snapshot != null && !snapshot.isEmpty()) {
                     // Assuming there is only one event with the given name
                     DocumentSnapshot eventDocument = snapshot.getDocuments().get(0);
-                    List<String> checkedInAttendeesEmails = (List<String>) eventDocument.get("checkedInAttendees");
+                    List<String> checkedInAttendeeIds = (List<String>) eventDocument.get("checkedInAttendees");
 
                     // Create a list to store the User objects
                     List<User> checkedInAttendees = new ArrayList<>();
@@ -771,13 +782,13 @@ public class Firebase {
                     // Create a counter to keep track of loaded users
                     AtomicInteger loadedUserCount = new AtomicInteger(0);
 
-                    // Iterate through the list of attendee emails and fetch their user data
-                    for (String email : checkedInAttendeesEmails) {
-                        getUserData(email, new OnUserLoadedListener() {
+                    // Iterate through the list of attendee IDs and fetch their user data
+                    for (String userId : checkedInAttendeeIds) {
+                        getUserData(userId, new OnUserLoadedListener() {
                             @Override
                             public void onUserLoaded(User user) {
                                 checkedInAttendees.add(user);
-                                if (loadedUserCount.incrementAndGet() == checkedInAttendeesEmails.size()) {
+                                if (loadedUserCount.incrementAndGet() == checkedInAttendeeIds.size()) {
                                     // All users have been loaded
                                     listener.onCheckInAttendeesLoaded(checkedInAttendees);
                                 }
@@ -785,7 +796,7 @@ public class Firebase {
 
                             @Override
                             public void onUserNotFound() {
-                                if (loadedUserCount.incrementAndGet() == checkedInAttendeesEmails.size()) {
+                                if (loadedUserCount.incrementAndGet() == checkedInAttendeeIds.size()) {
                                     // All users have been loaded
                                     listener.onCheckInAttendeesLoaded(checkedInAttendees);
                                 }
@@ -830,7 +841,7 @@ public class Firebase {
                 if (snapshot != null && !snapshot.isEmpty()) {
                     // Assuming there is only one event with the given name
                     DocumentSnapshot eventDocument = snapshot.getDocuments().get(0);
-                    List<String> registeredAttendeesEmails = (List<String>) eventDocument.get("registeredAttendees");
+                    List<String> registeredAttendeeIds = (List<String>) eventDocument.get("registeredAttendees");
 
                     // Create a list to store the User objects
                     List<User> registeredAttendees = new ArrayList<>();
@@ -838,20 +849,20 @@ public class Firebase {
                     // Create an AtomicInteger to keep track of the number of loaded users
                     AtomicInteger loadedUserCount = new AtomicInteger(0);
 
-                    // Iterate through the list of attendee emails and fetch their user data
-                    for (String email : registeredAttendeesEmails) {
-                        getUserData(email, new OnUserLoadedListener() {
+                    // Iterate through the list of attendee IDs and fetch their user data
+                    for (String userId : registeredAttendeeIds) {
+                        getUserData(userId, new OnUserLoadedListener() {
                             @Override
                             public void onUserLoaded(User user) {
                                 registeredAttendees.add(user);
-                                if (loadedUserCount.incrementAndGet() == registeredAttendeesEmails.size()) {
+                                if (loadedUserCount.incrementAndGet() == registeredAttendeeIds.size()) {
                                     listener.onRegisteredAttendeesLoaded(registeredAttendees);
                                 }
                             }
 
                             @Override
                             public void onUserNotFound() {
-                                if (loadedUserCount.incrementAndGet() == registeredAttendeesEmails.size()) {
+                                if (loadedUserCount.incrementAndGet() == registeredAttendeeIds.size()) {
                                     listener.onRegisteredAttendeesLoaded(registeredAttendees);
                                 }
                             }
@@ -864,7 +875,7 @@ public class Firebase {
                     }
 
                     // If there are no registered attendees, call the onRegisteredAttendeesLoaded callback immediately
-                    if (registeredAttendeesEmails.isEmpty()) {
+                    if (registeredAttendeeIds.isEmpty()) {
                         listener.onRegisteredAttendeesLoaded(registeredAttendees);
                     }
                 } else {
@@ -883,5 +894,55 @@ public class Firebase {
         void onRegisteredAttendeesLoadFailed(Exception e);
     }
 
+    public void updateUser(User user, OnUserUpdatedListener listener) {
+        String userId = user.getId();
+        DocumentReference userRef = db.collection("users").document(userId);
 
+        Map<String, Object> updates = new HashMap<>();
+        updates.put("firstName", user.getFirstName());
+        updates.put("lastName", user.getLastName());
+        updates.put("email", user.getEmail());
+        updates.put("phoneNumber", user.getPhone());
+        updates.put("geolocation", user.isGeolocation());
+        updates.put("imageURL", user.getImageURL());
+
+        userRef.update(updates)
+                .addOnSuccessListener(aVoid -> {
+                    Log.d("Firebase", "User updated successfully");
+                    listener.onUserUpdated();
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("Firebase", "Error updating user: " + e.getMessage());
+                    listener.onUserUpdateFailed(e);
+                });
+    }
+
+    public interface OnUserUpdatedListener {
+        void onUserUpdated();
+        void onUserUpdateFailed(Exception e);
+    }
+
+    public void updateEvent(String eventId, String newEventName, Date newEventDate, String newLocation, OnEventUpdatedListener listener) {
+        DocumentReference eventRef = db.collection("events").document(eventId);
+
+        Map<String, Object> updates = new HashMap<>();
+        updates.put("eventName", newEventName);
+        updates.put("eventDate", newEventDate);
+        updates.put("location", newLocation);
+
+        eventRef.update(updates)
+                .addOnSuccessListener(aVoid -> {
+                    Log.d("Firebase", "Event updated successfully");
+                    listener.onEventUpdated();
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("Firebase", "Error updating event: " + e.getMessage());
+                    listener.onEventUpdateFailed(e);
+                });
+    }
+
+    public interface OnEventUpdatedListener {
+        void onEventUpdated();
+        void onEventUpdateFailed(Exception e);
+    }
 }

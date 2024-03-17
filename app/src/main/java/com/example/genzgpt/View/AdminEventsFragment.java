@@ -6,6 +6,7 @@ import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -28,6 +29,7 @@ import java.util.List;
  * create an instance of this fragment.
  */
 public class AdminEventsFragment extends EventsFragment {
+    protected EventAdapter eventAdapter;
 
     /**
      * Required empty constructor for AdminEventsFragment
@@ -46,6 +48,40 @@ public class AdminEventsFragment extends EventsFragment {
     public static AdminEventsFragment newInstance() {
         AdminEventsFragment fragment = new AdminEventsFragment();
         return fragment;
+    }
+
+    /**
+     *  Handles the visual creation of the AdminEventsFragment.
+     *  @param inflater The LayoutInflater object that can be used to inflate
+     *  any views in the fragment,
+     *  @param container If non-null, this is the parent view that the fragment's
+     *  UI should be attached to.  The fragment should not add the view itself,
+     *  but this can be used to generate the LayoutParams of the view.
+     *  @param savedInstanceState If non-null, this fragment is being re-constructed
+     *  from a previous saved state as given here.
+     *
+     * @return
+     * A View for an EventsFragment
+     */
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.event_list_fragment, container, false);
+
+        int spacingInPixels = 16; // Adjust the spacing as needed
+        recyclerView = view.findViewById(R.id.eventsRecyclerView);
+        recyclerView.addItemDecoration(new SpacingItemDecoration(spacingInPixels));
+        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+
+        eventList = new ArrayList<>();
+        eventAdapter = new EventAdapter(eventList);
+        recyclerView.setAdapter(eventAdapter);
+
+        firebase = new Firebase();
+
+        // Fetch the list of events from Firestore and update the RecyclerView
+        fetchEvents();
+
+        return view;
     }
 
     /**
@@ -122,6 +158,64 @@ public class AdminEventsFragment extends EventsFragment {
                 Log.e("EventListFragment", "Failed to load events: " + e.getMessage());
             }
         });
+    }
+
+    //FIXME CAN WE JUST REMOVE EVENTADAPTER AND EVENTVIEWHOLDER FROM BEING NESTED CLASSES TO MAKE
+    // THIS EASIER?
+    /**
+     * Allows for an Event to be handled by the RecyclerView in an AdminEventsFragment
+     */
+    protected class EventAdapter extends RecyclerView.Adapter<EventViewHolder> {
+        private List<Event> events;
+
+        /**
+         * Constructor for the EventAdapter
+         */
+        public EventAdapter(List<Event> events) {
+            this.events = events;
+        }
+
+        /**
+         * Creates a new view holder and inflates the view
+         */
+        @Override
+        public EventViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+            View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_event, parent, false);
+            return new EventViewHolder(itemView);
+        }
+
+        /**
+         * Binds the event data to the view holder
+         */
+        @Override
+        public void onBindViewHolder(EventViewHolder holder, int position) {
+            Event event = events.get(position);
+            holder.bind(event);
+        }
+
+        /**
+         * Returns the number of items in the list
+         */
+        @Override
+        public int getItemCount() {
+            return events.size();
+        }
+
+        /**
+         * Updates the list of events in the EventAdapter
+         */
+        public void setEvents(List<Event> newEvents) {
+            this.events.clear();
+            this.events.addAll(newEvents);
+            notifyDataSetChanged();
+        }
+
+        /**
+         * Returns the list of events in the EventAdapter
+         */
+        public List<Event> getEvents() {
+            return events;
+        }
     }
 
     protected class EventViewHolder extends EventsFragment.EventViewHolder {
