@@ -1,3 +1,5 @@
+<!--The formatting for the main part of the camera functionality
+    contains a capture button for capturing images.-->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"

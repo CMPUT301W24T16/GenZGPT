@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--A test picture for the functionality of notifications in the app.
+    ISSUES: THIS IS PLACEHOLDER. IT DOES NOTHING-->
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
 
 </selector>

@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--The fragment that allows for the admin to view all user profiles
+    ISSUES: CURRENTLY DOES NOT HAVE ANYTHING VALUABLE. IS PLACEHOLDER.-->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".AdminProfilesFragment">
+    tools:context=".View.AdminProfilesFragment">
 
     <!-- TODO: Update blank fragment layout -->
     <TextView

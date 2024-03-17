@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--The formatting for the one time sign in page of the app.
+    ISSUES: THE buttons are currently the wrong colour-->
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
@@ -50,7 +52,7 @@
             android:id="@+id/last_name_fill"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="22dp"
+            android:layout_marginTop="12dp"
             android:background="@drawable/edit_text_outline"
             android:ems="15"
             android:hint="@string/last_name"

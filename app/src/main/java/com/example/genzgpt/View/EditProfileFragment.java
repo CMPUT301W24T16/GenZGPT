@@ -1,21 +1,31 @@
-package com.example.genzgpt;
+package com.example.genzgpt.View;
 
 import static com.example.genzgpt.Controller.GalleryHandler.openGallery;
 
+import android.Manifest;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.SwitchCompat;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.DialogFragment;
 
+import com.example.genzgpt.Controller.Firebase;
+import com.example.genzgpt.Model.AppUser;
 import com.example.genzgpt.Model.User;
+import com.example.genzgpt.R;
 
 /**
  * A Dialog window used for when a User wants to edit their profile information.
@@ -23,6 +33,7 @@ import com.example.genzgpt.Model.User;
 public class EditProfileFragment extends DialogFragment {
     private String geolocationName;
     private User selectedUser;
+
 
     /**
      * Creates a profile fragment
@@ -54,7 +65,7 @@ public class EditProfileFragment extends DialogFragment {
         editFirstName.setText(selectedUser.getFirstName());
         editLastName.setText(selectedUser.getLastName());
         editEmail.setText(selectedUser.getEmail());
-        //editPhone.setText(selectedUser.getPhone());
+        editPhone.setText(String.valueOf(selectedUser.getPhone()));
         if (selectedUser.isGeolocation()){
             geolocationSwitch.setChecked(Boolean.TRUE);
         }
@@ -80,17 +91,35 @@ public class EditProfileFragment extends DialogFragment {
         });
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         return builder.setView(view).setTitle("Edit Profile").setNegativeButton("Cancel", null).setPositiveButton("Save Changes", (dialog, which) ->{
+            Firebase firebase = new Firebase();
             String firstName = editFirstName.getText().toString();
             String lastName = editLastName.getText().toString();
             String emailName = editEmail.getText().toString();
             //May need to update if it is not a String object
             String phoneNum = editPhone.getText().toString();
-            SwitchCompat geoStatus = geolocationSwitch;
-            if (geoStatus.isChecked()){
-                geolocationName = "ON";
-            }else{
-                geolocationName = "OFF";
+            long phone = Long.parseLong(phoneNum);
+            boolean geoBool = Boolean.FALSE;
+            if (checkPermissions()) {
+                geoBool = geolocationSwitch.isChecked();
             }
+            User new_user = new User(selectedUser.getId(), firstName,lastName, phone, emailName, geoBool, selectedUser.getImageURL());
+            firebase.updateUser(new_user, new Firebase.OnUserUpdatedListener() {
+                @Override
+                public void onUserUpdated() {
+                    Toast.makeText(getContext(),"Successfully updated user information!", Toast.LENGTH_SHORT).show();
+                }
+                @Override
+                public void onUserUpdateFailed(Exception e) {
+                    Log.e("Firebase", "Error updating user information.");
+                }
+            });
         }).create();
+    }
+    private boolean checkPermissions() {
+        if (getActivity() != null) {
+            return ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
+        }else{
+            return false;
+        }
     }
 }

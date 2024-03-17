@@ -1,4 +1,4 @@
-package com.example.genzgpt.Controller;
+package com.example.genzgpt.View;
 
 import android.Manifest;
 import android.content.Intent;
@@ -13,6 +13,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
+import com.example.genzgpt.Controller.Firebase;
 import com.example.genzgpt.Model.Event;
 import com.example.genzgpt.Model.AppUser;
 import com.example.genzgpt.R;
@@ -123,6 +124,6 @@ public class QRCodeFragment extends Fragment {
 
     private void checkInUser(String substring) {
         // Check in the user to the event
-        firebase.addUserToCheckedInAttendees(substring, AppUser.getAppUserEmail());
+        firebase.addUserToCheckedInAttendees(substring, AppUser.getUserId());
     }
 }

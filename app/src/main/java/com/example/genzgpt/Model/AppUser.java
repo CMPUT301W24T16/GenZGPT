@@ -4,7 +4,7 @@ package com.example.genzgpt.Model;
  * A class representing the User of the App on this device.
  */
 public class AppUser extends User{
-    private static String userEmail;
+    private static String userId;
 
     /**
      * A constructor for the AppUser Class.
@@ -28,7 +28,6 @@ public class AppUser extends User{
      */
     public AppUser(String id, String firstName, String lastName, long phone, String email, Boolean geolocation, String imageURL) {
         super(id, firstName, lastName, phone, email, geolocation, imageURL);
-        userEmail = email;
     }
 
     /**
@@ -52,25 +51,23 @@ public class AppUser extends User{
     public AppUser(String firstName, String lastName, long phone, String email, Boolean geolocation, String imageURL) {
         super(firstName, lastName, phone, email, geolocation, imageURL);
     }
+
     /**
-     * A static version of the getter for a User email. Used for getting the email as a Firebase
-     * argument.
-     *
+     * A getter for the static version of the User's Id
      * @return
-     * The email of the user currently using the app.
+     * The Id for the current user.
      */
-    public static String getAppUserEmail() {
-        return userEmail;
+    public static String getUserId() {
+        return userId;
     }
 
     /**
-     * A setter for the static version of the User's email.
-     *
-     * @param newEmail
-     * The email to set the User Profile to.
+     * A setter for the Id of the app user (used on first sign in)
+     * @param _userId
+     * The Id we will be assigning the app user.
      */
-    public static void setUserEmail(String newEmail) {
-        userEmail = newEmail;
+    public static void setUserId(String _userId) {
+        userId = _userId;
     }
 
 }

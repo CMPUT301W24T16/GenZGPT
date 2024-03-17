@@ -1,5 +1,6 @@
 package com.example.genzgpt.View;
 
+import android.Manifest;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -13,7 +14,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.genzgpt.Controller.Firebase;
-import com.example.genzgpt.EditProfileFragment;
+import com.example.genzgpt.Controller.GeolocationTracking;
+import com.example.genzgpt.Model.AppUser;
 import com.example.genzgpt.Model.User;
 import com.example.genzgpt.R;
 
@@ -34,6 +36,7 @@ public class UserProfileFragment extends Fragment {
     private TextView userTheme;
     private TextView userGeolocation;
     private Firebase firebase;
+    private GeolocationTracking geolocation;
     private User userCurrent;
 
     /**
@@ -69,6 +72,7 @@ public class UserProfileFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         firebase = new Firebase();
+        geolocation = new GeolocationTracking();
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_user_profile, container, false);
         //Initialize all variables
@@ -81,7 +85,8 @@ public class UserProfileFragment extends Fragment {
         userEmail = view.findViewById(R.id.email_text);
         userTheme = view.findViewById(R.id.theme_text);
         userGeolocation = view.findViewById(R.id.geolocation_text);
-        firebase.getUserData("dvtaylor@ualberta.ca", new Firebase.OnUserLoadedListener() {
+        String appUser = AppUser.getUserId();
+        firebase.getUserData(appUser, new Firebase.OnUserLoadedListener() {
             @Override
             public void onUserLoaded(User user) {
                 Bind(user);
@@ -96,20 +101,21 @@ public class UserProfileFragment extends Fragment {
                 Log.e("Firebase", "User retrieval failed.");
             }
         });
-
-        editButton.setOnClickListener(new View.OnClickListener() {
-            /**
-             * Opens the dialog fragment for editing a user profile
-             * @param v The view that was clicked.
-             */
-            @Override
-            public void onClick(View v) {
-                new EditProfileFragment(userCurrent).show(getParentFragmentManager(), "Edit Profile");
+        if (userCurrent != null) {
+            editButton.setOnClickListener(new View.OnClickListener() {
+                /**
+                 * Opens the dialog fragment for editing a user profile
+                 *
+                 * @param v The view that was clicked.
+                 */
+                @Override
+                public void onClick(View v) {
+                    new EditProfileFragment(userCurrent).show(getParentFragmentManager(), "Edit Profile");
+                }
+            });
             }
-        });
-        return view;
-    }
-
+            return view;
+        }
     /**
      * Gets the user data from the firebase
      * @param user
@@ -117,15 +123,15 @@ public class UserProfileFragment extends Fragment {
     public void Bind(User user){
         userFirstName.setText(user.getFirstName());
         userLastName.setText(user.getLastName());
-        userPhoneNumber.setText("123-456-7890");
+        userPhoneNumber.setText(String.valueOf(user.getPhone()));
         userEmail.setText(user.getEmail());
         userBanner.setText(user.getFirstName() + " " + user.getLastName());
         userTheme.setText("Black and White");
-        if (user.isGeolocation()){
+        if (user.isGeolocation() == Boolean.TRUE && (geolocation.checkPermission(Manifest.permission.ACCESS_COARSE_LOCATION) && geolocation.checkPermission(Manifest.permission.ACCESS_FINE_LOCATION))){
             userGeolocation.setText("ON");
-        }else{
+        }
+        if (user.isGeolocation() == Boolean.FALSE || (!(geolocation.checkPermission(Manifest.permission.ACCESS_COARSE_LOCATION) && geolocation.checkPermission(Manifest.permission.ACCESS_FINE_LOCATION)))){
             userGeolocation.setText("OFF");
         }
-
     }
 }

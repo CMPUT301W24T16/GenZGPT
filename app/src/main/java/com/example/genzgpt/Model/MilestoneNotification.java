@@ -1,4 +1,4 @@
-package com.example.genzgpt;
+package com.example.genzgpt.Model;
 
 import static androidx.core.app.NotificationCompat.VISIBILITY_PUBLIC;
 
@@ -7,25 +7,26 @@ import android.content.Context;
 import androidx.annotation.NonNull;
 import androidx.core.app.NotificationCompat;
 
+import com.example.genzgpt.R;
+
 /**
  * The contents of a notification that an attendee shall receive after reaching a milestone
  * number of attendees at their event.
- *
- * FIXME: See AppNotification.java FIXME
+ * FIXME: Currently does nothing in the app
  */
 public class MilestoneNotification extends AppNotification{
     /**
-     * @see com.example.genzgpt.AppNotification#title
+     * @see AppNotification#title
      */
     protected String title = "Event Milestone";
 
     /**
-     * @see com.example.genzgpt.AppNotification#channelID
+     * @see AppNotification#channelID
      */
     private String channelID = "Milestone";
 
     /**
-     * @see com.example.genzgpt.AppNotification#notificationID
+     * @see AppNotification#notificationID
      */
     protected int notificationID = 0;
 

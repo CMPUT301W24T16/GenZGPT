@@ -1,4 +1,4 @@
-package com.example.genzgpt;
+package com.example.genzgpt.Model;
 
 import android.content.Context;
 
@@ -7,8 +7,7 @@ import androidx.core.app.NotificationCompat;
 
 /**
  * The General Structure for a notification that is used in this app.
- * FIXME: Give proper credit to
- * FIXME: https://developer.android.com/develop/ui/views/notifications/build-notification#Priority
+ * FIXME: Currently does nothing
  */
 abstract class AppNotification {
     /**
