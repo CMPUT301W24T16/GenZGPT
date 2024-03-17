@@ -1,5 +1,6 @@
 package com.example.genzgpt.View;
 
+import android.Manifest;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -13,6 +14,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.genzgpt.Controller.Firebase;
+import com.example.genzgpt.Controller.GeolocationTracking;
 import com.example.genzgpt.Model.AppUser;
 import com.example.genzgpt.Model.User;
 import com.example.genzgpt.R;
@@ -34,6 +36,7 @@ public class UserProfileFragment extends Fragment {
     private TextView userTheme;
     private TextView userGeolocation;
     private Firebase firebase;
+    private GeolocationTracking geolocation;
     private User userCurrent;
 
     /**
@@ -69,6 +72,7 @@ public class UserProfileFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         firebase = new Firebase();
+        geolocation = new GeolocationTracking();
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_user_profile, container, false);
         //Initialize all variables
@@ -88,12 +92,10 @@ public class UserProfileFragment extends Fragment {
                 Bind(user);
                 userCurrent = user;
             }
-
             @Override
             public void onUserNotFound() {
                 Log.d("Firebase", "User not found.");
             }
-
             @Override
             public void onUserLoadFailed(Exception e) {
                 Log.e("Firebase", "User retrieval failed.");
@@ -114,7 +116,6 @@ public class UserProfileFragment extends Fragment {
             }
             return view;
         }
-
     /**
      * Gets the user data from the firebase
      * @param user
@@ -126,12 +127,11 @@ public class UserProfileFragment extends Fragment {
         userEmail.setText(user.getEmail());
         userBanner.setText(user.getFirstName() + " " + user.getLastName());
         userTheme.setText("Black and White");
-        if (user.isGeolocation() == Boolean.TRUE){
+        if (user.isGeolocation() == Boolean.TRUE && (geolocation.checkPermission(Manifest.permission.ACCESS_COARSE_LOCATION) && geolocation.checkPermission(Manifest.permission.ACCESS_FINE_LOCATION))){
             userGeolocation.setText("ON");
         }
-        if (user.isGeolocation() == Boolean.FALSE){
+        if (user.isGeolocation() == Boolean.FALSE || (!(geolocation.checkPermission(Manifest.permission.ACCESS_COARSE_LOCATION) && geolocation.checkPermission(Manifest.permission.ACCESS_FINE_LOCATION)))){
             userGeolocation.setText("OFF");
         }
-
     }
 }
