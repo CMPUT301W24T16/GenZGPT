@@ -124,6 +124,6 @@ public class QRCodeFragment extends Fragment {
 
     private void checkInUser(String substring) {
         // Check in the user to the event
-        firebase.addUserToCheckedInAttendees(substring, AppUser.getAppUserEmail());
+        firebase.addUserToCheckedInAttendees(substring, AppUser.getUserId());
     }
 }
