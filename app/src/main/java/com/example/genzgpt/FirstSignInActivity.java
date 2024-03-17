@@ -93,7 +93,7 @@ public class FirstSignInActivity extends AppCompatActivity {
                         imageURL);
 
                 Firebase firebase = new Firebase();
-                firebase.createUser(newUser, new onUserCreatedListener() {
+                firebase.createUser(newUser, new Firebase.OnUserCreatedListener() {
                     @Override
                     public void onUserCreated(String userId) {
                         // Assign the id for the new user into the app
