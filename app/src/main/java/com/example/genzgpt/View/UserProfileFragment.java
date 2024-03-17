@@ -130,7 +130,7 @@ public class UserProfileFragment extends Fragment {
         if (user.isGeolocation() == Boolean.TRUE && (geolocation.checkPermission(Manifest.permission.ACCESS_COARSE_LOCATION) && geolocation.checkPermission(Manifest.permission.ACCESS_FINE_LOCATION))){
             userGeolocation.setText("ON");
         }
-        if (user.isGeolocation() == Boolean.FALSE || (!(geolocation.checkPermission(Manifest.permission.ACCESS_COARSE_LOCATION) && geolocation.checkPermission(Manifest.permission.ACCESS_FINE_LOCATION))){
+        if (user.isGeolocation() == Boolean.FALSE || (!(geolocation.checkPermission(Manifest.permission.ACCESS_COARSE_LOCATION) && geolocation.checkPermission(Manifest.permission.ACCESS_FINE_LOCATION)))){
             userGeolocation.setText("OFF");
         }
     }
