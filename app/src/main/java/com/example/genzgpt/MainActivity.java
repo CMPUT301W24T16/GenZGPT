@@ -101,8 +101,8 @@ public class MainActivity extends AppCompatActivity {
 
         // Confirm whether or not a user has signed in on this application.
         hasSignedIn = preferences.getBoolean("signIn", false);
-        if (preferences.contains("email")) {
-            AppUser.setUserEmail(preferences.getString("email", null));
+        if (preferences.contains("id")) {
+            AppUser.setUserId(preferences.getString("id", null));
         }
 
         // Go to another Activity if the user needs to put in their information.
@@ -136,7 +136,7 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences preferences = this.getSharedPreferences("com.example.genzgpt",
                 Context.MODE_PRIVATE);
         preferences.edit().putBoolean("signIn", hasSignedIn).apply();
-        preferences.edit().putString("email", AppUser.getAppUserEmail()).apply();
+        preferences.edit().putString("id", AppUser.getUserId()).apply();
     }
 
 }
