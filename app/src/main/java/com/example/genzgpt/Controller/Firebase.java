@@ -460,9 +460,8 @@ public class Firebase {
             if (task.isSuccessful()) {
                 DocumentSnapshot userSnapshot = task.getResult();
                 if (userSnapshot.exists()) {
-                    // User already exists, handle accordingly (e.g., throw an exception or return an error)
                     Log.e("Firebase", "User with ID " + user.getEmail() + " already exists");
-                    // Optionally, you can throw an exception or invoke a callback to handle the error
+                    // Optionally, anymore error handling can be done here
                 } else {
                     // Create a new user document
                     Map<String, Object> userData = new HashMap<>();
@@ -500,7 +499,6 @@ public class Firebase {
             } else {
                 // Error occurred while checking if the user exists
                 Log.e("Firebase", "Error checking user existence: " + task.getException().getMessage());
-                // Optionally, you can throw an exception or invoke a callback to handle the error
             }
         });
     }
@@ -699,7 +697,7 @@ public class Firebase {
                     List<User> userList = new ArrayList<>();
                     for (DocumentSnapshot document : querySnapshot.getDocuments()) {
                         // Extract user data from the document
-                        String userID = document.getId(); //comment this out if we get rid of userID
+                        String userID = document.getString("id");
                         String firstName = document.getString("firstName");
                         String lastName = document.getString("lastName");
                         String email = document.getString("email");
@@ -896,5 +894,55 @@ public class Firebase {
         void onRegisteredAttendeesLoadFailed(Exception e);
     }
 
+    public void updateUser(User user, OnUserUpdatedListener listener) {
+        String userId = user.getId();
+        DocumentReference userRef = db.collection("users").document(userId);
 
+        Map<String, Object> updates = new HashMap<>();
+        updates.put("firstName", user.getFirstName());
+        updates.put("lastName", user.getLastName());
+        updates.put("email", user.getEmail());
+        updates.put("phoneNumber", user.getPhone());
+        updates.put("geolocation", user.isGeolocation());
+        updates.put("imageURL", user.getImageURL());
+
+        userRef.update(updates)
+                .addOnSuccessListener(aVoid -> {
+                    Log.d("Firebase", "User updated successfully");
+                    listener.onUserUpdated();
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("Firebase", "Error updating user: " + e.getMessage());
+                    listener.onUserUpdateFailed(e);
+                });
+    }
+
+    public interface OnUserUpdatedListener {
+        void onUserUpdated();
+        void onUserUpdateFailed(Exception e);
+    }
+
+    public void updateEvent(String eventId, String newEventName, Date newEventDate, String newLocation, OnEventUpdatedListener listener) {
+        DocumentReference eventRef = db.collection("events").document(eventId);
+
+        Map<String, Object> updates = new HashMap<>();
+        updates.put("eventName", newEventName);
+        updates.put("eventDate", newEventDate);
+        updates.put("location", newLocation);
+
+        eventRef.update(updates)
+                .addOnSuccessListener(aVoid -> {
+                    Log.d("Firebase", "Event updated successfully");
+                    listener.onEventUpdated();
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("Firebase", "Error updating event: " + e.getMessage());
+                    listener.onEventUpdateFailed(e);
+                });
+    }
+
+    public interface OnEventUpdatedListener {
+        void onEventUpdated();
+        void onEventUpdateFailed(Exception e);
+    }
 }
