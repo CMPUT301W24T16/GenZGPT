@@ -1,32 +1,21 @@
 package com.example.genzgpt.Controller;
 
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.net.Uri;
 import android.util.Log;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
-
 import com.example.genzgpt.Model.Event;
 import com.example.genzgpt.Model.User;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
-import com.google.android.gms.tasks.Tasks;
-import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.OnProgressListener;
 import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
@@ -34,15 +23,13 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * This class is responsible for handling all interactions with Firebase.
  */
 public class Firebase {
-
-    private String userEmail;
     private final FirebaseFirestore db;
     //Handle Firebase interactions
 
@@ -453,54 +440,57 @@ public class Firebase {
      * Creates a new user in the database.
      * @param user
      */
-    public void createUser(User user) {
-        // Check if the user already exists
-        DocumentReference userRef = db.collection("users").document(user.getEmail());
-        userRef.get().addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                DocumentSnapshot userSnapshot = task.getResult();
-                if (userSnapshot.exists()) {
-                    Log.e("Firebase", "User with ID " + user.getEmail() + " already exists");
-                    // Optionally, anymore error handling can be done here
-                } else {
-                    // Create a new user document
-                    Map<String, Object> userData = new HashMap<>();
-                    userData.put("firstName", user.getFirstName());
-                    userData.put("lastName", user.getLastName());
-                    userData.put("email", user.getEmail());
-                    userData.put("phoneNumber", user.getPhone());
-                    userData.put("geolocation", user.isGeolocation());
-                    userData.put("imageURL", user.getImageURL());
+    public void createUser(User user, OnUserCreatedListener listener) {
+        // Check if the email is already used
+        db.collection("users")
+                .whereEqualTo("email", user.getEmail())
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        QuerySnapshot emailSnapshot = task.getResult();
+                        if (emailSnapshot != null && !emailSnapshot.isEmpty()) {
+                            Log.e("Firebase", "Email " + user.getEmail() + " is already used");
+                            listener.onEmailAlreadyExists();
+                        } else {
+                            // Create a new user document
+                            DocumentReference userRef = db.collection("users").document();
+                            Map<String, Object> userData = new HashMap<>();
+                            userData.put("firstName", user.getFirstName());
+                            userData.put("lastName", user.getLastName());
+                            userData.put("email", user.getEmail());
+                            userData.put("phoneNumber", user.getPhone());
+                            userData.put("geolocation", user.isGeolocation());
+                            userData.put("imageURL", user.getImageURL());
 
-                    userRef.set(userData)
-                            .addOnSuccessListener(aVoid -> {
-                                // User created successfully
-                                Log.i("Firebase", "User created successfully");
+                            userRef.set(userData)
+                                    .addOnSuccessListener(aVoid -> {
+                                        // User created successfully
+                                        Log.i("Firebase", "User created successfully");
 
-                                // Retrieve the ID of the newly created user
-                                String userId = userRef.getId();
+                                        // Retrieve the ID of the newly created user
+                                        String userId = userRef.getId();
 
-                                // Update the user document with the ID field
-                                userRef.update("userId", userId)
-                                        .addOnSuccessListener(aVoid1 -> {
-                                            // ID field added successfully
-                                            Log.i("Firebase", "User ID added successfully");
-                                        })
-                                        .addOnFailureListener(e -> {
-                                            // Error occurred while adding the ID field
-                                            Log.e("Firebase", "Error adding user ID: " + e.getMessage());
-                                        });
-                            })
-                            .addOnFailureListener(e -> {
-                                // Error occurred while creating the user
-                                Log.e("Firebase", "Error creating user: " + e.getMessage());
-                            });
-                }
-            } else {
-                // Error occurred while checking if the user exists
-                Log.e("Firebase", "Error checking user existence: " + task.getException().getMessage());
-            }
-        });
+                                        // Return the user ID through the callback
+                                        listener.onUserCreated(userId);
+                                    })
+                                    .addOnFailureListener(e -> {
+                                        // Error occurred while creating the user
+                                        Log.e("Firebase", "Error creating user: " + e.getMessage());
+                                        listener.onUserCreationFailed(e);
+                                    });
+                        }
+                    } else {
+                        // Error occurred while checking if the email is already used
+                        Log.e("Firebase", "Error checking email existence: " + task.getException().getMessage());
+                        listener.onUserCreationFailed(task.getException());
+                    }
+                });
+    }
+
+    public interface OnUserCreatedListener {
+        void onUserCreated(String userId);
+        void onEmailAlreadyExists();
+        void onUserCreationFailed(Exception e);
     }
 
     /**
@@ -589,13 +579,47 @@ public class Firebase {
         }
     }
 
-
     /**
-     * set the email of the user
-     * @param email
+     * Adds a user to the list of registered attendees for a specific event.
+     * @param eventName
+     * @param userId
      */
-    private void setEmail(String email){
-        this.userEmail = email;
+    public void addUserToRegisteredAttendees(String eventName, String userId) {
+        try {
+            CollectionReference eventsRef = db.collection("events");
+            Query query = eventsRef.whereEqualTo("eventName", eventName);
+
+            query.get().addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
+                    QuerySnapshot snapshot = task.getResult();
+                    if (snapshot != null && !snapshot.isEmpty()) {
+                        // Assuming there is only one event with the given name
+                        DocumentSnapshot eventDocument = snapshot.getDocuments().get(0);
+                        String eventId = eventDocument.getId();
+
+                        DocumentReference eventRef = db.collection("events").document(eventId);
+                        eventRef.update("registeredAttendees", FieldValue.arrayUnion(userId))
+                                .addOnSuccessListener(aVoid -> {
+                                    // User added to registeredAttendees successfully
+                                    Log.i("Firebase", "User added to registeredAttendees successfully");
+                                })
+                                .addOnFailureListener(e -> {
+                                    // Error occurred while adding user to registeredAttendees
+                                    Log.e("Firebase", "Error adding user to registeredAttendees: " + e.getMessage());
+                                });
+                    } else {
+                        // No events found with the specified name
+                        Log.i("Firebase", "No events found with the name: " + eventName);
+                    }
+                } else {
+                    // Error occurred while querying events
+                    Log.e("Firebase", "Error querying events: " + task.getException().getMessage());
+                }
+            });
+        } catch (Exception e) {
+            // Handle any exceptions that occur during the process
+            Log.e("Firebase", "Error adding user to registeredAttendees: " + e.getMessage());
+        }
     }
 
     /**
@@ -894,6 +918,10 @@ public class Firebase {
         void onRegisteredAttendeesLoadFailed(Exception e);
     }
 
+    /**
+     * Updates the user data in the database.
+     * @param user
+     */
     public void updateUser(User user, OnUserUpdatedListener listener) {
         String userId = user.getId();
         DocumentReference userRef = db.collection("users").document(userId);
@@ -922,11 +950,14 @@ public class Firebase {
         void onUserUpdateFailed(Exception e);
     }
 
-    public void updateEvent(String eventId, String newEventName, Date newEventDate, String newLocation, OnEventUpdatedListener listener) {
+    /**
+     * Updates the event data in the database.
+     * @param eventId, newEventDate, newLocation
+     */
+    public void updateEvent(String eventId, Date newEventDate, String newLocation, OnEventUpdatedListener listener) {
         DocumentReference eventRef = db.collection("events").document(eventId);
 
         Map<String, Object> updates = new HashMap<>();
-        updates.put("eventName", newEventName);
         updates.put("eventDate", newEventDate);
         updates.put("location", newLocation);
 

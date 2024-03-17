@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
@@ -92,14 +93,30 @@ public class FirstSignInActivity extends AppCompatActivity {
                         imageURL);
 
                 Firebase firebase = new Firebase();
-                firebase.createUser(newUser);
+                firebase.createUser(newUser, new Firebase.OnUserCreatedListener() {
+                    @Override
+                    public void onUserCreated(String userId) {
+                        // Assign the id for the new user into the app
+                        AppUser.setUserId(userId);
 
-                // Set the static value of UserEmail to the provided email address
-                AppUser.setUserEmail(email);
+                        // notify the Main Activity that a successful sign in has occurred
+                        MainActivity.hasSignedIn = true;
+                        finish();
+                    }
 
-                // notify the Main Activity that a successful sign in has occurred
-                MainActivity.hasSignedIn = true;
-                finish();
+                    @Override
+                    public void onEmailAlreadyExists() {
+                        Toast.makeText(getApplicationContext(),
+                                "The provided email already exists for another user." +
+                                "Please use a different email.", Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void onUserCreationFailed(Exception e) {
+                        Log.e("UserCreationFailed", "The User was not Created",e);
+                    }
+                });
+
             }
         });
 
