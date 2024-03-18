@@ -1,5 +1,6 @@
 package com.example.genzgpt.View;
 
+import static androidx.camera.core.impl.utils.ContextUtil.getApplicationContext;
 import static com.example.genzgpt.Controller.GalleryHandler.openGallery;
 
 import android.Manifest;
@@ -106,7 +107,7 @@ public class EditProfileFragment extends DialogFragment {
             firebase.updateUser(new_user, new Firebase.OnUserUpdatedListener() {
                 @Override
                 public void onUserUpdated() {
-                    Toast.makeText(getContext(),"Successfully updated user information!", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(),"Successfully updated user information!", Toast.LENGTH_SHORT).show();
                 }
                 @Override
                 public void onUserUpdateFailed(Exception e) {
