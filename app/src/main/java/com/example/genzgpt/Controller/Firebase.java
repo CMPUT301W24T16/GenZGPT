@@ -221,6 +221,7 @@ public class Firebase {
                     });
         }
     }
+
     /**
      * Retrieves the user data from Firebase.
      * @return the user details for a particular email.
