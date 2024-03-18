@@ -470,8 +470,20 @@ public class Firebase {
                                         // Retrieve the ID of the newly created user
                                         String userId = userRef.getId();
 
-                                        // Return the user ID through the callback
-                                        listener.onUserCreated(userId);
+                                        // Update the user document with the ID field
+                                        userRef.update("id", userId)
+                                                .addOnSuccessListener(aVoid1 -> {
+                                                    // ID field added successfully
+                                                    Log.i("Firebase", "User ID added successfully");
+
+                                                    // Return the user ID through the callback
+                                                    listener.onUserCreated(userId);
+                                                })
+                                                .addOnFailureListener(e -> {
+                                                    // Error occurred while adding the ID field
+                                                    Log.e("Firebase", "Error adding user ID: " + e.getMessage());
+                                                    listener.onUserCreationFailed(e);
+                                                });
                                     })
                                     .addOnFailureListener(e -> {
                                         // Error occurred while creating the user
