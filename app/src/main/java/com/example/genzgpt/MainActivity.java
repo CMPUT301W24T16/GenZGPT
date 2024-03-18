@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 
 import com.example.genzgpt.Model.AppUser;
@@ -135,8 +136,47 @@ public class MainActivity extends AppCompatActivity {
         super.onSaveInstanceState(outState);
         SharedPreferences preferences = this.getSharedPreferences("com.example.genzgpt",
                 Context.MODE_PRIVATE);
-        preferences.edit().putBoolean("signIn", hasSignedIn).apply();
+
+        preferences.edit().putBoolean("signIn", AppUser.getHasSignedIn()).apply();
         preferences.edit().putString("id", AppUser.getUserId()).apply();
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        SharedPreferences preferences = this.getSharedPreferences("com.example.genzgpt",
+                Context.MODE_PRIVATE);
+
+        preferences.edit().putBoolean("signIn", AppUser.getHasSignedIn()).apply();
+        preferences.edit().putString("id", AppUser.getUserId()).apply();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        SharedPreferences preferences = this.getSharedPreferences("com.example.genzgpt",
+                Context.MODE_PRIVATE);
+
+        preferences.edit().putBoolean("signIn", AppUser.getHasSignedIn()).apply();
+        preferences.edit().putString("id", AppUser.getUserId()).apply();
+    }
+
+
+    /**
+     * Handles resuming Main Activity (this is used for when we travel from FirstSignIn Currently)
+     */
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        if (AppUser.getHasSignedIn() && AppUser.getUserId() != null) {
+            SharedPreferences preferences = this.getSharedPreferences("com.example.genzgpt",
+                    Context.MODE_PRIVATE);
+
+            preferences.edit().putBoolean("signIn", AppUser.getHasSignedIn()).apply();
+            preferences.edit().putString("id", AppUser.getUserId()).apply();
+        }
+    }
 }

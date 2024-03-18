@@ -122,6 +122,7 @@ public class QRCodeFragment extends Fragment {
         }
     }
 
+    //FIXME NEED TO CHANGE TO NO LONGER ACCOUNT FOR EMAIL?
     private void checkInUser(String substring) {
         // Check in the user to the event
         firebase.addUserToCheckedInAttendees(substring, AppUser.getUserId());
