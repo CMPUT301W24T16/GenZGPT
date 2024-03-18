@@ -5,7 +5,9 @@ import static java.lang.Long.parseLong;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Button;
@@ -29,7 +31,7 @@ public class FirstSignInActivity extends AppCompatActivity {
     Spinner theme;
     Switch geolocation;
     AdminLoginFragment adminSignIn = new AdminLoginFragment();
-    private boolean isValidProfile = false;
+    private boolean isValidSignIn = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -98,9 +100,8 @@ public class FirstSignInActivity extends AppCompatActivity {
                     public void onUserCreated(String userId) {
                         // Assign the id for the new user into the app
                         AppUser.setUserId(userId);
-
-                        // notify the Main Activity that a successful sign in has occurred
-                        MainActivity.hasSignedIn = true;
+                        AppUser.setHasSignedIn(true);
+                        Log.e("User Creation", "Successful User Creation");
                         finish();
                     }
 
@@ -113,10 +114,9 @@ public class FirstSignInActivity extends AppCompatActivity {
 
                     @Override
                     public void onUserCreationFailed(Exception e) {
-                        Log.e("UserCreationFailed", "The User was not Created",e);
+                        Log.e("User Creation", "The User was not Created", e);
                     }
                 });
-
             }
         });
 
