@@ -31,18 +31,20 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 public class Firebase {
     private final FirebaseFirestore db;
-    //Handle Firebase interactions
+    // Handle Firebase interactions
 
     /**
-
-     * Uploads an image to Firebase Storage and associates it with the specified event.
+     * 
+     * Uploads an image to Firebase Storage and associates it with the specified
+     * event.
      *
-     * @param eventID   ID of the event to associate with the image.
-     * @param imageUri  Uri of the image to upload.
+     * @param eventID        ID of the event to associate with the image.
+     * @param imageUri       Uri of the image to upload.
      * @param progressDialog Progress dialog for showing upload progress.
-     * @param context   Context for displaying toasts.
+     * @param context        Context for displaying toasts.
      */
-    public static void uploadImageForEvent(String eventID, Uri imageUri, ProgressDialog progressDialog, Context context) {
+    public static void uploadImageForEvent(String eventID, Uri imageUri, ProgressDialog progressDialog,
+            Context context) {
         StorageReference storageRef = FirebaseStorage.getInstance().getReference();
         StorageReference imageRef = storageRef.child("event_images/" + eventID);
 
@@ -76,8 +78,8 @@ public class Firebase {
     /**
      * Update the Firestore document for the specified event with the image URL.
      *
-     * @param eventID   ID of the event to update.
-     * @param imageURL  URL of the uploaded image.
+     * @param eventID  ID of the event to update.
+     * @param imageURL URL of the uploaded image.
      */
     private static void updateEventImageURL(String eventID, String imageURL) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -95,14 +97,14 @@ public class Firebase {
                 });
     }
 
-
     /**
-     * Uploads an image to Firebase Storage and associates it with the specified user.
+     * Uploads an image to Firebase Storage and associates it with the specified
+     * user.
      *
-     * @param userID   ID of the event to associate with the image.
-     * @param imageUri  Uri of the image to upload.
+     * @param userID         ID of the event to associate with the image.
+     * @param imageUri       Uri of the image to upload.
      * @param progressDialog Progress dialog for showing upload progress.
-     * @param context   Context for displaying toasts.
+     * @param context        Context for displaying toasts.
      */
     public static void uploadImageForUser(String userID, Uri imageUri, ProgressDialog progressDialog, Context context) {
         StorageReference storageRef = FirebaseStorage.getInstance().getReference();
@@ -139,7 +141,7 @@ public class Firebase {
      * Update the Firestore document for the specified user with the image URL.
      *
      * @param userID   ID of the event to update.
-     * @param imageURL  URL of the uploaded image.
+     * @param imageURL URL of the uploaded image.
      */
     private static void updateUserImageURL(String userID, String imageURL) {
         FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -156,7 +158,6 @@ public class Firebase {
                     Log.e("Firebase", "Error updating image URL: " + e.getMessage());
                 });
     }
-
 
     private static void showToast(Context context, String message) {
         Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
@@ -195,7 +196,7 @@ public class Firebase {
     /**
      * Delete an Event image from Firestore and Firebase Storage.
      *
-     * @param userID  ID of the event containing the image.
+     * @param userID   ID of the event containing the image.
      * @param imageURL URL of the image to be deleted.
      */
     public void deletUserImage(String userID, String imageURL) {
@@ -221,8 +222,10 @@ public class Firebase {
                     });
         }
     }
+
     /**
      * Retrieves the user data from Firebase.
+     * 
      * @return the user details for a particular email.
      * @param userId
      */
@@ -254,18 +257,21 @@ public class Firebase {
 
     public interface OnUserLoadedListener {
         void onUserLoaded(User user);
+
         void onUserNotFound();
+
         void onUserLoadFailed(Exception e);
     }
 
     /**
      * Uploads an image to Firebase Storage and retrieves the download URL.
      *
-     * @param imagePath           Path to store the image in Firebase Storage.
-     * @param imageUri            Uri of the image to upload.
+     * @param imagePath                Path to store the image in Firebase Storage.
+     * @param imageUri                 Uri of the image to upload.
      * @param onUploadCompleteListener Callback for handling upload completion.
      */
-    public static void uploadImageAndGetUrl(String imagePath, Uri imageUri, OnUploadCompleteListener onUploadCompleteListener) {
+    public static void uploadImageAndGetUrl(String imagePath, Uri imageUri,
+            OnUploadCompleteListener onUploadCompleteListener) {
         StorageReference storageRef = FirebaseStorage.getInstance().getReference();
         StorageReference imageRef = storageRef.child(imagePath);
 
@@ -295,9 +301,9 @@ public class Firebase {
      */
     public interface OnUploadCompleteListener {
         void onUploadComplete(String imageURL);
+
         void onUploadFailed(String errorMessage);
     }
-
 
     /**
      * Retrieves the list of events from the database.
@@ -369,43 +375,36 @@ public class Firebase {
                                 }
                             } else {
                                 fetchRegisteredAttendees(eventName, new OnRegisteredAttendeesLoadedListener() {
-                                    @Override
-                                    public void onRegisteredAttendeesLoaded(List<User> registeredAttendees) {
-                                        event.setRegisteredAttendees(registeredAttendees);
-                                        fetchCheckedInAttendees(eventName, new OnCheckInAttendeesLoadedListener() {
-                                            @Override
-                                            public void onCheckInAttendeesLoaded(List<User> checkedInAttendees) {
-                                                event.setCheckedInAttendees(checkedInAttendees);
-                                                listener.onEventLoaded(event);
-                                            }
 
-                                            @Override
-                                            public void onCheckInAttendeesLoadFailed(Exception e) {
-                                                listener.onEventLoadFailed(e);
-                                            }
-                                        });
-                                    }
+    @Override
+    public void onRegisteredAttendeesLoaded(List<User> registeredAttendees) {
+        event.setRegisteredAttendees(registeredAttendees);
+        fetchCheckedInAttendees(eventName, new OnCheckInAttendeesLoadedListener() {
+            @Override
+            public void onCheckInAttendeesLoaded(List<User> checkedInAttendees) {
+                event.setCheckedInAttendees(checkedInAttendees);
+                listener.onEventLoaded(event);
+            }
 
-                                    @Override
-                                    public void onRegisteredAttendeesLoadFailed(Exception e) {
-                                        listener.onEventLoadFailed(e);
-                                    }
-                                });
-                            }
-                        } else {
-                            listener.onEventNotFound();
-                        }
-                    } else {
-                        listener.onEventLoadFailed(task.getException());
-                    }
-                });
+            @Override
+            public void onCheckInAttendeesLoadFailed(Exception e) {
+                listener.onEventLoadFailed(e);
+            }
+        });
     }
 
-    public interface OnEventLoadedListener {
-        void onEventLoaded(Event event);
-        void onEventNotFound();
-        void onEventLoadFailed(Exception e);
+    @Override
+    public void onRegisteredAttendeesLoadFailed(Exception e) {
+        listener.onEventLoadFailed(e);
     }
+});}}else{listener.onEventNotFound();}}else{listener.onEventLoadFailed(task.getException());}});}
+
+public interface OnEventLoadedListener {
+    void onEventLoaded(Event event);
+
+    void onEventNotFound();
+
+    void onEventLoadFailed(Exception e);}
 
     public void addEvent(Event event) {
         // Create a new document with a generated ID
@@ -421,6 +420,7 @@ public class Firebase {
 
     /**
      * Retrieves the user data from Firebase.
+     * 
      * @return the user details for a particular email.
      * @param userMap
      */
@@ -489,7 +489,9 @@ public class Firebase {
 
     public interface OnUserCreatedListener {
         void onUserCreated(String userId);
+
         void onEmailAlreadyExists();
+
         void onUserCreationFailed(Exception e);
     }
 
@@ -741,6 +743,7 @@ public class Firebase {
 
     public interface OnUsersLoadedListener {
         void onUsersLoaded(List<User> userList);
+
         void onUsersLoadFailed(Exception e);
     }
 
@@ -750,6 +753,7 @@ public class Firebase {
      * @param listener Listener for handling events retrieval.
      */
     public void fetchEvents(OnEventsLoadedListener listener) {
+        System.out.println("Fetching events:" + db.collection("events").get() + OnAttendeeRegisteredListener.class);
         db.collection("events").get()
                 .addOnSuccessListener(querySnapshot -> {
                     List<Event> eventList = new ArrayList<>();
@@ -776,9 +780,9 @@ public class Firebase {
                 });
     }
 
-
     public interface OnEventsLoadedListener {
         void onEventsLoaded(List<Event> eventList);
+
         void onEventsLoadFailed(Exception e);
     }
 
@@ -843,9 +847,9 @@ public class Firebase {
         });
     }
 
-
     public interface OnCheckInAttendeesLoadedListener {
         void onCheckInAttendeesLoaded(List<User> checkedInAttendees);
+
         void onCheckInAttendeesLoadFailed(Exception e);
     }
 
@@ -915,6 +919,7 @@ public class Firebase {
 
     public interface OnRegisteredAttendeesLoadedListener {
         void onRegisteredAttendeesLoaded(List<User> registeredAttendees);
+
         void onRegisteredAttendeesLoadFailed(Exception e);
     }
 
@@ -947,6 +952,7 @@ public class Firebase {
 
     public interface OnUserUpdatedListener {
         void onUserUpdated();
+
         void onUserUpdateFailed(Exception e);
     }
 
@@ -972,8 +978,62 @@ public class Firebase {
                 });
     }
 
+    /**
+     * Registers a user for a specific event.
+     * @param event
+     * @param user
+     * @param listener
+     */
+
+    public void registerAttendee(Event event, User user, OnAttendeeRegisteredListener listener) {
+        System.out.println(event.getEventName() + " 123123" + user.getEmail());
+CollectionReference eventsRef = db.collection("events");
+        Query query = eventsRef.whereEqualTo("eventName", event.getEventName());
+
+        query.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                QuerySnapshot snapshot = task.getResult();
+                if (snapshot != null && !snapshot.isEmpty()) {
+                    // Assuming there is only one event with the given name
+                    DocumentSnapshot eventDocument = snapshot.getDocuments().get(0);
+                    System.out.println("current event: " + event.getEventName() + "current user: " + user.getEmail() + "current event id: " + eventDocument.getId());
+                    String eventId = eventDocument.getId();
+
+                    DocumentReference eventRef = db.collection("events").document(eventId);
+                    System.out.println("current event: " + event.getEventName() + "current user: " + user.getEmail() + "current event id: " + eventRef.getId());
+                    eventRef.update("registeredAttendees", FieldValue.arrayUnion(user.getEmail()))
+                            .addOnSuccessListener(aVoid -> {
+                                // User registered for the event successfully
+                                listener.onAttendeeRegistered();
+                            })
+                            .addOnFailureListener(e -> {
+                                // Error occurred while registering user for the event
+                                listener.onAttendeeRegistrationFailed(e);
+                            });
+                } else {
+                    // No events found with the specified name
+                    listener.onEventNotFound();
+                }
+            } else {
+                // Error occurred while querying events
+                listener.onEventLoadFailed(task.getException());
+            }
+        });
+    }
+
+    public interface OnAttendeeRegisteredListener {
+        void onAttendeeRegistered();
+
+        void onAttendeeRegistrationFailed(Exception e);
+
+        void onEventNotFound();
+
+        void onEventLoadFailed(Exception e);
+    }
+
     public interface OnEventUpdatedListener {
         void onEventUpdated();
+
         void onEventUpdateFailed(Exception e);
     }
 }
