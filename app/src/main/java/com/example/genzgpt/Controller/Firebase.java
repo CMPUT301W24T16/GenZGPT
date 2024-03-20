@@ -298,7 +298,7 @@ public class Firebase {
         void onUploadFailed(String errorMessage);
     }
 
-
+    // FIXME MIGHT STILL BE USING EMAIL TO GET A USER?
     /**
      * Retrieves the list of events from the database.
      * @return the event details for a particular event name.
