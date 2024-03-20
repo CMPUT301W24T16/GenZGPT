@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--A page that allows an administrator to view and delete all events.
+    ISSUES: THIS IS CURRENTLY PLACEHOLDER.-->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".View.AdminEventsFragment">
+
+    <!-- TODO: Update blank fragment layout -->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text="@string/hello_blank_fragment" />
+
+</FrameLayout>

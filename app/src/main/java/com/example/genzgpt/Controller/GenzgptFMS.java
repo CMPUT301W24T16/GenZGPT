@@ -1,4 +1,4 @@
-package com.example.genzgpt;
+package com.example.genzgpt.Controller;
 
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -13,7 +13,7 @@ import com.google.firebase.messaging.RemoteMessage;
 
 /**
  * This class handles the Firebase Messaging Service for this app
- * FIXME: Can we just send some version of the appNotification to the firebase, receive, then use CreateNotification on that?
+ * FIXME: Currently does nothing
  */
 public class GenzgptFMS extends FirebaseMessagingService {
 
@@ -36,6 +36,7 @@ public class GenzgptFMS extends FirebaseMessagingService {
      * @param context
      * The context of the application necessary to invoke this method.
      */
+    /*
     public void CreateNotification(AppNotification notification, @NonNull Context context) {
         NotificationCompat.Builder builder = notification.getBuilder(context);
 
@@ -52,4 +53,5 @@ public class GenzgptFMS extends FirebaseMessagingService {
 
         manager.notify(notification.getNotificationID(), builder.build());
     }
+     */
 }

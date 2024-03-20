@@ -1,85 +1,137 @@
 package com.example.genzgpt.View;
 
+import android.Manifest;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.TextView;
 
+import com.example.genzgpt.Controller.Firebase;
+import com.example.genzgpt.Controller.GeolocationTracking;
+import com.example.genzgpt.Model.AppUser;
+import com.example.genzgpt.Model.User;
 import com.example.genzgpt.R;
 
 /**
  * A simple {@link Fragment} subclass.
  * Serves as a display for a User's Profile
- * Use the {@link UserProfileFragment#newInstance} factory method to
+ * Use the {@link UserProfileFragment} factory method to
  * create an instance of this fragment.
  */
 public class UserProfileFragment extends Fragment {
     private Button editButton;
-    private View profileInfo;
-    private View userBanner;
-    private View userPicture;
+    private TextView userBanner;
+    private ImageView userPicture;
+    private TextView userFirstName;
+    private TextView userLastName;
+    private TextView userPhoneNumber;
+    private TextView userEmail;
+    private TextView userTheme;
+    private TextView userGeolocation;
+    private Firebase firebase;
+    private GeolocationTracking geolocation;
+    private User userCurrent;
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    //private static final String ARG_PARAM1 = "param1";
-    //private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    //private String mParam1;
-    //private String mParam2;
-
+    /**
+     * Empty required constructor
+     */
     public UserProfileFragment() {
         // Required empty public constructor
-        super(R.layout.fragment_user_profile);
     }
 
     /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment UserProfileFragment.
+     * Just a super to make the fragment show properly
+     * @param savedInstanceState If the fragment is being re-created from
+     * a previous saved state, this is the state.
      */
-    // TODO: Rename and change types and number of parameters
-    public static UserProfileFragment newInstance(String param1, String param2) {
-        UserProfileFragment fragment = new UserProfileFragment();
-        Bundle args = new Bundle();
-        //args.putString(ARG_PARAM1, param1);
-        //args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
     @Override
-    public void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState){
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            //mParam1 = getArguments().getString(ARG_PARAM1);
-           // mParam2 = getArguments().getString(ARG_PARAM2);
-        }
-
-        //FIXME:
-        // need to add these ids to the xml file for this fragment
-        //editButton = View.findViewById(R.id.edit_profile_button);
-        //profileInfo = View.findViewById(R.id.user_profile);
-        //userBanner = View.findViewById(R.id.profile_header);
-        //userPicture = View.findViewById(R.id.profile_picture);
-
-        // editButton.setOnClickListener( v -> {
-        //      new EditProfileFragment().show(getSupportFragmentManager(), "Profile Information");
-        // });
     }
 
+    /**
+     * Creates the view for the user profile
+     * @param inflater The LayoutInflater object that can be used to inflate
+     * any views in the fragment,
+     * @param container If non-null, this is the parent view that the fragment's
+     * UI should be attached to.  The fragment should not add the view itself,
+     * but this can be used to generate the LayoutParams of the view.
+     * @param savedInstanceState If non-null, this fragment is being re-constructed
+     * from a previous saved state as given here.
+     *
+     * @return view
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        firebase = new Firebase();
+        geolocation = new GeolocationTracking();
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_user_profile, container, false);
-
+        View view = inflater.inflate(R.layout.fragment_user_profile, container, false);
+        //Initialize all variables
+        editButton = view.findViewById(R.id.edit_profile_button);
+        userBanner = view.findViewById(R.id.profile_header);
+        userPicture = view.findViewById(R.id.profile_picture);
+        userFirstName = view.findViewById(R.id.first_name_text);
+        userLastName = view.findViewById(R.id.last_name_text);
+        userPhoneNumber = view.findViewById(R.id.phone_number_text);
+        userEmail = view.findViewById(R.id.email_text);
+        userTheme = view.findViewById(R.id.theme_text);
+        userGeolocation = view.findViewById(R.id.geolocation_text);
+        String appUser = AppUser.getUserId();
+        firebase.getUserData(appUser, new Firebase.OnUserLoadedListener() {
+            @Override
+            public void onUserLoaded(User user) {
+                Bind(user);
+                userCurrent = user;
+            }
+            @Override
+            public void onUserNotFound() {
+                Log.d("Firebase", "User not found.");
+            }
+            @Override
+            public void onUserLoadFailed(Exception e) {
+                Log.e("Firebase", "User retrieval failed.");
+            }
+        });
+        if (userCurrent != null) {
+            editButton.setOnClickListener(new View.OnClickListener() {
+                /**
+                 * Opens the dialog fragment for editing a user profile
+                 *
+                 * @param v The view that was clicked.
+                 */
+                @Override
+                public void onClick(View v) {
+                    new EditProfileFragment(userCurrent).show(getParentFragmentManager(), "Edit Profile");
+                }
+            });
+            }
+            return view;
+        }
+    /**
+     * Gets the user data from the firebase
+     * @param user
+     */
+    public void Bind(User user){
+        userFirstName.setText(user.getFirstName());
+        userLastName.setText(user.getLastName());
+        userPhoneNumber.setText(String.valueOf(user.getPhone()));
+        userEmail.setText(user.getEmail());
+        userBanner.setText(user.getFirstName() + " " + user.getLastName());
+        userTheme.setText("Black and White");
+        if (user.isGeolocation() == Boolean.TRUE && (geolocation.checkPermission(Manifest.permission.ACCESS_COARSE_LOCATION) && geolocation.checkPermission(Manifest.permission.ACCESS_FINE_LOCATION))){
+            userGeolocation.setText("ON");
+        }
+        if (user.isGeolocation() == Boolean.FALSE || (!(geolocation.checkPermission(Manifest.permission.ACCESS_COARSE_LOCATION) && geolocation.checkPermission(Manifest.permission.ACCESS_FINE_LOCATION)))){
+            userGeolocation.setText("OFF");
+        }
     }
 }

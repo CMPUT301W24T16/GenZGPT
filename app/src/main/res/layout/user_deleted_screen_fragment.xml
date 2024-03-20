@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--Contains information about the format of the screen a user will see if their account
+     gets deleted.-->
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@color/background_color"
+    android:padding="24dp">
+
+    <!-- Title TextView -->
+    <TextView
+        android:id="@+id/tvTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Hello User"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="48dp"
+        android:textSize="24sp"
+        android:textColor="@color/white" />
+
+    <!-- Message TextView -->
+    <TextView
+        android:id="@+id/tvMessage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="We regret to inform you that your account has been terminated.\n\nTo create another account, press okay to return to the app’s Introductory page. From there, you may create an account as you did previously."
+        android:layout_below="@+id/tvTitle"
+        android:layout_marginTop="48dp"
+        android:layout_centerHorizontal="true"
+        android:textSize="16sp"
+        android:textColor="@color/white" />
+
+    <!-- Okay Button -->
+    <Button
+        android:id="@+id/btnOkay"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Okay"
+        android:layout_below="@+id/tvMessage"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="48dp"
+        app:backgroundTint="@null"
+        android:background="@drawable/round_outline"
+        android:textColor="@color/white" />
+
+</RelativeLayout>

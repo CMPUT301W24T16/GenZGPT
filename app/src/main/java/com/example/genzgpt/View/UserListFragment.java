@@ -22,6 +22,7 @@ import java.util.Collections;
 import java.util.List;
 
 /**
+ * FIXME CAN WE GET ADMINPROFILESFRAGMENT DELETED AND REFACTOR THIS TO BE ADMINPROFILESFRAGMENT?
  * A simple {@link Fragment} subclass.
  * Serves as a Display for the User's List
  * Use the {@link UserListFragment} factory method to

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- This file contains the menu information for the admin navigation bar-->
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/profile"
+        android:title="Admin Main"
+        android:icon="@drawable/navbar_admin_profiles"/>
+    <item
+        android:id="@+id/admin_home"
+        android:title="Admin Home"
+        android:icon="@drawable/navbar_darkhome"/>
+    <item
+        android:id="@+id/allevents"
+        android:title="All Events"
+        android:icon="@drawable/navbar_event_host"/>
+</menu>

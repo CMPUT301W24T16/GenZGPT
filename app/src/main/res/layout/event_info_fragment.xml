@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--The formatting for the event info page.-->
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
@@ -22,34 +23,44 @@
         android:layout_height="wrap_content"
         android:text="Event Name"
         android:textSize="24sp"
-        app:layout_constraintBottom_toTopOf="@+id/event_information"
+        app:layout_constraintBottom_toTopOf="@+id/event_location"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.91" />
 
     <TextView
-        android:id="@+id/event_information"
+        android:id="@+id/event_location"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginBottom="268dp"
-        android:text="Event info"
+        android:text="Event location"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent" />
+
+    <TextView
+        android:id="@+id/event_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Event Date"
+        app:layout_constraintBottom_toTopOf="@+id/more_info_button"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/event_location" />
 
     <Button
         android:id="@+id/more_info_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@drawable/default_button"
-        android:text="More Info"
+        android:text="Announcements"
         app:backgroundTint="@null"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/sign_up_button"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/event_information"
+        app:layout_constraintTop_toBottomOf="@+id/event_location"
         app:layout_constraintVertical_bias="0.281" />
 
     <Button
@@ -62,7 +73,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@+id/more_info_button"
-        app:layout_constraintTop_toBottomOf="@+id/event_information"
+        app:layout_constraintTop_toBottomOf="@+id/event_location"
         app:layout_constraintVertical_bias="0.281" />
 
     <Button

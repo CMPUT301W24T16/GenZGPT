@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--Contains the formatting for the Event Host Dashboard of the APP
+     ISSUES: DOES NOT CONTAIN THE FORMAT CURRENTLY. THIS IS PLACEHOLDER NOW.-->
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"

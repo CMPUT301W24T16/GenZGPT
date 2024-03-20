@@ -1,4 +1,4 @@
-package com.example.genzgpt.Controller;
+package com.example.genzgpt.View;
 
 import android.Manifest;
 import android.content.Intent;
@@ -13,6 +13,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
+import com.example.genzgpt.Controller.Firebase;
 import com.example.genzgpt.Model.Event;
 import com.example.genzgpt.Model.AppUser;
 import com.example.genzgpt.R;
@@ -68,8 +69,7 @@ public class QRCodeFragment extends Fragment {
                         @Override
                         public void onEventLoaded(Event event) {
                             // Replace the current fragment with the EventInfoFragment
-                            EventInfoFragment eventInfoFragment = new EventInfoFragment();
-                            eventInfoFragment.setEvent(event);
+                            EventInfoFragment eventInfoFragment = new EventInfoFragment(event);
                             getFragmentManager().beginTransaction()
                                     .replace(R.id.BaseFragment, eventInfoFragment)
                                     .addToBackStack(null)
@@ -96,8 +96,7 @@ public class QRCodeFragment extends Fragment {
                             // Check the user in to the event
                             checkInUser(eventCode);
                             // Replace the current fragment with the EventInfoFragment
-                            EventInfoFragment eventInfoFragment = new EventInfoFragment();
-                            eventInfoFragment.setEvent(event);
+                            EventInfoFragment eventInfoFragment = new EventInfoFragment(event);
                             getFragmentManager().beginTransaction()
                                     .replace(R.id.BaseFragment, eventInfoFragment)
                                     .addToBackStack(null)
@@ -123,8 +122,9 @@ public class QRCodeFragment extends Fragment {
         }
     }
 
+    //FIXME NEED TO CHANGE TO NO LONGER ACCOUNT FOR EMAIL?
     private void checkInUser(String substring) {
         // Check in the user to the event
-        firebase.addUserToCheckedInAttendees(substring, AppUser.getAppUserEmail());
+        firebase.addUserToCheckedInAttendees(substring, AppUser.getUserId());
     }
 }
