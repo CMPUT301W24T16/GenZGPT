@@ -20,6 +20,7 @@ import com.example.genzgpt.R;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 /**
  * FIXME CAN WE GET ADMINPROFILESFRAGMENT DELETED AND REFACTOR THIS TO BE ADMINPROFILESFRAGMENT?
@@ -53,7 +54,8 @@ public class UserListFragment extends Fragment {
         userAdapter = new UserAdapter(userList);
         recyclerView.setAdapter(userAdapter);
 
-        firebase = new Firebase();
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        firebase = new Firebase(db);
 
         // Fetch the list of users from Firestore and update the RecyclerView
         fetchUsers();

@@ -24,6 +24,7 @@ import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 /**
  * The basis for any fragment that handles showing a collection of events.
@@ -63,7 +64,8 @@ abstract class EventsFragment extends Fragment {
         eventAdapter = new EventAdapter(eventList);
         recyclerView.setAdapter(eventAdapter);
 
-        firebase = new Firebase();
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        firebase = new Firebase(db);
 
         // Fetch the list of events from Firestore and update the RecyclerView
         fetchEvents();
