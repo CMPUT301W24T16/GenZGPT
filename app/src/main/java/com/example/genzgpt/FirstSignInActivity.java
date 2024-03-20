@@ -101,6 +101,7 @@ public class FirstSignInActivity extends AppCompatActivity {
                         // Assign the id for the new user into the app
                         AppUser.setUserId(userId);
                         AppUser.setHasSignedIn(true);
+                        Log.e("FSI UserId", userId);
                         Log.e("User Creation", "Successful User Creation");
                         finish();
                     }
