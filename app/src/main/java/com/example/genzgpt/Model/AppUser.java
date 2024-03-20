@@ -5,6 +5,8 @@ package com.example.genzgpt.Model;
  */
 public class AppUser extends User{
     private static String userId;
+    private static String userEmail;
+    private static boolean hasSignedIn;
 
     /**
      * A constructor for the AppUser Class.
@@ -70,4 +72,21 @@ public class AppUser extends User{
         userId = _userId;
     }
 
+    public static boolean getHasSignedIn() {
+        return hasSignedIn;
+    }
+
+    public static void setHasSignedIn(boolean status) {
+        hasSignedIn = status;
+    }
+
+    //FIXME THIS SHOULD NOT BE NECESSARY ANYMORE
+    public static void setUserEmail(String _userEmail) {
+        userEmail = _userEmail;
+    }
+
+    //FIXME THIS SHOULD NOT BE NECESSARY ANYMORE
+    public static String getAppUserEmail() {
+        return userEmail;
+    }
 }
