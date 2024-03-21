@@ -12,7 +12,6 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.TextView;
 import com.example.genzgpt.Controller.EventAdapter;
 import com.example.genzgpt.Controller.Firebase;
@@ -115,12 +114,16 @@ public class MainPageFragment extends Fragment implements EventAdapter.EventClic
 
     private void fetchEvents() {
         events.clear();
-        firebase.fetchEvents(new Firebase.OnEventsLoadedListener() {
+        String currentUserEmail = "msn@abc.com"; //AppUser.getUserId(); //TO DO!!!!!!
+        firebase.fetchUserEvents(currentUserEmail, new Firebase.OnUserEventsLoadedListener() {
+
             @Override
-            public void onEventsLoaded(List<Event> loadedEvents) {
+            public void onEventsLoaded(String email, List<Event> eventList) {
                 events.clear();
-                events.addAll(loadedEvents);
+                events.addAll(eventList);
                 eventAdapter.notifyDataSetChanged();
+                System.out.println("Events loaded: " + eventList);
+
             }
 
             @Override
