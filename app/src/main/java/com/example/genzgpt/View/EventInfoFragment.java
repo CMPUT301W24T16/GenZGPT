@@ -18,6 +18,7 @@ import com.example.genzgpt.R;
 import com.squareup.picasso.Picasso;
 import com.example.genzgpt.Model.AppUser;
 
+
 public class EventInfoFragment extends Fragment {
 
     private Event event;
@@ -38,7 +39,7 @@ public class EventInfoFragment extends Fragment {
         displayEventData();
         firebase = new Firebase();
         //if a user clicks on sign_up_button, call signUpForEvent
-        view.findViewById(R.id.sign_up_button).setOnClickListener(this::signUpForEvent);
+        view.findViewById(R.id.sign_up_button).setOnClickListener(this::signUpForEvent); // Lambda expression for the click listener to call signUpForEvent
         return view;
     }
 
@@ -65,7 +66,8 @@ public class EventInfoFragment extends Fragment {
     }
 
     public void signUpForEvent(View view) {
-        fetchUserData("zachtest@gmail.com");
+        fetchUserData(AppUser.getAppUserEmail());
+
     }
 
     private void fetchUserData(String email) {
@@ -73,6 +75,7 @@ public class EventInfoFragment extends Fragment {
             @Override
             public void onUserLoaded(User user) {
                 registerUserForEvent(user);
+                System.out.println("User data loaded: " + user.getFirstName() + " " + user.getLastName());
             }
 
             @Override

@@ -18,6 +18,7 @@ import com.example.genzgpt.R;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import com.example.genzgpt.Model.AppUser;
 
 /**
  * A fragment subclass serving as the main page display for the user.
@@ -63,8 +64,13 @@ public class MainPageFragment extends Fragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
-        firebase = new Firebase(); // Initialize Firebase here (ensure you have a constructor in your Firebase class)
-        eventAdapter = new EventAdapter(events); // Initialize your adapter with an empty list or fetched data
+        firebase = new Firebase();
+        eventAdapter = new EventAdapter(events, new EventAdapter.OnSettingButtonClickListener() {
+            @Override
+            public void onSettingButtonClick(Event event) {
+                Log.d("MainPageFragment", "Setting button clicked for event: " + event.getEventName());
+            }
+        });
     }
 
     @Override
@@ -97,14 +103,14 @@ public class MainPageFragment extends Fragment {
 
             @Override
             public void onEventsLoadFailed(Exception e) {
-                // Handle the error case
                 Log.e("EventListFragment", "Failed to load events: " + e.getMessage());
             }
         });
     }
 
     private void fetchUserData() {
-        firebase.getUserData("zachtest@gmail.com", new Firebase.OnUserLoadedListener() {
+
+        firebase.getUserData(AppUser.getAppUserEmail(), new Firebase.OnUserLoadedListener() {
             @Override
             public void onUserLoaded(User user) {
                 greetUserBasedOnTime(user);
