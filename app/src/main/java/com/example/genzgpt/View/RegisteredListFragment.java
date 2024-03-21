@@ -25,7 +25,8 @@ import java.util.List;
 
 /**
  * A Fragment representing a list of attendees for a specific event.
- * It displays a list of attendees fetched from Firestore and allows navigation back to the previous screen.
+ * It displays a list of attendees fetched from Firestore and allows navigation
+ * back to the previous screen.
  */
 public class RegisteredListFragment extends Fragment {
     private RecyclerView recyclerView;
@@ -36,18 +37,25 @@ public class RegisteredListFragment extends Fragment {
 
     /**
      * Constructs a new instance of AttendeeListFragment with a specific event.
+     * 
      * @param event The event for which attendees will be listed.
      */
-    public RegisteredListFragment(Event event){
+    public RegisteredListFragment(Event event) {
         this.event = event;
     };
 
     /**
-     * Inflates the fragment's view and initializes its components, such as the RecyclerView for displaying attendees.
-     * Also sets up a click listener for the back arrow ImageView to handle navigation.
-     * @param inflater The LayoutInflater object that can be used to inflate any views in the fragment.
-     * @param container If non-null, this is the parent view that the fragment's UI should be attached to.
-     * @param savedInstanceState If non-null, this fragment is being re-constructed from a previous saved state as given here.
+     * Inflates the fragment's view and initializes its components, such as the
+     * RecyclerView for displaying attendees.
+     * Also sets up a click listener for the back arrow ImageView to handle
+     * navigation.
+     * 
+     * @param inflater           The LayoutInflater object that can be used to
+     *                           inflate any views in the fragment.
+     * @param container          If non-null, this is the parent view that the
+     *                           fragment's UI should be attached to.
+     * @param savedInstanceState If non-null, this fragment is being re-constructed
+     *                           from a previous saved state as given here.
      * @return The View for the fragment's UI, or null.
      */
     @Override
@@ -62,7 +70,6 @@ public class RegisteredListFragment extends Fragment {
         registeredList = new ArrayList<>();
         userAdapter = new UserAdapter(registeredList);
         recyclerView.setAdapter(userAdapter);
-
         firebase = new Firebase();
 
         // Fetch the list of attendees from Firestore and update the RecyclerView
@@ -83,7 +90,9 @@ public class RegisteredListFragment extends Fragment {
     }
 
     /**
-     * Fetches the list of attendees who have checked in for the event from Firestore and updates the UI accordingly.
+     * Fetches the list of attendees who have checked in for the event from
+     * Firestore and updates the UI accordingly.
+     * 
      * @param eventName The name of the event to fetch attendees for.
      */
     private void fetchRegisteredAttendees(String eventName) {
@@ -115,6 +124,7 @@ public class RegisteredListFragment extends Fragment {
             tvTotalCount.setText(String.valueOf(registeredList.size()));
         }
     }
+
     /**
      * Adapter class for managing the display of attendees in a RecyclerView.
      */
@@ -154,21 +164,22 @@ public class RegisteredListFragment extends Fragment {
     }
 
     /**
-     * ViewHolder class for displaying individual attendee items in the RecyclerView.
+     * ViewHolder class for displaying individual attendee items in the
+     * RecyclerView.
      */
     private class UserViewHolder extends RecyclerView.ViewHolder {
         private TextView personName;
-        //private TextView checkInCount;
+        // private TextView checkInCount;
 
         public UserViewHolder(View itemView) {
             super(itemView);
             personName = itemView.findViewById(R.id.tvPersonName);
-            //checkInCount = itemView.findViewById(R.id.tvCheckedInCount);
+            // checkInCount = itemView.findViewById(R.id.tvCheckedInCount);
         }
 
         public void bind(User user) {
-            personName.setText(user.getFirstName()+" "+user.getLastName());
-            //checkInCount.setText("Checked In: " + user.getCheckInCount());
+            personName.setText(user.getFirstName() + " " + user.getLastName());
+            // checkInCount.setText("Checked In: " + user.getCheckInCount());
         }
     }
 }
