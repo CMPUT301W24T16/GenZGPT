@@ -5,13 +5,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.activity.OnBackPressedCallback;
-import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.example.genzgpt.Controller.Firebase;
@@ -28,8 +25,6 @@ public class EventInfoFragment extends Fragment {
     private TextView eventNameTextView, eventDateTextView, eventLocationTextView, eventAttendeesTextView;
     private ImageView eventImageView;
     private Firebase firebase;
-    private Button signUpButton;
-    private boolean isUserSignedUp = false;
 
     // Constructor now takes an Event object
     public EventInfoFragment(Event event) {
@@ -38,27 +33,14 @@ public class EventInfoFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.event_info_fragment, container, false);
         initializeViews(view);
         displayEventData();
         firebase = new Firebase();
         //if a user clicks on sign_up_button, call signUpForEvent
-        view.findViewById(R.id.sign_up_button).setOnClickListener(this::signUpForEvent);
-        view.findViewById(R.id.back_button).setOnClickListener(v -> {
-            getParentFragmentManager().popBackStack();
-        });
+        view.findViewById(R.id.sign_up_button).setOnClickListener(this::signUpForEvent); // Lambda expression for the click listener to call signUpForEvent
         return view;
-    }
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        requireActivity().getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
-            @Override
-            public void handleOnBackPressed() {
-                getParentFragmentManager().popBackStack();
-            }
-        });
     }
 
     private void initializeViews(View view) {
@@ -72,10 +54,12 @@ public class EventInfoFragment extends Fragment {
         // Directly display event data using the provided Event object
         if (event != null) {
             eventNameTextView.setText(event.getEventName());
+            // You may want to format the date
             eventDateTextView.setText(event.getEventDate().toString());
             eventLocationTextView.setText(event.getLocation());
 
             if (event.getImageURL() != null && !event.getImageURL().isEmpty()) {
+                // Load the image using Picasso or another library
                 Picasso.get().load(event.getImageURL()).into(eventImageView);
             }
         }

@@ -308,6 +308,7 @@ public class Firebase {
     // FIXME MIGHT STILL BE USING EMAIL TO GET A USER?
     /**
      * Retrieves the list of events from the database.
+     * 
      * @return the event details for a particular event name.
      * @param eventName
      */
@@ -323,7 +324,9 @@ public class Firebase {
                             String eventId = document.getId();
                             Date eventDate = document.getDate("eventDate");
                             String location = document.getString("location");
-                            Integer maxAttendees = document.getLong("maxAttendees") != null ? document.getLong("maxAttendees").intValue() : null;
+                            Integer maxAttendees = document.getLong("maxAttendees") != null
+                                    ? document.getLong("maxAttendees").intValue()
+                                    : null;
                             String imageURL = document.getString("imageURL");
 
                             Event event = new Event(eventId, eventName, eventDate, location, 0, imageURL);
@@ -337,29 +340,35 @@ public class Firebase {
                                         public void onUserLoaded(User user) {
                                             event.addOrganizer(user);
                                             if (event.getOrganizers().size() == organizerEmails.size()) {
-                                                fetchRegisteredAttendees(eventName, new OnRegisteredAttendeesLoadedListener() {
-                                                    @Override
-                                                    public void onRegisteredAttendeesLoaded(List<User> registeredAttendees) {
-                                                        event.setRegisteredAttendees(registeredAttendees);
-                                                        fetchCheckedInAttendees(eventName, new OnCheckInAttendeesLoadedListener() {
+                                                fetchRegisteredAttendees(eventName,
+                                                        new OnRegisteredAttendeesLoadedListener() {
                                                             @Override
-                                                            public void onCheckInAttendeesLoaded(List<User> checkedInAttendees) {
-                                                                event.setCheckedInAttendees(checkedInAttendees);
-                                                                listener.onEventLoaded(event);
+                                                            public void onRegisteredAttendeesLoaded(
+                                                                    List<User> registeredAttendees) {
+                                                                event.setRegisteredAttendees(registeredAttendees);
+                                                                fetchCheckedInAttendees(eventName,
+                                                                        new OnCheckInAttendeesLoadedListener() {
+                                                                            @Override
+                                                                            public void onCheckInAttendeesLoaded(
+                                                                                    List<User> checkedInAttendees) {
+                                                                                event.setCheckedInAttendees(
+                                                                                        checkedInAttendees);
+                                                                                listener.onEventLoaded(event);
+                                                                            }
+
+                                                                            @Override
+                                                                            public void onCheckInAttendeesLoadFailed(
+                                                                                    Exception e) {
+                                                                                listener.onEventLoadFailed(e);
+                                                                            }
+                                                                        });
                                                             }
 
                                                             @Override
-                                                            public void onCheckInAttendeesLoadFailed(Exception e) {
+                                                            public void onRegisteredAttendeesLoadFailed(Exception e) {
                                                                 listener.onEventLoadFailed(e);
                                                             }
                                                         });
-                                                    }
-
-                                                    @Override
-                                                    public void onRegisteredAttendeesLoadFailed(Exception e) {
-                                                        listener.onEventLoadFailed(e);
-                                                    }
-                                                });
                                             }
                                         }
 
@@ -377,35 +386,45 @@ public class Firebase {
                             } else {
                                 fetchRegisteredAttendees(eventName, new OnRegisteredAttendeesLoadedListener() {
 
-    @Override
-    public void onRegisteredAttendeesLoaded(List<User> registeredAttendees) {
-        event.setRegisteredAttendees(registeredAttendees);
-        fetchCheckedInAttendees(eventName, new OnCheckInAttendeesLoadedListener() {
-            @Override
-            public void onCheckInAttendeesLoaded(List<User> checkedInAttendees) {
-                event.setCheckedInAttendees(checkedInAttendees);
-                listener.onEventLoaded(event);
-            }
+                                    @Override
+                                    public void onRegisteredAttendeesLoaded(List<User> registeredAttendees) {
+                                        event.setRegisteredAttendees(registeredAttendees);
+                                        fetchCheckedInAttendees(eventName, new OnCheckInAttendeesLoadedListener() {
+                                            @Override
+                                            public void onCheckInAttendeesLoaded(List<User> checkedInAttendees) {
+                                                event.setCheckedInAttendees(checkedInAttendees);
+                                                listener.onEventLoaded(event);
+                                            }
 
-            @Override
-            public void onCheckInAttendeesLoadFailed(Exception e) {
-                listener.onEventLoadFailed(e);
-            }
-        });
+                                            @Override
+                                            public void onCheckInAttendeesLoadFailed(Exception e) {
+                                                listener.onEventLoadFailed(e);
+                                            }
+                                        });
+                                    }
+
+                                    @Override
+                                    public void onRegisteredAttendeesLoadFailed(Exception e) {
+                                        listener.onEventLoadFailed(e);
+                                    }
+                                });
+                            }
+                        } else {
+                            listener.onEventNotFound();
+                        }
+                    } else {
+                        listener.onEventLoadFailed(task.getException());
+                    }
+                });
     }
 
-    @Override
-    public void onRegisteredAttendeesLoadFailed(Exception e) {
-        listener.onEventLoadFailed(e);
+    public interface OnEventLoadedListener {
+        void onEventLoaded(Event event);
+
+        void onEventNotFound();
+
+        void onEventLoadFailed(Exception e);
     }
-});}}else{listener.onEventNotFound();}}else{listener.onEventLoadFailed(task.getException());}});}
-
-public interface OnEventLoadedListener {
-    void onEventLoaded(Event event);
-
-    void onEventNotFound();
-
-    void onEventLoadFailed(Exception e);}
 
     public void addEvent(Event event) {
         // Create a new document with a generated ID
@@ -439,6 +458,7 @@ public interface OnEventLoadedListener {
 
     /**
      * Creates a new user in the database.
+     * 
      * @param user
      */
     public void createUser(User user, OnUserCreatedListener listener) {
@@ -510,6 +530,7 @@ public interface OnEventLoadedListener {
 
     /**
      * Creates a new event in the database.
+     * 
      * @param organizer
      * @param event
      */
@@ -553,6 +574,7 @@ public interface OnEventLoadedListener {
 
     /**
      * Adds a user to the list of registered attendees for a specific event.
+     * 
      * @param eventName
      * @param userId
      */
@@ -596,6 +618,7 @@ public interface OnEventLoadedListener {
 
     /**
      * Adds a user to the list of registered attendees for a specific event.
+     * 
      * @param eventName
      * @param userId
      */
@@ -646,6 +669,7 @@ public interface OnEventLoadedListener {
 
     /**
      * Deletes an event from the database.
+     * 
      * @param eventName
      */
     public void deleteEvent(String eventName) {
@@ -688,6 +712,7 @@ public interface OnEventLoadedListener {
 
     /**
      * Deletes a user from the database.
+     * 
      * @param userId
      */
     public void deleteUser(String userId) {
@@ -727,8 +752,9 @@ public interface OnEventLoadedListener {
 
     /**
      * Retrieves the list of all users from the database.
+     * 
      * @return list of events
-     * Synchronous method
+     *         Synchronous method
      */
     public void fetchUsers(OnUsersLoadedListener listener) {
         db.collection("users").get()
@@ -741,7 +767,8 @@ public interface OnEventLoadedListener {
                         String lastName = document.getString("lastName");
                         String email = document.getString("email");
                         Long phoneNumber = document.getLong("phoneNumber");
-                        boolean geolocation = document.getBoolean("geolocation") != null && Boolean.TRUE.equals(document.getBoolean("geolocation"));
+                        boolean geolocation = document.getBoolean("geolocation") != null
+                                && Boolean.TRUE.equals(document.getBoolean("geolocation"));
                         String imageURL = document.getString("imageURL");
                         User user = new User(userID, firstName, lastName, phoneNumber, email, geolocation, imageURL);
                         userList.add(user);
@@ -824,12 +851,14 @@ public interface OnEventLoadedListener {
                         for (Object attendeeObj : registeredAttendees) {
                             if (attendeeObj instanceof Map) {
                                 Map<String, Object> attendee = (Map<String, Object>) attendeeObj;
-                                // Check if the attendee map contains the "email" key to avoid NullPointerException
+                                // Check if the attendee map contains the "email" key to avoid
+                                // NullPointerException
                                 System.out.println("Attendee + EventName: " + attendee + " " + eventName);
                                 if (attendee.containsKey("email")) {
                                     String attendeeEmail = (String) attendee.get("email");
                                     System.out.println("Attendee Email: " + attendeeEmail + "" + email);
-                                    // Check if both emails are not null before comparing to avoid NullPointerException
+                                    // Check if both emails are not null before comparing to avoid
+                                    // NullPointerException
                                     if (email != null && email.equals(attendeeEmail)) {
                                         isUserRegistered = true;
                                         break;
@@ -839,7 +868,8 @@ public interface OnEventLoadedListener {
                         }
 
                         System.out.println("User registered: " + isUserRegistered);
-                        // Add the event to the list if the user's email is found among the registered attendees
+                        // Add the event to the list if the user's email is found among the registered
+                        // attendees
                         if (isUserRegistered) {
                             Event event = new Event(eventId, eventName, eventDate, location, maxAttendees, imageURL);
                             event.setRegisteredAttendees(registeredAttendees);
@@ -855,7 +885,6 @@ public interface OnEventLoadedListener {
                 });
     }
 
-
     public interface OnUserEventsLoadedListener {
 
         void onEventsLoaded(String email, List<Event> eventList);
@@ -869,7 +898,7 @@ public interface OnEventLoadedListener {
      * 
      * @param eventName
      * @return list of checked-in attendees
-     * asynchronous method
+     *         asynchronous method
      */
     public void fetchCheckedInAttendees(String eventName, OnCheckInAttendeesLoadedListener listener) {
         CollectionReference eventsRef = db.collection("events");
@@ -933,10 +962,12 @@ public interface OnEventLoadedListener {
     }
 
     /**
-     * Retrieves the list of registered attendees for a specific event from the database.
+     * Retrieves the list of registered attendees for a specific event from the
+     * database.
+     * 
      * @param eventName
      * @return list of registered attendees
-     * asynchronous method
+     *         asynchronous method
      */
     public void fetchRegisteredAttendees(String eventName, OnRegisteredAttendeesLoadedListener listener) {
         CollectionReference eventsRef = db.collection("events");
@@ -981,13 +1012,15 @@ public interface OnEventLoadedListener {
                         });
                     }
 
-                    // If there are no registered attendees, call the onRegisteredAttendeesLoaded callback immediately
+                    // If there are no registered attendees, call the onRegisteredAttendeesLoaded
+                    // callback immediately
                     if (registeredAttendeeIds.isEmpty()) {
                         listener.onRegisteredAttendeesLoaded(registeredAttendees);
                     }
                 } else {
                     // No events found with the specified name
-                    listener.onRegisteredAttendeesLoadFailed(new Exception("No events found with the name: " + eventName));
+                    listener.onRegisteredAttendeesLoadFailed(
+                            new Exception("No events found with the name: " + eventName));
                 }
             } else {
                 // Error occurred while querying events
@@ -1004,6 +1037,7 @@ public interface OnEventLoadedListener {
 
     /**
      * Updates the user data in the database.
+     * 
      * @param user
      */
     public void updateUser(User user, OnUserUpdatedListener listener) {
@@ -1037,6 +1071,7 @@ public interface OnEventLoadedListener {
 
     /**
      * Updates the event data in the database.
+     * 
      * @param eventId, newEventDate, newLocation
      */
     public void updateEvent(String eventId, Date newEventDate, String newLocation, OnEventUpdatedListener listener) {
@@ -1059,6 +1094,7 @@ public interface OnEventLoadedListener {
 
     /**
      * Registers a user for a specific event.
+     * 
      * @param event
      * @param user
      * @param listener
@@ -1084,6 +1120,10 @@ public interface OnEventLoadedListener {
                     userMap.put("phone", user.getPhone());
                     userMap.put("geolocation", user.isGeolocation());
                     userMap.put("imageURL", user.getImageURL());
+                    // userMap.put("roles",
+                    // user.getRoles().stream().map(Role::toMap).collect(Collectors.toList()));
+                    System.out.println(userMap + " 123123");
+                    // Update the event's registeredAttendees field in Firestore
                     eventRef.update("registeredAttendees", FieldValue.arrayUnion(userMap))
                             .addOnSuccessListener(aVoid -> {
                                 // User registered for the event successfully
@@ -1106,8 +1146,11 @@ public interface OnEventLoadedListener {
 
     public interface OnAttendeeRegisteredListener {
         void onAttendeeRegistered();
+
         void onAttendeeRegistrationFailed(Exception e);
+
         void onEventNotFound();
+
         void onEventLoadFailed(Exception e);
     }
 
