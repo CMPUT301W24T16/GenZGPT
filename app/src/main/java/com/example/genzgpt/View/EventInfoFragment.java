@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -22,6 +23,8 @@ public class EventInfoFragment extends Fragment {
     private TextView eventNameTextView, eventDateTextView, eventLocationTextView, eventAttendeesTextView;
     private ImageView eventImageView;
     private Firebase firebase;
+    private Button signUpButton;
+    private boolean isUserSignedUp = false;
 
     // Constructor now takes an Event object
     public EventInfoFragment(Event event) {
@@ -34,6 +37,18 @@ public class EventInfoFragment extends Fragment {
         View view = inflater.inflate(R.layout.event_info_fragment, container, false);
         initializeViews(view);
         displayEventData();
+        firebase = new Firebase();
+
+        signUpButton = view.findViewById(R.id.sign_up_button);
+        signUpButton.setOnClickListener(v -> {
+            if (!isUserSignedUp) {
+                signUpForEvent();
+            } else {
+                withdrawFromEvent();
+            }
+        });
+
+        view.findViewById(R.id.back_button).setOnClickListener(v -> getParentFragmentManager().popBackStack());
         return view;
     }
 
@@ -57,5 +72,72 @@ public class EventInfoFragment extends Fragment {
                 Picasso.get().load(event.getImageURL()).into(eventImageView);
             }
         }
+    }
+
+    public void signUpForEvent() {
+        fetchUserData(AppUser.getAppUserEmail(), true);
+    }
+
+    public void withdrawFromEvent() {
+        // Implement logic to withdraw the user from the event
+        fetchUserData(AppUser.getAppUserEmail(), false);
+    }
+
+
+    private void fetchUserData(String email, boolean isSignUp) {
+        firebase.getUserData(email, new Firebase.OnUserLoadedListener() {
+            @Override
+            public void onUserLoaded(User user) {
+                if (isSignUp) {
+                    registerUserForEvent(user);
+                } else {
+                    unregisterUserFromEvent(user);
+                }
+                System.out.println("User data loaded: " + user.getFirstName() + " " + user.getLastName());
+            }
+
+            @Override
+            public void onUserNotFound() {
+                Log.d("EventInfoFragment", "User not found");
+            }
+
+            @Override
+            public void onUserLoadFailed(Exception e) {
+                Log.e("EventInfoFragment", "Error loading user data: " + e.getMessage());
+            }
+        });
+    }
+    private void registerUserForEvent(User user) {
+        firebase.registerAttendee(event, user, new Firebase.OnAttendeeRegisteredListener() {
+            @Override
+            public void onAttendeeRegistered() {
+                Toast.makeText(getContext(), "You have signed up for the event!", Toast.LENGTH_SHORT).show();
+                isUserSignedUp = true;
+                signUpButton.setText("Withdraw");
+            }
+
+            @Override
+            public void onAttendeeRegistrationFailed(Exception e) {
+                Toast.makeText(getContext(), "Failed to sign up for the event!", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onEventNotFound() {
+
+            }
+
+            @Override
+            public void onEventLoadFailed(Exception e) {
+
+            }
+        });
+    }
+
+    private void unregisterUserFromEvent(User user) {
+        // Implement the logic to unregister the user from the event
+        // After successfully unregistering, update the button and flag
+        Toast.makeText(getContext(), "You have withdrawn from the event!", Toast.LENGTH_SHORT).show();
+        isUserSignedUp = false;
+        signUpButton.setText("Sign Up");
     }
 }
