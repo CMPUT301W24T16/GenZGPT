@@ -9,6 +9,10 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.genzgpt.R;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import com.example.genzgpt.Model.AppUser;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -56,6 +60,13 @@ public class MainPageFragment extends Fragment {
             mParam1 = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
+        firebase = new Firebase();
+        eventAdapter = new EventAdapter(events, new EventAdapter.OnSettingButtonClickListener() {
+            @Override
+            public void onSettingButtonClick(Event event) {
+                Log.d("MainPageFragment", "Setting button clicked for event: " + event.getEventName());
+            }
+        });
     }
 
     @Override
@@ -63,5 +74,62 @@ public class MainPageFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_main_page, container, false);
+    }
+
+    private void setUpRecyclerView(View view) {
+        RecyclerView eventsRecyclerView = view.findViewById(R.id.eventsRecyclerView);
+        eventsRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        eventsRecyclerView.setAdapter(eventAdapter);
+    }
+
+    private void fetchEvents() {
+        events.clear();
+        firebase.fetchEvents(new Firebase.OnEventsLoadedListener() {
+            @Override
+            public void onEventsLoaded(List<Event> loadedEvents) {
+                events.clear();
+                events.addAll(loadedEvents);
+                eventAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onEventsLoadFailed(Exception e) {
+                Log.e("EventListFragment", "Failed to load events: " + e.getMessage());
+            }
+        });
+    }
+
+    private void fetchUserData() {
+
+        firebase.getUserData(AppUser.getAppUserEmail(), new Firebase.OnUserLoadedListener() {
+            @Override
+            public void onUserLoaded(User user) {
+                greetUserBasedOnTime(user);
+            }
+
+            @Override
+            public void onUserNotFound() {
+                Log.d("MainPageFragment", "User not found");
+            }
+
+            @Override
+            public void onUserLoadFailed(Exception e) {
+                Log.e("MainPageFragment", "Error loading user data: " + e.getMessage());
+            }
+        });
+    }
+
+    private void greetUserBasedOnTime(User user) {
+        Date date = new Date();
+        int hour = date.getHours();
+        String greeting;
+        if (hour < 12) {
+            greeting = "Good Morning, ";
+        } else if (hour < 18) {
+            greeting = "Good Afternoon, ";
+        } else {
+            greeting = "Good Evening, ";
+        }
+        userName.setText(greeting + user.getFirstName() + "👋");
     }
 }

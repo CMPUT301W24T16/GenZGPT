@@ -997,24 +997,32 @@ public interface OnEventLoadedListener {
      * @param user
      * @param listener
      */
-
     public void registerAttendee(Event event, User user, OnAttendeeRegisteredListener listener) {
-        System.out.println(event.getEventName() + " 123123" + user.getEmail());
-CollectionReference eventsRef = db.collection("events");
+        System.out.println("Registering attendee for event: " + event.getEventName());
+        CollectionReference eventsRef = db.collection("events");
         Query query = eventsRef.whereEqualTo("eventName", event.getEventName());
 
         query.get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 QuerySnapshot snapshot = task.getResult();
                 if (snapshot != null && !snapshot.isEmpty()) {
-                    // Assuming there is only one event with the given name
                     DocumentSnapshot eventDocument = snapshot.getDocuments().get(0);
-                    System.out.println("current event: " + event.getEventName() + "current user: " + user.getEmail() + "current event id: " + eventDocument.getId());
                     String eventId = eventDocument.getId();
-
                     DocumentReference eventRef = db.collection("events").document(eventId);
-                    System.out.println("current event: " + event.getEventName() + "current user: " + user.getEmail() + "current event id: " + eventRef.getId());
-                    eventRef.update("registeredAttendees", FieldValue.arrayUnion(user.getEmail()))
+
+                    Map<String, Object> userMap = new HashMap<>();
+                    userMap.put("id", user.getId());
+                    userMap.put("firstName", user.getFirstName());
+                    userMap.put("lastName", user.getLastName());
+                    userMap.put("email", user.getEmail());
+                    userMap.put("phone", user.getPhone());
+                    userMap.put("geolocation", user.isGeolocation());
+                    userMap.put("imageURL", user.getImageURL());
+                    // Note: If the roles are complex objects, you'll need to convert them to a Firestore-friendly format.
+                    // userMap.put("roles", user.getRoles().stream().map(Role::toMap).collect(Collectors.toList()));
+                    System.out.println(userMap + " 123123");
+                    // Update the event's registeredAttendees field in Firestore
+                    eventRef.update("registeredAttendees", FieldValue.arrayUnion(userMap))
                             .addOnSuccessListener(aVoid -> {
                                 // User registered for the event successfully
                                 listener.onAttendeeRegistered();
@@ -1036,11 +1044,8 @@ CollectionReference eventsRef = db.collection("events");
 
     public interface OnAttendeeRegisteredListener {
         void onAttendeeRegistered();
-
         void onAttendeeRegistrationFailed(Exception e);
-
         void onEventNotFound();
-
         void onEventLoadFailed(Exception e);
     }
 

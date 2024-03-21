@@ -8,4 +8,5 @@
     <color name="colorAccent">#00FF00</color>
     <color name="actionMenuTextColor">#0000FF</color>
     <color name="background_color">#B3B3B3</color>
+    <color name="primary">#000000</color>
 </resources>
