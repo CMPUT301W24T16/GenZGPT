@@ -1120,10 +1120,6 @@ public class Firebase {
                     userMap.put("phone", user.getPhone());
                     userMap.put("geolocation", user.isGeolocation());
                     userMap.put("imageURL", user.getImageURL());
-                    // userMap.put("roles",
-                    // user.getRoles().stream().map(Role::toMap).collect(Collectors.toList()));
-                    System.out.println(userMap + " 123123");
-                    // Update the event's registeredAttendees field in Firestore
                     eventRef.update("registeredAttendees", FieldValue.arrayUnion(userMap))
                             .addOnSuccessListener(aVoid -> {
                                 // User registered for the event successfully
