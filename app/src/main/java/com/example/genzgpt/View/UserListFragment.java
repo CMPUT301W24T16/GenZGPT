@@ -54,7 +54,6 @@ public class UserListFragment extends Fragment {
         userAdapter = new UserAdapter(userList);
         recyclerView.setAdapter(userAdapter);
 
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
         firebase = new Firebase();
 
         // Fetch the list of users from Firestore and update the RecyclerView

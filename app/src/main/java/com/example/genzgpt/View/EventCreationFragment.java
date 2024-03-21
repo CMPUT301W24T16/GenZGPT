@@ -45,7 +45,6 @@ public class EventCreationFragment extends Fragment {
     private EditText eventNameEditText, eventDateEditText, locationEditText;
     private ImageView eventImageView;
     private Button selectImageButton, createEventButton;
-    private FirebaseFirestore db;
     private Calendar eventDateCalendar;
     private ActivityResultLauncher<Intent> galleryLauncher;
     private Uri selectedImageUri;
@@ -55,7 +54,6 @@ public class EventCreationFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.event_creation_fragment, container, false);
 
-        db = FirebaseFirestore.getInstance();
         eventDateCalendar = Calendar.getInstance();
 
         MaterialToolbar toolbar = view.findViewById(R.id.toolbar);

@@ -64,7 +64,6 @@ abstract class EventsFragment extends Fragment {
         eventAdapter = new EventAdapter(eventList);
         recyclerView.setAdapter(eventAdapter);
 
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
         firebase = new Firebase();
 
         // Fetch the list of events from Firestore and update the RecyclerView

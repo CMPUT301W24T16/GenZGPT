@@ -64,7 +64,6 @@ public class RegisteredListFragment extends Fragment {
         registeredList = new ArrayList<>();
         userAdapter = new UserAdapter(registeredList);
         recyclerView.setAdapter(userAdapter);
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
         firebase = new Firebase();
 
         // Fetch the list of attendees from Firestore and update the RecyclerView
