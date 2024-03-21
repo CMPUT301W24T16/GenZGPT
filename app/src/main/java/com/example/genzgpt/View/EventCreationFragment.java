@@ -152,7 +152,7 @@ public class EventCreationFragment extends Fragment {
                     );
 
                     // Add the new event to Firebase
-                    Firebase firebase = new Firebase(db);
+                    Firebase firebase = new Firebase();
                     firebase.addEvent(newEvent);
 
                     getParentFragmentManager().popBackStack();
