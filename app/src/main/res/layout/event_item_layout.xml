@@ -81,30 +81,6 @@
             android:paddingBottom="1dp">
 
 
-            <ImageButton
-                android:id="@+id/settingBotton"
-                android:layout_width="47dp"
-                android:layout_height="43dp"
-                android:layout_marginEnd="4dp"
-                android:background="@color/white"
-                android:clickable="true"
-                android:focusable="true"
-                android:src="@drawable/ic_manage_event"
-                android:visibility="visible"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <TextView
-                android:layout_width="28dp"
-                android:layout_height="16dp"
-                android:layout_marginTop="-5dp"
-                android:layout_marginEnd="10dp"
-                android:text="Edit"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/settingBotton"
-                app:layout_constraintVertical_bias="0.31" />
 
             <TextView
                 android:id="@+id/attendeeOrHostName"
