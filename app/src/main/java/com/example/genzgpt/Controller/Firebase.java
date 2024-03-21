@@ -826,6 +826,70 @@ public class Firebase {
     }
 
     /**
+     * Retrieves the list of events from the database.
+     *
+     * @param listener Listener for handling events retrieval.
+     */
+    public void fetchUserEvents(String email, OnUserEventsLoadedListener listener) {
+        db.collection("events").get()
+                .addOnSuccessListener(querySnapshot -> {
+                    List<Event> eventList = new ArrayList<>();
+                    for (DocumentSnapshot document : querySnapshot.getDocuments()) {
+                        String eventId = document.getString("eventId");
+                        String eventName = document.getString("eventName");
+                        Date eventDate = document.getDate("eventDate");
+                        String location = document.getString("location");
+                        Long maxAttendeesLong = document.getLong("maxAttendees");
+                        Integer maxAttendees = maxAttendeesLong != null ? maxAttendeesLong.intValue() : null;
+                        String imageURL = document.getString("imageURL");
+                        List<User> registeredAttendees = document.get("registeredAttendees") != null
+                                ? (List<User>) document.get("registeredAttendees")
+                                : new ArrayList<>();
+
+                        boolean isUserRegistered = false;
+                        for (Object attendeeObj : registeredAttendees) {
+                            if (attendeeObj instanceof Map) {
+                                Map<String, Object> attendee = (Map<String, Object>) attendeeObj;
+                                // Check if the attendee map contains the "email" key to avoid NullPointerException
+                                System.out.println("Attendee + EventName: " + attendee + " " + eventName);
+                                if (attendee.containsKey("email")) {
+                                    String attendeeEmail = (String) attendee.get("email");
+                                    System.out.println("Attendee Email: " + attendeeEmail + "" + email);
+                                    // Check if both emails are not null before comparing to avoid NullPointerException
+                                    if (email != null && email.equals(attendeeEmail)) {
+                                        isUserRegistered = true;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+
+                        System.out.println("User registered: " + isUserRegistered);
+                        // Add the event to the list if the user's email is found among the registered attendees
+                        if (isUserRegistered) {
+                            Event event = new Event(eventId, eventName, eventDate, location, maxAttendees, imageURL);
+                            event.setRegisteredAttendees(registeredAttendees);
+                            eventList.add(event);
+
+                        }
+                    }
+                    listener.onEventsLoaded(email, eventList);
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("Firebase", "Error fetching events: " + e.getMessage());
+                    listener.onEventsLoadFailed(e);
+                });
+    }
+
+
+    public interface OnUserEventsLoadedListener {
+
+        void onEventsLoaded(String email, List<Event> eventList);
+
+        void onEventsLoadFailed(Exception e);
+    }
+
+    /**
      * Retrieves the list of checked-in attendees for a specific event from the
      * database.
      * 
@@ -1053,12 +1117,6 @@ public class Firebase {
                     userMap.put("phone", user.getPhone());
                     userMap.put("geolocation", user.isGeolocation());
                     userMap.put("imageURL", user.getImageURL());
-                    // Note: If the roles are complex objects, you'll need to convert them to a
-                    // Firestore-friendly format.
-                    // userMap.put("roles",
-                    // user.getRoles().stream().map(Role::toMap).collect(Collectors.toList()));
-                    System.out.println(userMap + " 123123");
-                    // Update the event's registeredAttendees field in Firestore
                     eventRef.update("registeredAttendees", FieldValue.arrayUnion(userMap))
                             .addOnSuccessListener(aVoid -> {
                                 // User registered for the event successfully
