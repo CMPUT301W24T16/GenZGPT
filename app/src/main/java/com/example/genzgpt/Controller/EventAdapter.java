@@ -18,10 +18,16 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> 
 
     private static List<Event> eventList;
     private OnSettingButtonClickListener settingButtonClickListener;
+    public interface EventClickListener {
+        void onEventClick(Event event);
+    }
 
-    public EventAdapter(List<Event> eventList, OnSettingButtonClickListener settingButtonClickListener) {
+    private static EventClickListener eventClickListener;
+
+    public EventAdapter(List<Event> eventList, OnSettingButtonClickListener settingButtonClickListener, EventClickListener eventClickListener) {
         this.eventList = eventList;
         this.settingButtonClickListener = settingButtonClickListener;
+        this.eventClickListener = eventClickListener;
     }
 
     @NonNull
@@ -29,6 +35,8 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> 
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.event_item_layout, parent, false);
         return new ViewHolder(view, settingButtonClickListener);
+
+
     }
 
     @Override
@@ -67,15 +75,14 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> 
             eventLocation = itemView.findViewById(R.id.eventLocation);
             eventDate = itemView.findViewById(R.id.eventDate);
             eventImage = itemView.findViewById(R.id.eventImage);
-            settingButton = itemView.findViewById(R.id.settingBotton);
 
-            settingButton.setOnClickListener(new View.OnClickListener() {
+            itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     int position = getAdapterPosition();
-                    if (position != RecyclerView.NO_POSITION && listener != null) {
-                        listener.onSettingButtonClick(eventList.get(position));
-                        System.out.println("Setting button clicked for event: " + eventList.get(position).getEventName());
+                    if (position != RecyclerView.NO_POSITION && eventClickListener != null) {
+                        eventClickListener.onEventClick(eventList.get(position));
+                        System.out.println("Event clicked: " + eventList.get(position).getEventName());
                     }
                 }
             });

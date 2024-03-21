@@ -1,13 +1,23 @@
 package com.example.genzgpt.View;
 
 import android.os.Bundle;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-
+import android.widget.Button;
+import android.widget.TextView;
+import com.example.genzgpt.Controller.EventAdapter;
+import com.example.genzgpt.Controller.Firebase;
+import com.example.genzgpt.Model.Event;
+import com.example.genzgpt.Model.User;
 import com.example.genzgpt.R;
 import java.util.ArrayList;
 import java.util.Date;
@@ -20,7 +30,12 @@ import com.example.genzgpt.Model.AppUser;
  * Use the {@link MainPageFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class MainPageFragment extends Fragment {
+public class MainPageFragment extends Fragment implements EventAdapter.EventClickListener {
+    @Override
+    public void onEventClick(Event event) {
+        EventInfoFragment eventInfoFragment = new EventInfoFragment(event);
+        switchFragment(eventInfoFragment, R.id.BaseFragment);
+    }
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -66,7 +81,7 @@ public class MainPageFragment extends Fragment {
             public void onSettingButtonClick(Event event) {
                 Log.d("MainPageFragment", "Setting button clicked for event: " + event.getEventName());
             }
-        });
+        }, this); // 'this' refers to MainPageFragment which now implements EventClickListener
     }
 
     @Override
@@ -81,6 +96,22 @@ public class MainPageFragment extends Fragment {
         eventsRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         eventsRecyclerView.setAdapter(eventAdapter);
     }
+
+    /**
+     * Switches the current fragment to the new fragment
+     */
+    protected void switchFragment(Fragment fragment, int idToReplace) {
+        FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+
+        // Replace the current fragment with the new fragment
+        fragmentTransaction.replace(idToReplace, fragment);
+        fragmentTransaction.addToBackStack(null);
+
+        // Commit the transaction
+        fragmentTransaction.commit();
+    }
+
 
     private void fetchEvents() {
         events.clear();
