@@ -116,7 +116,7 @@ public class MainPageFragment extends Fragment implements EventAdapter.EventClic
 
     private void fetchEvents() {
         events.clear();
-        String currentUserEmail = "msn@abc.com"; //AppUser.getUserId(); //TO DO!!!!!!
+        String currentUserEmail = AppUser.getInstance().getEmail();
         firebase.fetchUserEvents(currentUserEmail, new Firebase.OnUserEventsLoadedListener() {
 
             @Override
@@ -124,7 +124,7 @@ public class MainPageFragment extends Fragment implements EventAdapter.EventClic
                 events.clear();
                 events.addAll(eventList);
                 eventAdapter.notifyDataSetChanged();
-                System.out.println("Events loaded: " + eventList);
+                System.out.println("user is: " + AppUser.getInstance().getId() + " and name is: " + AppUser.getInstance().getFirstName());
 
             }
 
@@ -137,7 +137,7 @@ public class MainPageFragment extends Fragment implements EventAdapter.EventClic
 
     private void fetchUserData() {
 
-        firebase.getUserData(AppUser.getAppUserEmail(), new Firebase.OnUserLoadedListener() {
+        firebase.getUserData(AppUser.getInstance().getId(), new Firebase.OnUserLoadedListener() {
             @Override
             public void onUserLoaded(User user) {
                 greetUserBasedOnTime(user);

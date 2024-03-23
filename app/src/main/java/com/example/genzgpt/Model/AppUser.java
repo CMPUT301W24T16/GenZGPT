@@ -7,6 +7,7 @@ public class AppUser extends User{
     private static String userId;
     private static String userEmail;
     private static boolean hasSignedIn;
+    private static AppUser instance;
 
     /**
      * A constructor for the AppUser Class.
@@ -52,6 +53,20 @@ public class AppUser extends User{
      */
     public AppUser(String firstName, String lastName, long phone, String email, Boolean geolocation, String imageURL) {
         super(firstName, lastName, phone, email, geolocation, imageURL);
+    }
+    public static synchronized AppUser getInstance() {
+        if (instance == null) {
+            // Handle error or initialize with default values
+            throw new IllegalStateException("AppUser is not initialized");
+        }
+        return instance;
+    }
+
+    public static synchronized void initInstance(String id, String firstName, String lastName, long phone, String email, Boolean geolocation, String imageURL) {
+        if (instance == null) {
+            instance = new AppUser(id, firstName, lastName, phone, email, geolocation, imageURL);
+        }
+
     }
 
     /**

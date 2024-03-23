@@ -425,18 +425,51 @@ public class Firebase {
 
         void onEventLoadFailed(Exception e);
     }
+    /**
+     * Creates a new event and adds the provided user as an organizer.
+     *
+     * @param event The event to be created.
+     * @param user The user to add as an organizer.
+     *  The callback listener for the event creation and organizer registration process.
+     */
+    public void addEvent(Event event, User user) {
+        System.out.println("Creating event and registering organizer: " + user.getFirstName() + " " + user.getLastName());
 
-    public void addEvent(Event event) {
-        // Create a new document with a generated ID
-        db.collection("events")
-                .add(event.toMap())
-                .addOnSuccessListener(documentReference -> {
-                    Log.i("Firebase", "Event added with ID: " + documentReference.getId());
-                })
-                .addOnFailureListener(e -> {
-                    Log.e("Firebase", "Error adding event: " + e.getMessage());
-                });
+        // Convert the event to a Map
+        Map<String, Object> eventMap = event.toMap();
+
+        // Initially, do not include the organizers in the event map
+        // as we'll add them right after creating the event
+        CollectionReference eventsRef = db.collection("events");
+
+        // Add the event to the database
+        eventsRef.add(eventMap).addOnSuccessListener(documentReference -> {
+            System.out.println("Event created with ID: " + documentReference.getId());
+
+            // Convert organizer (user) to a Map
+            Map<String, Object> organizerMap = new HashMap<>();
+            organizerMap.put("id", user.getId());
+            organizerMap.put("firstName", user.getFirstName());
+            organizerMap.put("lastName", user.getLastName());
+            organizerMap.put("email", user.getEmail());
+            organizerMap.put("phone", user.getPhone());
+            organizerMap.put("geolocation", user.isGeolocation());
+            organizerMap.put("imageURL", user.getImageURL());
+
+            // Add the user as an organizer to the "organizers" array of the newly created event
+            DocumentReference eventRef = eventsRef.document(documentReference.getId());
+            eventRef.update("organizers", FieldValue.arrayUnion(organizerMap))
+                    .addOnSuccessListener(aVoid -> {
+                        System.out.println("Organizer registered for the event successfully");
+                    })
+                    .addOnFailureListener(e -> {
+                        System.err.println("Error adding organizer to event: " + e.getMessage());
+                    });
+        }).addOnFailureListener(e -> {
+            System.err.println("Error creating event: " + e.getMessage());
+        });
     }
+
 
     /**
      * Retrieves the user data from Firebase.
@@ -856,7 +889,6 @@ public class Firebase {
                                 System.out.println("Attendee + EventName: " + attendee + " " + eventName);
                                 if (attendee.containsKey("email")) {
                                     String attendeeEmail = (String) attendee.get("email");
-                                    System.out.println("Attendee Email: " + attendeeEmail + "" + email);
                                     // Check if both emails are not null before comparing to avoid
                                     // NullPointerException
                                     if (email != null && email.equals(attendeeEmail)) {
@@ -874,7 +906,6 @@ public class Firebase {
                             Event event = new Event(eventId, eventName, eventDate, location, maxAttendees, imageURL);
                             event.setRegisteredAttendees(registeredAttendees);
                             eventList.add(event);
-
                         }
                     }
                     listener.onEventsLoaded(email, eventList);

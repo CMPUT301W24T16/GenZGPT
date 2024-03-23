@@ -98,11 +98,27 @@ public class FirstSignInActivity extends AppCompatActivity {
                 firebase.createUser(newUser, new Firebase.OnUserCreatedListener() {
                     @Override
                     public void onUserCreated(String userId) {
-                        // Assign the id for the new user into the app
                         AppUser.setUserId(userId);
                         AppUser.setHasSignedIn(true);
                         Log.e("User Creation", "Successful User Creation");
+
+                        // Save user details to SharedPreferences
+                        SharedPreferences preferences = getSharedPreferences("com.example.genzgpt", Context.MODE_PRIVATE);
+                        SharedPreferences.Editor editor = preferences.edit();
+                        editor.putBoolean("signIn", true);
+                        editor.putString("id", userId);
+                        editor.putString("firstName", newUser.getFirstName());
+                        editor.putString("lastName", newUser.getLastName());
+                        editor.putString("email", newUser.getEmail());
+                        editor.putLong("phoneNumber", newUser.getPhone());
+                        editor.putBoolean("geolocation", newUser.isGeolocation());
+                        // If imageURL can be null, then we need to handle that case
+                        editor.putString("imageURL", newUser.getImageURL() != null ? newUser.getImageURL() : "default_image_url");
+                        editor.apply();
+
                         finish();
+                        System.out.println("ID: " + preferences.getString("id", null)  + " firstName testing 232: " + preferences.getString("email", null));
+
                     }
 
                     @Override

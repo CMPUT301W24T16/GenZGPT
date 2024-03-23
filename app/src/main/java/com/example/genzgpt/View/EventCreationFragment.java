@@ -36,6 +36,7 @@ import com.example.genzgpt.R;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.example.genzgpt.Controller.Firebase;
+import com.example.genzgpt.Model.AppUser;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -48,6 +49,7 @@ public class EventCreationFragment extends Fragment {
     private Calendar eventDateCalendar;
     private ActivityResultLauncher<Intent> galleryLauncher;
     private Uri selectedImageUri;
+
 
     @Nullable
     @Override
@@ -151,8 +153,8 @@ public class EventCreationFragment extends Fragment {
 
                     // Add the new event to Firebase
                     Firebase firebase = new Firebase();
-                    firebase.addEvent(newEvent);
-
+                    AppUser appUserInstance = AppUser.getInstance();
+                    firebase.addEvent(newEvent, appUserInstance);
                     getParentFragmentManager().popBackStack();
                 }
 

@@ -30,6 +30,7 @@ public class EventInfoFragment extends Fragment {
     private Firebase firebase;
     private Button signUpButton;
     private boolean isUserSignedUp = false;
+//    AppUser appUserInstance = AppUser.getInstance();
 
     // Constructor now takes an Event object
     public EventInfoFragment(Event event) {
@@ -88,25 +89,26 @@ public class EventInfoFragment extends Fragment {
     }
 
     public void signUpForEvent() {
-        fetchUserData(AppUser.getAppUserEmail(), true);
+        fetchUserData(AppUser.getInstance().getId(), true);
     }
 
     public void withdrawFromEvent() {
         // Implement logic to withdraw the user from the event
-        fetchUserData(AppUser.getAppUserEmail(), false);
+//        fetchUserData(AppUser.getInstance().getEmail(), false);
     }
 
 
-    private void fetchUserData(String email, boolean isSignUp) {
-        firebase.getUserData(email, new Firebase.OnUserLoadedListener() {
+    private void fetchUserData(String userId, boolean isSignUp) {
+        firebase.getUserData(userId, new Firebase.OnUserLoadedListener() {
             @Override
             public void onUserLoaded(User user) {
+                System.out.println("User is:@@!#!#! " + user.getFirstName() + " " + user.getLastName());
                 if (isSignUp) {
+                    System.out.println("User is BLAH BLAH: " + user.getFirstName() + " " + user.getLastName());
                     registerUserForEvent(user);
                 } else {
                     unregisterUserFromEvent(user);
                 }
-                System.out.println("User data loaded: " + user.getFirstName() + " " + user.getLastName());
             }
 
             @Override
