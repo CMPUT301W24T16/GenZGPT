@@ -9,6 +9,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.widget.Button;
 import android.widget.EditText;
@@ -114,7 +116,10 @@ public class FirstSignInActivity extends AppCompatActivity {
                         editor.putBoolean("geolocation", newUser.isGeolocation());
                         // If imageURL can be null, then we need to handle that case
                         editor.putString("imageURL", newUser.getImageURL() != null ? newUser.getImageURL() : "default_image_url");
+
                         editor.apply();
+                        Intent toMain = new Intent(FirstSignInActivity.this, MainActivity.class);
+                        startActivity(toMain);
 
                         finish();
                         System.out.println("ID: " + preferences.getString("id", null)  + " firstName testing 232: " + preferences.getString("email", null));
