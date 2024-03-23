@@ -124,7 +124,9 @@ public class MainPageFragment extends Fragment implements EventAdapter.EventClic
                 events.clear();
                 events.addAll(eventList);
                 eventAdapter.notifyDataSetChanged();
-                System.out.println("user is: " + AppUser.getInstance().getId() + " and name is: " + AppUser.getInstance().getFirstName());
+                for (Event event : eventList) {
+                    Log.d("EventListFragment", "Event: " + event.getOrganizers() + " " + event.getEventName());
+                }
 
             }
 

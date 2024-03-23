@@ -879,32 +879,45 @@ public class Firebase {
                         List<User> registeredAttendees = document.get("registeredAttendees") != null
                                 ? (List<User>) document.get("registeredAttendees")
                                 : new ArrayList<>();
+                        List<User> organizers = document.get("organizers") != null
+                                ? (List<User>) document.get("organizers")
+                                : new ArrayList<>();
 
-                        boolean isUserRegistered = false;
+                        boolean isUserInvolved = false;
+                        // Check if the user is a registered attendee
                         for (Object attendeeObj : registeredAttendees) {
                             if (attendeeObj instanceof Map) {
                                 Map<String, Object> attendee = (Map<String, Object>) attendeeObj;
-                                // Check if the attendee map contains the "email" key to avoid
-                                // NullPointerException
-                                System.out.println("Attendee + EventName: " + attendee + " " + eventName);
                                 if (attendee.containsKey("email")) {
                                     String attendeeEmail = (String) attendee.get("email");
-                                    // Check if both emails are not null before comparing to avoid
-                                    // NullPointerException
                                     if (email != null && email.equals(attendeeEmail)) {
-                                        isUserRegistered = true;
+                                        isUserInvolved = true;
                                         break;
                                     }
                                 }
                             }
                         }
 
-                        System.out.println("User registered: " + isUserRegistered);
-                        // Add the event to the list if the user's email is found among the registered
-                        // attendees
-                        if (isUserRegistered) {
+                        boolean isUserAnOrganizer = false;
+                        for (Object organizerObj : organizers) {
+                            if (organizerObj instanceof Map) {
+                                Map<String, Object> organizer = (Map<String, Object>) organizerObj;
+                                if (organizer.containsKey("email")) {
+                                    String organizerEmail = (String) organizer.get("email");
+                                    if (email != null && email.equals(organizerEmail)) {
+                                        isUserAnOrganizer = true;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+
+                        System.out.println("User involved: " + isUserInvolved);
+                        if (isUserInvolved || isUserAnOrganizer) {
                             Event event = new Event(eventId, eventName, eventDate, location, maxAttendees, imageURL);
                             event.setRegisteredAttendees(registeredAttendees);
+                            event.setOrganizers(organizers);
+
                             eventList.add(event);
                         }
                     }

@@ -102,9 +102,8 @@ public class EventInfoFragment extends Fragment {
         firebase.getUserData(userId, new Firebase.OnUserLoadedListener() {
             @Override
             public void onUserLoaded(User user) {
-                System.out.println("User is:@@!#!#! " + user.getFirstName() + " " + user.getLastName());
+
                 if (isSignUp) {
-                    System.out.println("User is BLAH BLAH: " + user.getFirstName() + " " + user.getLastName());
                     registerUserForEvent(user);
                 } else {
                     unregisterUserFromEvent(user);

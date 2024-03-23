@@ -137,4 +137,6 @@ public class AttendeeManager {
     }
     public void setRegisteredAttendees(List<User> registeredAttendees){
         this.registeredAttendees = registeredAttendees;}
+
 }
+
