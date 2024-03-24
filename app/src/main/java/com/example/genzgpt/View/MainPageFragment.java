@@ -116,11 +116,11 @@ public class MainPageFragment extends Fragment implements EventAdapter.EventClic
 
     private void fetchEvents() {
         events.clear();
-        String currentUserEmail = AppUser.getInstance().getEmail();
-        firebase.fetchUserEvents(currentUserEmail, new Firebase.OnUserEventsLoadedListener() {
+        String currentUserId = AppUser.getInstance().getId();
+        firebase.fetchUserEvents(currentUserId, new Firebase.OnUserEventsLoadedListener() {
 
             @Override
-            public void onEventsLoaded(String email, List<Event> eventList) {
+            public void onEventsLoaded(String userId, List<Event> eventList) {
                 events.clear();
                 events.addAll(eventList);
                 eventAdapter.notifyDataSetChanged();

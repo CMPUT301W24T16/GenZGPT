@@ -434,41 +434,17 @@ public class Firebase {
      */
     public void addEvent(Event event, User user) {
         System.out.println("Creating event and registering organizer: " + user.getFirstName() + " " + user.getLastName());
-
-        // Convert the event to a Map
         Map<String, Object> eventMap = event.toMap();
-
-        // Initially, do not include the organizers in the event map
-        // as we'll add them right after creating the event
         CollectionReference eventsRef = db.collection("events");
-
-        // Add the event to the database
         eventsRef.add(eventMap).addOnSuccessListener(documentReference -> {
             System.out.println("Event created with ID: " + documentReference.getId());
-
-            // Convert organizer (user) to a Map
-            Map<String, Object> organizerMap = new HashMap<>();
-            organizerMap.put("id", user.getId());
-            organizerMap.put("firstName", user.getFirstName());
-            organizerMap.put("lastName", user.getLastName());
-            organizerMap.put("email", user.getEmail());
-            organizerMap.put("phone", user.getPhone());
-            organizerMap.put("geolocation", user.isGeolocation());
-            organizerMap.put("imageURL", user.getImageURL());
-
-            // Add the user as an organizer to the "organizers" array of the newly created event
             DocumentReference eventRef = eventsRef.document(documentReference.getId());
-            eventRef.update("organizers", FieldValue.arrayUnion(organizerMap))
-                    .addOnSuccessListener(aVoid -> {
-                        System.out.println("Organizer registered for the event successfully");
-                    })
-                    .addOnFailureListener(e -> {
-                        System.err.println("Error adding organizer to event: " + e.getMessage());
-                    });
-        }).addOnFailureListener(e -> {
-            System.err.println("Error creating event: " + e.getMessage());
-        });
+            eventRef.update("organizers", FieldValue.arrayUnion(user.getId()))
+                    .addOnSuccessListener(aVoid -> System.out.println("Organizer registered for the event successfully"))
+                    .addOnFailureListener(e -> System.err.println("Error adding organizer to event: " + e.getMessage()));
+        }).addOnFailureListener(e -> System.err.println("Error creating event: " + e.getMessage()));
     }
+
 
 
     /**
@@ -858,81 +834,52 @@ public class Firebase {
 
         void onEventsLoadFailed(Exception e);
     }
+    public void fetchUserEvents(String userId, OnUserEventsLoadedListener listener) {
+        List<Event> eventList = new ArrayList<>();
 
-    /**
-     * Retrieves the list of events from the database.
-     *
-     * @param listener Listener for handling events retrieval.
-     */
-    public void fetchUserEvents(String email, OnUserEventsLoadedListener listener) {
-        db.collection("events").get()
-                .addOnSuccessListener(querySnapshot -> {
-                    List<Event> eventList = new ArrayList<>();
-                    for (DocumentSnapshot document : querySnapshot.getDocuments()) {
-                        String eventId = document.getString("eventId");
-                        String eventName = document.getString("eventName");
-                        Date eventDate = document.getDate("eventDate");
-                        String location = document.getString("location");
-                        Long maxAttendeesLong = document.getLong("maxAttendees");
-                        Integer maxAttendees = maxAttendeesLong != null ? maxAttendeesLong.intValue() : null;
-                        String imageURL = document.getString("imageURL");
-                        List<User> registeredAttendees = document.get("registeredAttendees") != null
-                                ? (List<User>) document.get("registeredAttendees")
-                                : new ArrayList<>();
-                        List<User> organizers = document.get("organizers") != null
-                                ? (List<User>) document.get("organizers")
-                                : new ArrayList<>();
-
-                        boolean isUserInvolved = false;
-                        // Check if the user is a registered attendee
-                        for (Object attendeeObj : registeredAttendees) {
-                            if (attendeeObj instanceof Map) {
-                                Map<String, Object> attendee = (Map<String, Object>) attendeeObj;
-                                if (attendee.containsKey("email")) {
-                                    String attendeeEmail = (String) attendee.get("email");
-                                    if (email != null && email.equals(attendeeEmail)) {
-                                        isUserInvolved = true;
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-
-                        boolean isUserAnOrganizer = false;
-                        for (Object organizerObj : organizers) {
-                            if (organizerObj instanceof Map) {
-                                Map<String, Object> organizer = (Map<String, Object>) organizerObj;
-                                if (organizer.containsKey("email")) {
-                                    String organizerEmail = (String) organizer.get("email");
-                                    if (email != null && email.equals(organizerEmail)) {
-                                        isUserAnOrganizer = true;
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-
-                        System.out.println("User involved: " + isUserInvolved);
-                        if (isUserInvolved || isUserAnOrganizer) {
-                            Event event = new Event(eventId, eventName, eventDate, location, maxAttendees, imageURL);
-                            event.setRegisteredAttendees(registeredAttendees);
-                            event.setOrganizers(organizers);
-
-                            eventList.add(event);
-                        }
+        // First, query for events where the user is an organizer
+        db.collection("events").whereArrayContains("organizers", userId).get()
+                .addOnSuccessListener(organizerQuerySnapshot -> {
+                    for (DocumentSnapshot document : organizerQuerySnapshot.getDocuments()) {
+                        Event event = documentToObject(document);
+                        eventList.add(event);
                     }
-                    listener.onEventsLoaded(email, eventList);
+
+                    db.collection("events").whereArrayContains("registeredAttendees", userId).get()
+                            .addOnSuccessListener(attendeeQuerySnapshot -> {
+
+                                for (DocumentSnapshot document : attendeeQuerySnapshot.getDocuments()) {
+                                    Event event = documentToObject(document); // Ensure no duplicate events are added
+                                    if (!eventList.contains(event)) {
+                                        eventList.add(event);
+                                    }
+                                }
+
+                                listener.onEventsLoaded(userId, eventList);
+                            })
+                            .addOnFailureListener(e -> {
+                                Log.e("Firebase", "Error fetching events as attendee: " + e.getMessage());
+                                listener.onEventsLoadFailed(e);
+                            });
                 })
                 .addOnFailureListener(e -> {
-                    Log.e("Firebase", "Error fetching events: " + e.getMessage());
+                    Log.e("Firebase", "Error fetching events as organizer: " + e.getMessage());
                     listener.onEventsLoadFailed(e);
                 });
     }
+    private Event documentToObject(DocumentSnapshot document) {
+        String eventId = document.getId(); // Use document ID as event ID
+        String eventName = document.getString("eventName");
+        Date eventDate = document.getDate("eventDate");
+        String location = document.getString("location");
+        Long maxAttendeesLong = document.getLong("maxAttendees");
+        Integer maxAttendees = maxAttendeesLong != null ? maxAttendeesLong.intValue() : null;
+        String imageURL = document.getString("imageURL");
+        return new Event(eventId, eventName, eventDate, location, maxAttendees, imageURL);
+    }
 
     public interface OnUserEventsLoadedListener {
-
         void onEventsLoaded(String email, List<Event> eventList);
-
         void onEventsLoadFailed(Exception e);
     }
 
@@ -1156,29 +1103,22 @@ public class Firebase {
                     String eventId = eventDocument.getId();
                     DocumentReference eventRef = db.collection("events").document(eventId);
 
-                    Map<String, Object> userMap = new HashMap<>();
-                    userMap.put("id", user.getId());
-                    userMap.put("firstName", user.getFirstName());
-                    userMap.put("lastName", user.getLastName());
-                    userMap.put("email", user.getEmail());
-                    userMap.put("phone", user.getPhone());
-                    userMap.put("geolocation", user.isGeolocation());
-                    userMap.put("imageURL", user.getImageURL());
-                    eventRef.update("registeredAttendees", FieldValue.arrayUnion(userMap))
+                    // Now only store the user's ID as the attendee
+                    eventRef.update("registeredAttendees", FieldValue.arrayUnion(user.getId()))
                             .addOnSuccessListener(aVoid -> {
-                                // User registered for the event successfully
+                                System.out.println("User registered for the event successfully.");
                                 listener.onAttendeeRegistered();
                             })
                             .addOnFailureListener(e -> {
-                                // Error occurred while registering user for the event
+                                System.err.println("Error occurred while registering user for the event: " + e.getMessage());
                                 listener.onAttendeeRegistrationFailed(e);
                             });
                 } else {
-                    // No events found with the specified name
+                    System.out.println("No events found with the specified name.");
                     listener.onEventNotFound();
                 }
             } else {
-                // Error occurred while querying events
+                System.err.println("Error occurred while querying events: " + task.getException().getMessage());
                 listener.onEventLoadFailed(task.getException());
             }
         });
