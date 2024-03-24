@@ -83,7 +83,12 @@ public class EventInfoFragment extends Fragment {
             eventLocationTextView.setText(event.getLocation());
 
             if (event.getImageURL() != null && !event.getImageURL().isEmpty()) {
-                Picasso.get().load(event.getImageURL()).into(eventImageView);
+                // Load the image using Picasso and resize it to fit into a specific size
+                Picasso.get()
+                        .load(event.getImageURL())
+                        .resize(800, 800) // Specify the desired dimensions
+                        .centerCrop() // Crop the image from the center if necessary
+                        .into(eventImageView);
             }
         }
     }
