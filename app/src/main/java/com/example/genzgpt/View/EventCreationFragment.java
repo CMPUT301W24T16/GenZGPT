@@ -154,7 +154,7 @@ public class EventCreationFragment extends Fragment {
                     // Add the new event to Firebase
                     Firebase firebase = new Firebase();
                     AppUser appUserInstance = AppUser.getInstance();
-                    firebase.addEvent(newEvent, appUserInstance);
+                    firebase.createEvent(newEvent, appUserInstance);
                     getParentFragmentManager().popBackStack();
                 }
 

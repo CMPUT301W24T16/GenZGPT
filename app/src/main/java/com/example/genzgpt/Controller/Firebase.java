@@ -558,9 +558,9 @@ public class Firebase {
             eventData.put("maxAttendees", event.getMaxAttendees());
 
             // Add the organizer's email to the list of organizers
-            List<String> organizerEmails = new ArrayList<>();
-            organizerEmails.add(organizer.getEmail());
-            eventData.put("organizers", organizerEmails);
+            List<String> organizerIds = new ArrayList<>();
+            organizerIds.add(organizer.getId());
+            eventData.put("organizers", organizerIds);
 
             // Initialize empty lists for registered attendees and checked-in attendees
             eventData.put("registeredAttendees", new ArrayList<>());
