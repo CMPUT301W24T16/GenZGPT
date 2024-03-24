@@ -5,10 +5,12 @@ import android.app.Activity;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
+import androidx.fragment.app.Fragment;
 
 import com.example.genzgpt.R;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -18,16 +20,16 @@ import com.google.android.gms.tasks.OnSuccessListener;
 /**
  * This class handles Geolocation Tracking for the user, includes permission requests and location pulls.
  */
-public class GeolocationTracking extends Activity {
+public class GeolocationTracking extends Fragment {
     private FusedLocationProviderClient fusedLocationClient;
     private String[] permissions = {android.Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION};
 
     /**
      * This class represents request codes for the specified permissions.
      */
-    class RequestCode{
-        static final int COARSE_LOCATION_PERMISSION = 100;
-        static final int FINE_LOCATION_PERMISSION = 101;
+    public class RequestCode{
+        public static final int COARSE_LOCATION_PERMISSION = 100;
+        public static final int FINE_LOCATION_PERMISSION = 101;
     }
 
     /**
@@ -38,19 +40,18 @@ public class GeolocationTracking extends Activity {
      *
      */
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
 
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());
 
         if (!checkPermission(Manifest.permission.ACCESS_FINE_LOCATION) && !checkPermission(Manifest.permission.ACCESS_COARSE_LOCATION)){
             //Permission is not granted.
-            Toast.makeText(this, "Geolocation permissions are not enabled.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), "Geolocation permissions are not enabled.", Toast.LENGTH_SHORT).show();
             checkPermission(android.Manifest.permission.ACCESS_COARSE_LOCATION);
             checkPermission(android.Manifest.permission.ACCESS_FINE_LOCATION);
         } else {
-            fusedLocationClient.getLastLocation().addOnSuccessListener(this, new OnSuccessListener<Location>() {
+            fusedLocationClient.getLastLocation().addOnSuccessListener(getActivity(), new OnSuccessListener<Location>() {
                 /**
                  * Method that gets the location if it is successful, if not successful throw exception
                  * @param location
@@ -86,10 +87,10 @@ public class GeolocationTracking extends Activity {
             if (grantResults.length > 0) {
                 for (int i = 0; i < grantResults.length; i++) {
                     if (grantResults[i] == PackageManager.PERMISSION_GRANTED) {
-                        Toast.makeText(this, "Permission granted", Toast.LENGTH_SHORT).show();
+                        Log.d("Geolocation", "Permission granted");
 
                     } else {
-                        Toast.makeText(this, "Permission denied", Toast.LENGTH_SHORT).show();
+                        Log.d("Geolocation", "Permission denied");
                     }
                 }
             }
@@ -101,10 +102,10 @@ public class GeolocationTracking extends Activity {
      * @param requestCode
      */
     public void requestPermission(String permission, int requestCode){
-            ActivityCompat.requestPermissions(this, permissions, requestCode);
+            ActivityCompat.requestPermissions(getActivity(), permissions, requestCode);
     }
     public boolean checkPermission(String permission){
-        return ActivityCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_GRANTED;
+        return ActivityCompat.checkSelfPermission(getActivity(), permission) == PackageManager.PERMISSION_GRANTED;
     }
 }
 

@@ -1,25 +1,31 @@
 package com.example.genzgpt;
 
+import static com.example.genzgpt.Controller.GeolocationTracking.RequestCode.COARSE_LOCATION_PERMISSION;
+import static com.example.genzgpt.Controller.GeolocationTracking.RequestCode.FINE_LOCATION_PERMISSION;
 import static java.lang.Character.isLetter;
 import static java.lang.Long.parseLong;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.Toast;
 
 import com.example.genzgpt.Controller.Firebase;
+import com.example.genzgpt.Controller.GeolocationTracking;
 import com.example.genzgpt.Model.AppUser;
 import com.example.genzgpt.Model.User;
 import com.example.genzgpt.View.AdminLoginFragment;
+import com.example.genzgpt.Controller.GeolocationTracking;
 
 public class FirstSignInActivity extends AppCompatActivity {
     Button profileButton;
@@ -30,6 +36,7 @@ public class FirstSignInActivity extends AppCompatActivity {
     EditText phoneNumber;
     Spinner theme;
     Switch geolocation;
+    GeolocationTracking geoStatus = new GeolocationTracking();
     AdminLoginFragment adminSignIn = new AdminLoginFragment();
     private boolean isValidSignIn = false;
 
@@ -117,6 +124,13 @@ public class FirstSignInActivity extends AppCompatActivity {
                         Log.e("User Creation", "The User was not Created", e);
                     }
                 });
+            }
+        });
+        geolocation.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                geoStatus.requestPermission(Manifest.permission.ACCESS_COARSE_LOCATION, COARSE_LOCATION_PERMISSION);
+                geoStatus.requestPermission(Manifest.permission.ACCESS_COARSE_LOCATION, FINE_LOCATION_PERMISSION);
             }
         });
 
