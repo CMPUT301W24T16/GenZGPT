@@ -221,6 +221,7 @@ public class Firebase {
                     });
         }
     }
+
     /**
      * Retrieves the user data from Firebase.
      * @return the user details for a particular email.
@@ -298,7 +299,7 @@ public class Firebase {
         void onUploadFailed(String errorMessage);
     }
 
-
+    // FIXME MIGHT STILL BE USING EMAIL TO GET A USER?
     /**
      * Retrieves the list of events from the database.
      * @return the event details for a particular event name.

@@ -1,37 +1,46 @@
 package com.example.genzgpt.Controller;
 
+
 import android.Manifest;
-import android.app.Activity;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
-import android.util.Log;
-import android.widget.Toast;
-
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.example.genzgpt.R;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.tasks.OnSuccessListener;
+
+import org.osmdroid.api.IMapController;
+import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
+import org.osmdroid.util.GeoPoint;
+import org.osmdroid.views.MapView;
+import org.osmdroid.views.overlay.Marker;
 
 /**
  * This class handles Geolocation Tracking for the user, includes permission requests and location pulls.
  */
-public class GeolocationTracking extends Fragment {
+public class GeolocationTracking extends Fragment implements LocationListener {
+    private MapView mapView;
     private FusedLocationProviderClient fusedLocationClient;
-    private String[] permissions = {android.Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION};
+    private LocationManager locationManager;
 
     /**
      * This class represents request codes for the specified permissions.
      */
     public class RequestCode{
-        public static final int COARSE_LOCATION_PERMISSION = 100;
         public static final int FINE_LOCATION_PERMISSION = 101;
     }
-
     /**
      * This method is an onCreate for the activity
      * @param savedInstanceState If the activity is being re-initialized after
@@ -40,72 +49,94 @@ public class GeolocationTracking extends Fragment {
      *
      */
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view;
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());
-
-        if (!checkPermission(Manifest.permission.ACCESS_FINE_LOCATION) && !checkPermission(Manifest.permission.ACCESS_COARSE_LOCATION)){
-            //Permission is not granted.
-            Toast.makeText(getContext(), "Geolocation permissions are not enabled.", Toast.LENGTH_SHORT).show();
-            checkPermission(android.Manifest.permission.ACCESS_COARSE_LOCATION);
-            checkPermission(android.Manifest.permission.ACCESS_FINE_LOCATION);
+        if (checkPermission(android.Manifest.permission.ACCESS_FINE_LOCATION)){
+            view = inflater.inflate(R.layout.map_view_fragment, container, false);
         } else {
-            fusedLocationClient.getLastLocation().addOnSuccessListener(getActivity(), new OnSuccessListener<Location>() {
-                /**
-                 * Method that gets the location if it is successful, if not successful throw exception
-                 * @param location
-                 */
-                @Override
-                public void onSuccess(Location location) {
-                    if (location != null) {
-                        double latitude = location.getLatitude();
-                        double longitude = location.getLongitude();
-                        String position = location.toString();
-                        String locationString = ("Latitude: " + latitude + "| Longitude: " + longitude);
-                    }else{
-                        throw new NullPointerException("Location turned off");
-                    }
-                }
-            });
+            requestPermission();
+            view = inflater.inflate(R.layout.map_view_fragment, container, false);
+
         }
+        return view;
     }
 
-    /**
-     * This method will output the status of the permission request as a Toast prompt
-     * @param requestCode The request code passed in {@link #requestPermissions(String[], int)}.
-     * @param permissions The requested permissions. Never null.
-     * @param grantResults The grant results for the corresponding permissions
-     *     which is either {@link android.content.pm.PackageManager#PERMISSION_GRANTED}
-     *     or {@link android.content.pm.PackageManager#PERMISSION_DENIED}. Never null.
-     *
-     */
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == GeolocationTracking.RequestCode.COARSE_LOCATION_PERMISSION || requestCode == GeolocationTracking.RequestCode.FINE_LOCATION_PERMISSION) {
-            if (grantResults.length > 0) {
-                for (int i = 0; i < grantResults.length; i++) {
-                    if (grantResults[i] == PackageManager.PERMISSION_GRANTED) {
-                        Log.d("Geolocation", "Permission granted");
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
 
-                    } else {
-                        Log.d("Geolocation", "Permission denied");
-                    }
-                }
+        mapView = view.findViewById(R.id.mapView);
+        mapView.setTileSource(TileSourceFactory.MAPNIK);
+        mapView.setMultiTouchControls(true);
+
+        // Request location permission
+        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(requireActivity(),
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    RequestCode.FINE_LOCATION_PERMISSION);
+        } else {
+            // Start retrieving the user's location
+            startLocationUpdates();
+        }
+        // Retrieve attendee locations from Firebase and add markers to the map
+
+            //FIXME: Do this
+        }
+    private void startLocationUpdates() {
+        locationManager = (LocationManager) requireContext().getSystemService(Context.LOCATION_SERVICE);
+        if (locationManager != null) {
+            if (ActivityCompat.checkSelfPermission(requireContext(), android.Manifest.permission.ACCESS_FINE_LOCATION)
+                    == PackageManager.PERMISSION_GRANTED) {
+                locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, this);
             }
         }
     }
-    /**
-     * This method will ask for permissions if they are not already granted.
-     * @param permission
-     * @param requestCode
-     */
-    public void requestPermission(String permission, int requestCode){
-            ActivityCompat.requestPermissions(getActivity(), permissions, requestCode);
+
+    @Override
+    public void onLocationChanged(Location location) {
+        // Update map center with the user's current location
+        GeoPoint userLocation = new GeoPoint(location.getLatitude(), location.getLongitude());
+        IMapController mapController = mapView.getController();
+        mapController.setCenter(userLocation);
     }
+
+        private void addMarkerToMap(double latitude, double longitude, String title) {
+            Marker marker = new Marker(mapView);
+            marker.setPosition(new GeoPoint(latitude, longitude));
+            marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM);
+            marker.setTitle(title);
+            mapView.getOverlays().add(marker);
+            mapView.invalidate();
+        }
+
+        @Override
+        public void onResume() {
+            super.onResume();
+            mapView.onResume();
+        }
+
+        @Override
+        public void onPause() {
+            super.onPause();
+            mapView.onPause();
+        }
+    /**
+     * This method will ask for permissions.
+     *
+     */
+    public void requestPermission(){
+            ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, RequestCode.FINE_LOCATION_PERMISSION);
+    }
+
+    /**
+     * This method will check if permissions are granted or denied
+     * @param permission
+     * @return a boolean value
+     */
     public boolean checkPermission(String permission){
-        return ActivityCompat.checkSelfPermission(getActivity(), permission) == PackageManager.PERMISSION_GRANTED;
+        return ContextCompat.checkSelfPermission(getActivity(), permission) == PackageManager.PERMISSION_GRANTED;
     }
 }
 

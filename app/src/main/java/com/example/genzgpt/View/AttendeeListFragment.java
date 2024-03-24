@@ -18,6 +18,7 @@ import com.example.genzgpt.Model.User;
 import com.example.genzgpt.R;
 import com.example.genzgpt.View.SpacingItemDecoration;
 import com.example.genzgpt.Model.Event;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 import java.util.Collections;

@@ -137,6 +137,7 @@ public class MainActivity extends AppCompatActivity {
         if (AppUser.getHasSignedIn() && AppUser.getUserId() != null) {
             SharedPreferences preferences = this.getSharedPreferences("com.example.genzgpt",
                     Context.MODE_PRIVATE);
+
             preferences.edit().putBoolean("signIn", AppUser.getHasSignedIn()).apply();
             preferences.edit().putString("id", AppUser.getUserId()).apply();
         }
@@ -149,6 +150,7 @@ public class MainActivity extends AppCompatActivity {
         if (AppUser.getHasSignedIn() && AppUser.getUserId() != null) {
             SharedPreferences preferences = this.getSharedPreferences("com.example.genzgpt",
                     Context.MODE_PRIVATE);
+
             preferences.edit().putBoolean("signIn", AppUser.getHasSignedIn()).apply();
             preferences.edit().putString("id", AppUser.getUserId()).apply();
         }
@@ -160,6 +162,7 @@ public class MainActivity extends AppCompatActivity {
         if (AppUser.getHasSignedIn() && AppUser.getUserId() != null) {
             SharedPreferences preferences = this.getSharedPreferences("com.example.genzgpt",
                     Context.MODE_PRIVATE);
+
             preferences.edit().putBoolean("signIn", AppUser.getHasSignedIn()).apply();
             preferences.edit().putString("id", AppUser.getUserId()).apply();
         }
@@ -181,6 +184,7 @@ public class MainActivity extends AppCompatActivity {
             preferences.edit().putString("id", AppUser.getUserId()).apply();
         }
     }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();

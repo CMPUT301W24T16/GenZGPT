@@ -24,6 +24,7 @@ import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.List;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 /**
  * The basis for any fragment that handles showing a collection of events.
