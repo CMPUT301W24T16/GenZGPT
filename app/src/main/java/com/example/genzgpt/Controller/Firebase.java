@@ -166,7 +166,6 @@ public class Firebase {
      * Delete an Event image from Firestore and Firebase Storage.
      *
      * @param eventName  Name of the event containing the image.
-     * @param imageURL URL of the image to be deleted.
      */
     public void deleteEventImage(String eventName) {
         try {
@@ -207,32 +206,43 @@ public class Firebase {
     }
 
     /**
-     * Delete an Event image from Firestore and Firebase Storage.
+     * Delete an Event image from Firebase Storage.
      *
-     * @param userID  ID of the event containing the image.
-     * @param imageURL URL of the image to be deleted.
+     * @param userId  ID of the event containing the image.
      */
-    public void deletUserImage(String userID, String imageURL) {
-        // Delete the image data in Firestore
-        db.collection("users").document(userID)
-                .update("imageURL", FieldValue.delete())
-                .addOnSuccessListener(aVoid -> {
-                    Log.i("Firebase", "Image URL deleted from Firestore");
-                })
-                .addOnFailureListener(e -> {
-                    Log.e("Firebase", "Error deleting image URL from Firestore: " + e.getMessage());
-                });
+    public void deleteUserImage(String userId) {
+        try {
+            CollectionReference usersRef = db.collection("users");
+            Query query = usersRef.whereEqualTo("email", userId);
 
-        // Delete the image file from Firebase Storage
-        if (imageURL != null && !imageURL.isEmpty()) {
-            StorageReference storageReference = FirebaseStorage.getInstance().getReferenceFromUrl(imageURL);
-            storageReference.delete()
-                    .addOnSuccessListener(aVoid -> {
-                        Log.i("Firebase", "Image deleted from Firebase Storage");
-                    })
-                    .addOnFailureListener(e -> {
-                        Log.e("Firebase", "Error deleting image from Firebase Storage: " + e.getMessage());
-                    });
+            query.get().addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
+                    QuerySnapshot snapshot = task.getResult();
+                    if (snapshot != null && !snapshot.isEmpty()) {
+                        for (DocumentSnapshot document : snapshot.getDocuments()) {
+                            // Update the imageURL field to null
+                            document.getReference().update("imageURL", null)
+                                    .addOnSuccessListener(aVoid -> {
+                                        // Image URL deleted successfully
+                                        Log.i("Firebase", "Image URL deleted successfully for user: " + userId);
+                                    })
+                                    .addOnFailureListener(e -> {
+                                        // Error occurred while deleting the image URL
+                                        Log.e("Firebase", "Error deleting image URL for user: " + userId + ", " + e.getMessage());
+                                    });
+                        }
+                    } else {
+                        // No users found with the specified ID
+                        Log.i("Firebase", "No users found with the ID: " + userId);
+                    }
+                } else {
+                    // Error occurred while querying users
+                    Log.e("Firebase", "Error querying users: " + task.getException().getMessage());
+                }
+            });
+        } catch (Exception e) {
+            // Handle any exceptions that occur during the process
+            Log.e("Firebase", "Error deleting image URL: " + e.getMessage());
         }
     }
 
@@ -705,7 +715,7 @@ public class Firebase {
     public void deleteUser(String userId) {
         try {
             CollectionReference usersRef = db.collection("users");
-            Query query = usersRef.whereEqualTo("id", userId);
+            Query query = usersRef.whereEqualTo("email", userId);
 
             query.get().addOnCompleteListener(task -> {
                 if (task.isSuccessful()) {
