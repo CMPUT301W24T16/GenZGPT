@@ -556,6 +556,7 @@ public class Firebase {
             eventData.put("eventDate", event.getEventDate());
             eventData.put("location", event.getLocation());
             eventData.put("maxAttendees", event.getMaxAttendees());
+            eventData.put("imageURL", event.getImageURL());
 
             // Add the organizer's email to the list of organizers
             List<String> organizerIds = new ArrayList<>();
