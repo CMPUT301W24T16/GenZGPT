@@ -63,15 +63,3 @@ public class QRCodeGenerator {
         }
     }
 }
-
-/**
- * How to use:
- * // set the ImageView to display the QR code
- * ImageView checkInImageView = findViewById(R.id.checkInImageView);
- *
- * // Generate the QR code for an eventId
- * Bitmap checkInQrCode = QRCodeGenerator.generateCheckInQRCode(eventId, 200, 200);
- *
- * // Set the generated QR code bitmap to the ImageView
- * checkInImageView.setImageBitmap(checkInQrCode);
- */
