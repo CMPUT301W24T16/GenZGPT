@@ -1,5 +1,6 @@
 package com.example.genzgpt.View;
 
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -16,6 +17,7 @@ import androidx.fragment.app.Fragment;
 
 import com.example.genzgpt.Controller.Firebase;
 import com.example.genzgpt.Model.Event;
+import com.example.genzgpt.Model.QRCodeGenerator;
 import com.example.genzgpt.Model.User;
 import com.example.genzgpt.R;
 import com.squareup.picasso.Picasso;
@@ -26,7 +28,7 @@ public class EventInfoFragment extends Fragment {
 
     private Event event;
     private TextView eventNameTextView, eventDateTextView, eventLocationTextView, eventAttendeesTextView;
-    private ImageView eventImageView;
+    private ImageView eventImageView, qrCodeImageView;
     private Firebase firebase;
     private Button signUpButton;
     private boolean isUserSignedUp = false;
@@ -78,6 +80,7 @@ public class EventInfoFragment extends Fragment {
         eventDateTextView = view.findViewById(R.id.event_date);
         eventLocationTextView = view.findViewById(R.id.event_location);
         eventImageView = view.findViewById(R.id.event_poster);
+        qrCodeImageView = view.findViewById(R.id.qr_code_image_view); // Modify this line
     }
 
     private void displayEventData() {
@@ -94,6 +97,11 @@ public class EventInfoFragment extends Fragment {
                         .resize(800, 800) // Specify the desired dimensions
                         .centerCrop() // Crop the image from the center if necessary
                         .into(eventImageView);
+            }
+            // Generate a QR code for Sign-Up and display it
+            Bitmap signUpQrCode = QRCodeGenerator.generateSignUpQRCode(event.getEventId(), 200, 200);
+            if (signUpQrCode != null) {
+                qrCodeImageView.setImageBitmap(signUpQrCode);
             }
         }
     }
