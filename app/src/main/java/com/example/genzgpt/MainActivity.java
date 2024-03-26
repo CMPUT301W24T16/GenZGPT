@@ -9,6 +9,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 
 import com.example.genzgpt.Model.AppUser;
@@ -97,26 +98,34 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Get information that should be stored between runs of the app
-        SharedPreferences preferences = this.getSharedPreferences("com.example.genzgpt",
-                Context.MODE_PRIVATE);
-
-        // Confirm whether or not a user has signed in on this application.
+        SharedPreferences preferences = this.getSharedPreferences("com.example.genzgpt", Context.MODE_PRIVATE);
         hasSignedIn = preferences.getBoolean("signIn", false);
-        if (preferences.contains("id")) {
-            AppUser.setUserId(preferences.getString("id", null));
+
+        if (hasSignedIn) {
+            System.out.println("User has signed in: " + preferences.getString("id", "") +  preferences.getString("firstName", "") + preferences.getString("lastName", "") + preferences.getLong("phoneNumber", 0) + preferences.getString("email", "") + preferences.getBoolean("geolocation", false) + preferences.getString("imageURL", "default_image_url"));
+            String id = preferences.getString("id", "");
+            String firstName = preferences.getString("firstName", "Default First Name");
+            String lastName = preferences.getString("lastName", "Default Last Name");
+            long phone = preferences.getLong("phoneNumber", 0);
+            String email = preferences.getString("email", "");
+            boolean geolocation = preferences.getBoolean("geolocation", false);
+            String imageURL = preferences.getString("imageURL", "default_image_url");
+
+            // Initialize the AppUser singleton instance with the retrieved data
+            AppUser.initInstance(id, firstName, lastName, phone, email, geolocation, imageURL);
+        } else {
+            // Redirect to sign-in activity if not signed in
+            Intent toFirst = new Intent(MainActivity.this, FirstSignInActivity.class);
+            startActivity(toFirst);
+            finish();
         }
 
-        // Go to another Activity if the user needs to put in their information.
-        // Putting this before setContentView will stop Main Activity from showing initially
-        sendToFirstTime();
 
         navBar = findViewById(R.id.bottomNavigationView);
-
         navBar.setOnItemSelectedListener(navListener);
         navBar.setSelectedItemId(R.id.home);
-    }
 
+    }
     /**
      * Sends the user to a first time sign in if they have need to do this already.
      */
@@ -137,8 +146,47 @@ public class MainActivity extends AppCompatActivity {
         super.onSaveInstanceState(outState);
         SharedPreferences preferences = this.getSharedPreferences("com.example.genzgpt",
                 Context.MODE_PRIVATE);
-        preferences.edit().putBoolean("signIn", hasSignedIn).apply();
+
+        preferences.edit().putBoolean("signIn", AppUser.getHasSignedIn()).apply();
         preferences.edit().putString("id", AppUser.getUserId()).apply();
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+
+        SharedPreferences preferences = this.getSharedPreferences("com.example.genzgpt",
+                Context.MODE_PRIVATE);
+
+        preferences.edit().putBoolean("signIn", AppUser.getHasSignedIn()).apply();
+        preferences.edit().putString("id", AppUser.getUserId()).apply();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        SharedPreferences preferences = this.getSharedPreferences("com.example.genzgpt",
+                Context.MODE_PRIVATE);
+
+        preferences.edit().putBoolean("signIn", AppUser.getHasSignedIn()).apply();
+        preferences.edit().putString("id", AppUser.getUserId()).apply();
+    }
+
+
+    /**
+     * Handles resuming Main Activity (this is used for when we travel from FirstSignIn Currently)
+     */
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        if (AppUser.getHasSignedIn() && AppUser.getUserId() != null) {
+            SharedPreferences preferences = this.getSharedPreferences("com.example.genzgpt",
+                    Context.MODE_PRIVATE);
+
+            preferences.edit().putBoolean("signIn", AppUser.getHasSignedIn()).apply();
+            preferences.edit().putString("id", AppUser.getUserId()).apply();
+        }
+    }
 }

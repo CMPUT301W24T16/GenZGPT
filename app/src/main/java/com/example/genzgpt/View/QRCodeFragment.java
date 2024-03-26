@@ -119,6 +119,7 @@ public class QRCodeFragment extends Fragment {
         }
     }
 
+
     private void handleEventLoaded() {
         if (loadedEvent != null) {
             replaceFragment(new EventInfoFragment(loadedEvent));

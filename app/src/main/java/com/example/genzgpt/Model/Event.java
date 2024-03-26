@@ -142,7 +142,7 @@ public class Event {
      * The list of Users considered Oragnizers of an Event.
      */
     public List<User> getOrganizers() {
-        return new ArrayList<>(organizers);
+        return organizers;
     }
 
     /**
@@ -218,6 +218,7 @@ public class Event {
         attendeeManager.setMaxAttendees(maxAttendees);
     }
 
+
     /**
      * Registers an Attendee with the Attendee Manager for this Event.
      *
@@ -258,6 +259,10 @@ public class Event {
 
     public void setRegisteredAttendees(List<User> registeredAttendees) {
         attendeeManager.setRegisteredAttendees(registeredAttendees);
+    }
+
+    public void setOrganizers(List<User> organizers) {
+        this.organizers = organizers;
     }
 
     public Map<String, Object> toMap() {
