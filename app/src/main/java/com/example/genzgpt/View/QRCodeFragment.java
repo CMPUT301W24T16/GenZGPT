@@ -9,6 +9,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
@@ -35,6 +37,7 @@ public class QRCodeFragment extends Fragment {
         } else {
             requestPermissions();
             view = inflater.inflate(R.layout.qr_activity, container, false);
+            initiateQrScan();
         }
 
         return view;
@@ -54,6 +57,16 @@ public class QRCodeFragment extends Fragment {
                 .initiateScan();
     }
 
+    /**
+     * This method is called when the QR code scanner activity returns a result.
+     * It will handle the result and take the appropriate action.
+     * leading 0 sends to eveninfo without checking in
+     * leading 1 sends to eventinfo and checks in
+     *
+     * @param requestCode The request code for the activity.
+     * @param resultCode The result code for the activity.
+     * @param data The intent data returned by the activity.
+     */
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
