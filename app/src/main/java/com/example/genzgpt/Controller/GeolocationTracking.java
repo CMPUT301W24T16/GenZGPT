@@ -8,15 +8,20 @@ import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
+import com.example.genzgpt.Model.AppUser;
+import com.example.genzgpt.Model.User;
 import com.example.genzgpt.R;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -34,6 +39,9 @@ public class GeolocationTracking extends Fragment implements LocationListener {
     private MapView mapView;
     private FusedLocationProviderClient fusedLocationClient;
     private LocationManager locationManager;
+    private User userCurrent;
+    private Firebase firebase;
+
 
     /**
      * This class represents request codes for the specified permissions.
@@ -41,6 +49,7 @@ public class GeolocationTracking extends Fragment implements LocationListener {
     public class RequestCode{
         public static final int FINE_LOCATION_PERMISSION = 101;
     }
+
     /**
      * This method is an onCreate for the activity
      * @param savedInstanceState If the activity is being re-initialized after
@@ -51,13 +60,32 @@ public class GeolocationTracking extends Fragment implements LocationListener {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view;
+        firebase = new Firebase();
+        firebase.getUserData(AppUser.getUserId(), new Firebase.OnUserLoadedListener() {
+            @Override
+            public void onUserLoaded(User user) {
+                userCurrent = user;
+            }
+
+            @Override
+            public void onUserNotFound() {
+                Log.d("Firebase", "User not found.");
+            }
+
+            @Override
+            public void onUserLoadFailed(Exception e) {
+                Log.e("Firebase", "User retrieval failed.");
+            }
+        });
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());
-        if (checkPermission(android.Manifest.permission.ACCESS_FINE_LOCATION)){
+        if (checkPermission(android.Manifest.permission.ACCESS_FINE_LOCATION) && userCurrent.isGeolocation()){
             view = inflater.inflate(R.layout.map_view_fragment, container, false);
-        } else {
+        }else if(checkPermission(Manifest.permission.ACCESS_FINE_LOCATION) && !userCurrent.isGeolocation()){
+            Toast.makeText(getContext(), "Geolocation is disabled. It can be enabled in your settings.", Toast.LENGTH_SHORT).show();
+            view = inflater.inflate(R.layout.map_view_fragment, container, false);
+        }else{
             requestPermission();
             view = inflater.inflate(R.layout.map_view_fragment, container, false);
-
         }
         return view;
     }
@@ -138,5 +166,10 @@ public class GeolocationTracking extends Fragment implements LocationListener {
     public boolean checkPermission(String permission){
         return ContextCompat.checkSelfPermission(getActivity(), permission) == PackageManager.PERMISSION_GRANTED;
     }
+    /**
+     * Gets the user data from the firebase
+     * @param user
+     */
+
 }
 
