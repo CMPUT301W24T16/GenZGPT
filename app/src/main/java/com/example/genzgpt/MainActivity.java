@@ -60,9 +60,11 @@ public class MainActivity extends AppCompatActivity {
                         .commit();
                 return true;
             } else if (id == R.id.qr) {
+                // Create a new instance of QRCodeFragment
+                QRCodeFragment qrCodeFragment = new QRCodeFragment();
                 getSupportFragmentManager()
                         .beginTransaction()
-                        .replace(R.id.BaseFragment, QRCodeActivity)
+                        .replace(R.id.BaseFragment, qrCodeFragment)
                         .commit();
                 return true;
             } else if (id == R.id.event_host) {

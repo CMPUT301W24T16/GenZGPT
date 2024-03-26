@@ -37,6 +37,11 @@ public class EventInfoFragment extends Fragment {
         this.event = event;
     }
 
+    // Default constructor
+    public EventInfoFragment() {
+        // Required empty public constructor
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.event_info_fragment, container, false);
