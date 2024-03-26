@@ -1012,6 +1012,7 @@ public class Firebase {
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         DocumentSnapshot document = task.getResult();
+                        Log.d("Firebase", "DocumentSnapshot data: " + document.getData());
                         if (document.exists()) {
                             String eventName = document.getString("eventName");
                             Date eventDate = document.getDate("eventDate");
@@ -1030,11 +1031,11 @@ public class Firebase {
                                         public void onUserLoaded(User user) {
                                             event.addOrganizer(user);
                                             if (event.getOrganizers().size() == organizerEmails.size()) {
-                                                fetchRegisteredAttendees(eventId, new OnRegisteredAttendeesLoadedListener() {
+                                                fetchRegisteredAttendees(eventName, new OnRegisteredAttendeesLoadedListener() {
                                                     @Override
                                                     public void onRegisteredAttendeesLoaded(List<User> registeredAttendees) {
                                                         event.setRegisteredAttendees(registeredAttendees);
-                                                        fetchCheckedInAttendees(eventId, new OnCheckInAttendeesLoadedListener() {
+                                                        fetchCheckedInAttendees(eventName, new OnCheckInAttendeesLoadedListener() {
                                                             @Override
                                                             public void onCheckInAttendeesLoaded(List<User> checkedInAttendees) {
                                                                 event.setCheckedInAttendees(checkedInAttendees);
@@ -1068,11 +1069,11 @@ public class Firebase {
                                     });
                                 }
                             } else {
-                                fetchRegisteredAttendees(eventId, new OnRegisteredAttendeesLoadedListener() {
+                                fetchRegisteredAttendees(eventName, new OnRegisteredAttendeesLoadedListener() {
                                     @Override
                                     public void onRegisteredAttendeesLoaded(List<User> registeredAttendees) {
                                         event.setRegisteredAttendees(registeredAttendees);
-                                        fetchCheckedInAttendees(eventId, new OnCheckInAttendeesLoadedListener() {
+                                        fetchCheckedInAttendees(eventName, new OnCheckInAttendeesLoadedListener() {
                                             @Override
                                             public void onCheckInAttendeesLoaded(List<User> checkedInAttendees) {
                                                 event.setCheckedInAttendees(checkedInAttendees);
