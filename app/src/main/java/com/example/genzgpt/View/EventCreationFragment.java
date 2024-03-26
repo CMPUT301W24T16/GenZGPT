@@ -38,6 +38,7 @@ import com.example.genzgpt.R;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.example.genzgpt.Controller.Firebase;
+import com.example.genzgpt.Model.AppUser;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -51,6 +52,7 @@ public class EventCreationFragment extends Fragment {
     private ActivityResultLauncher<String> galleryLauncher;
 
     private Uri selectedImageUri;
+
 
     @Nullable
     @Override
@@ -130,20 +132,7 @@ public class EventCreationFragment extends Fragment {
                 @Override
                 public void onUploadComplete(String imageURL) {
                     // Image upload is complete, now create the Event
-                    Event newEvent = new Event(
-                            "",
-                            eventName,
-                            eventDateCalendar.getTime(),
-                            location,
-                            100,
-                            imageURL // Set the imageURL obtained from Firebase Storage
-                    );
-
-                    // Add the new event to Firebase
-                    Firebase firebase = new Firebase();
-                    firebase.addEvent(newEvent);
-
-                    getParentFragmentManager().popBackStack();
+                    createAndSaveEvent(eventName, location, imageURL);
                 }
 
                 @Override
@@ -154,21 +143,24 @@ public class EventCreationFragment extends Fragment {
             });
         } else {
             // If selectedImageUri is null, proceed to create event without imageURL
-            Event newEvent = new Event(
-                    "",
-                    eventName,
-                    eventDateCalendar.getTime(),
-                    location,
-                    100,
-                    imageURL
-            );
-
-            // Add the new event to Firebase
-            Firebase firebase = new Firebase();
-            firebase.addEvent(newEvent);
-
-            getParentFragmentManager().popBackStack();
+            createAndSaveEvent(eventName, location, null);
         }
+    }
+
+    private void createAndSaveEvent(String eventName, String location, @Nullable String imageURL) {
+        Event newEvent = new Event(
+                "",
+                eventName,
+                eventDateCalendar.getTime(),
+                location,
+                100,
+                imageURL
+        );
+        // Add the new event to Firebase
+        Firebase firebase = new Firebase();
+        AppUser appUserInstance = AppUser.getInstance();
+        firebase.createEvent(newEvent, appUserInstance);
+        getParentFragmentManager().popBackStack();
     }
 
     private void selectImage() {
