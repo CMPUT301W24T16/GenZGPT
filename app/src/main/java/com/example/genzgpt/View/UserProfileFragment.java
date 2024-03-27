@@ -13,6 +13,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.example.genzgpt.Controller.Firebase;
 import com.example.genzgpt.Controller.GeolocationTracking;
 import com.example.genzgpt.Model.AppUser;
@@ -44,6 +45,42 @@ public class UserProfileFragment extends Fragment {
      */
     public UserProfileFragment() {
         // Required empty public constructor
+    }
+    @Override
+    public void onResume() {
+        super.onResume();
+        // Refresh the fragment when it becomes visible again
+        refreshUserData();
+    }
+
+    private void refreshUserData() {
+        // Load user data from Firebase and update UI
+        String appUser = AppUser.getUserId();
+        firebase.getUserData(appUser, new Firebase.OnUserLoadedListener() {
+            @Override
+            public void onUserLoaded(User user) {
+                // Bind the user data to UI elements
+                Bind(user);
+                userCurrent = user;
+
+                // Update profile picture if available
+                if (userCurrent != null && userCurrent.getImageURL() != null) {
+                    Glide.with(requireContext())
+                            .load(userCurrent.getImageURL())
+                            .into(userPicture);
+                }
+            }
+
+            @Override
+            public void onUserNotFound() {
+                Log.d("Firebase", "User not found.");
+            }
+
+            @Override
+            public void onUserLoadFailed(Exception e) {
+                Log.e("Firebase", "User retrieval failed.");
+            }
+        });
     }
 
     /**
@@ -86,16 +123,25 @@ public class UserProfileFragment extends Fragment {
         userTheme = view.findViewById(R.id.theme_text);
         userGeolocation = view.findViewById(R.id.geolocation_text);
         String appUser = AppUser.getUserId();
+
         firebase.getUserData(appUser, new Firebase.OnUserLoadedListener() {
             @Override
             public void onUserLoaded(User user) {
                 Bind(user);
                 userCurrent = user;
+                // Update profile picture if available
+                if (userCurrent != null && userCurrent.getImageURL() != null) {
+                    Glide.with(requireContext())
+                            .load(userCurrent.getImageURL()) // Load image URL
+                            .into(userPicture); // ImageView to load the image into
+                }
             }
+
             @Override
             public void onUserNotFound() {
                 Log.d("Firebase", "User not found.");
             }
+
             @Override
             public void onUserLoadFailed(Exception e) {
                 Log.e("Firebase", "User retrieval failed.");
