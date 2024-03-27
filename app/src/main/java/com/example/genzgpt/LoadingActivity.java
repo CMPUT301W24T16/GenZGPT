@@ -8,6 +8,9 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 
+import com.example.genzgpt.Controller.Firebase;
+import com.example.genzgpt.Model.AppUser;
+
 public class LoadingActivity extends AppCompatActivity {
     public boolean isAdmin = false;
     public boolean isSignedIn;
@@ -25,6 +28,7 @@ public class LoadingActivity extends AppCompatActivity {
 
         sendToFirstTime();
         sendToAdmin();
+        sendToMain();
     }
 
     /**
@@ -47,6 +51,13 @@ public class LoadingActivity extends AppCompatActivity {
         }
     }
 
+    public void sendToMain() {
+        if (isSignedIn) {
+            Intent toMain = new Intent(LoadingActivity.this, MainActivity.class);
+            startActivity(toMain);
+        }
+    }
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -57,7 +68,8 @@ public class LoadingActivity extends AppCompatActivity {
         Log.e("Resume", "Resume Works");
         isSignedIn = preferences.getBoolean("signIn", false);
         isAdmin = preferences.getBoolean("admin", false);
-        sendToAdmin();
         sendToFirstTime();
+        sendToAdmin();
+        sendToMain();
     }
 }

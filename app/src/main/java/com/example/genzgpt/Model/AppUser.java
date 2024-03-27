@@ -69,6 +69,14 @@ public class AppUser extends User{
 
     }
 
+
+    public static synchronized void initInstance(User user) {
+        if (instance == null) {
+            instance = new AppUser(user.getId(), user.getFirstName(), user.getLastName(),
+                    user.getPhone(), user.getEmail(), user.isGeolocation(), user.getImageURL());
+        }
+    }
+
     /**
      * A getter for the static version of the User's Id
      * @return

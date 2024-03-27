@@ -2,6 +2,8 @@ package com.example.genzgpt;
 
 import static android.app.PendingIntent.getActivity;
 
+import static androidx.core.content.ContentProviderCompat.requireContext;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -12,7 +14,10 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 
+import com.bumptech.glide.Glide;
+import com.example.genzgpt.Controller.Firebase;
 import com.example.genzgpt.Model.AppUser;
+import com.example.genzgpt.Model.User;
 import com.example.genzgpt.View.MyEventsFragment;
 import com.example.genzgpt.View.QRCodeFragment;
 import com.example.genzgpt.View.AllEventsFragment;
@@ -108,6 +113,15 @@ public class MainActivity extends AppCompatActivity {
             AppUser.setUserId(preferences.getString("id", null));
         }
 
+        if (hasSignedIn) {
+            Firebase firebase = new Firebase();
+
+            boolean exists = firebase.confirmUserExists(AppUser.getUserId());
+
+            if (!exists) {
+                openDeletionMessage();
+            }
+        }
         // Go to another Activity if the user needs to put in their information.
         // Putting this before setContentView will stop Main Activity from showing initially
         sendToFirstTime();
@@ -135,5 +149,34 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        Firebase firebase = new Firebase();
+
+        boolean exists = firebase.confirmUserExists(AppUser.getUserId());
+
+        if (!exists) {
+            openDeletionMessage();
         }
     }
+
+    public void openDeletionMessage() {
+        //FIXME Opens up a prompt that the user's account has been deleted
+        // may need a good amount of refactoring. I just put this here to
+        // ensure nothing goes wrong right now.
+        // Current implementation just sets hasSignedIn to false
+
+        // ensure hasSignedIn is no longer true
+        hasSignedIn = false;
+        SharedPreferences preferences = this.getSharedPreferences("com.example.genzgpt",
+                Context.MODE_PRIVATE);
+
+        preferences.edit().putBoolean("signIn", hasSignedIn).apply();
+
+        finish();
+    }
+}
