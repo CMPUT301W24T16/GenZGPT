@@ -22,6 +22,8 @@ import com.example.genzgpt.Model.Event;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import com.google.firebase.firestore.FirebaseFirestore;
+
 
 /**
  * A Fragment representing a list of attendees for a specific event.
@@ -62,7 +64,6 @@ public class RegisteredListFragment extends Fragment {
         registeredList = new ArrayList<>();
         userAdapter = new UserAdapter(registeredList);
         recyclerView.setAdapter(userAdapter);
-
         firebase = new Firebase();
 
         // Fetch the list of attendees from Firestore and update the RecyclerView

@@ -8,39 +8,61 @@
     android:background="#F0F0F0"
     android:padding="16dp">
 
-    <TextView
-        android:id="@+id/first_name"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:text="@string/first_name"
-        android:textSize="20sp"
-        app:layout_constraintBottom_toTopOf="@+id/user_email"
-        app:layout_constraintEnd_toStartOf="@+id/last_name"
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_marginEnd="15dp"
+        app:layout_constraintEnd_toStartOf="@+id/linearLayout"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <TextView
-        android:id="@+id/last_name"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:text="@string/last_name"
-        android:textSize="20sp"
-        app:layout_constraintBottom_toTopOf="@+id/user_email"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/first_name"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0" />
+        app:srcCompat="@drawable/ic_launcher_foreground_black" />
 
-    <TextView
-        android:id="@+id/user_email"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="@string/user_email"
-        android:textSize="16sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/first_name" />
+    <LinearLayout
+        android:id="@+id/linearLayout"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_marginStart="15dp"
+        android:orientation="vertical"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toEndOf="@id/imageView"
+        tools:layout_editor_absoluteX="109dp">
+
+        <TextView
+            android:id="@+id/first_name"
+            android:layout_width="match_parent"
+            android:layout_height="25dp"
+            android:layout_marginEnd="8dp"
+            android:text="@string/first_name"
+            android:textSize="20sp"
+            app:layout_constraintBottom_toTopOf="@+id/user_email"
+            app:layout_constraintEnd_toStartOf="@+id/last_name"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/last_name"
+            android:layout_width="match_parent"
+            android:layout_height="25dp"
+            android:text="@string/last_name"
+            android:textSize="20sp"
+            app:layout_constraintBottom_toTopOf="@+id/user_email"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/first_name"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.0" />
+
+        <TextView
+            android:id="@+id/user_email"
+            android:layout_width="match_parent"
+            android:layout_height="25dp"
+            android:layout_marginTop="8dp"
+            android:text="@string/user_email"
+            android:textSize="16sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/first_name" />
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,25 +1,29 @@
 package com.example.genzgpt.View;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.genzgpt.Controller.Firebase;
-import com.example.genzgpt.Model.Event;
 import com.example.genzgpt.Model.User;
 import com.example.genzgpt.R;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.squareup.picasso.Picasso;
 
 /**
  * FIXME CAN WE GET ADMINPROFILESFRAGMENT DELETED AND REFACTOR THIS TO BE ADMINPROFILESFRAGMENT?
@@ -142,6 +146,8 @@ public class UserListFragment extends Fragment {
         private TextView firstName;
         private TextView lastName;
         private TextView email;
+        protected ImageView userImage;
+
 
         /**
          * Constructor for the ViewHolder
@@ -151,6 +157,8 @@ public class UserListFragment extends Fragment {
             firstName = itemView.findViewById(R.id.first_name);
             lastName = itemView.findViewById(R.id.last_name);
             email = itemView.findViewById(R.id.user_email);
+            userImage = itemView.findViewById(R.id.imageView);
+
         }
 
         /**
@@ -161,8 +169,37 @@ public class UserListFragment extends Fragment {
             lastName.setText(user.getLastName());
             email.setText(user.getEmail());
 
+            // Load the image using Picasso
+            if (user.getImageURL() != null && !user.getImageURL().isEmpty()) {
+                Picasso.get()
+                        .load(user.getImageURL())
+//                        .resize(200, 200) // Specify the desired width and height
+                        .into(userImage);
+            }
+
             itemView.setOnClickListener(v -> {
-                showDeleteUserDialog(user);
+                // Context for creating AlertDialog
+                final Context context = v.getContext();
+
+                // Options for the user to select
+                final CharSequence[] deleteOptions = {"Delete User", "Delete User Image", "Cancel"};
+
+                // Creating AlertDialog.Builder
+                AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                builder.setTitle("Choose an option");
+
+                // Setting the options
+                builder.setItems(deleteOptions, (dialog, item) -> {
+                    if (deleteOptions[item].equals("Delete User")) {
+                        showDeleteUserDialog(user);
+                    } else if (deleteOptions[item].equals("Delete User Image")) {
+                        showDeleteUserImageDialog(user);
+                    } else if (deleteOptions[item].equals("Cancel")) {
+                        dialog.dismiss();
+                    }
+                });
+
+                builder.show();
             });
         }
     }
@@ -176,6 +213,19 @@ public class UserListFragment extends Fragment {
                 .setMessage("Are you sure you want to delete this user?")
                 .setPositiveButton("Delete", (dialog, which) -> {
                     deleteUser(user);
+                })
+                .setNegativeButton("Cancel", (dialog, which) -> {
+                    dialog.dismiss();
+                })
+                .show();
+    }
+
+    private void showDeleteUserImageDialog(User user) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle("Delete User Image")
+                .setMessage("Are you sure you want to delete this user Image?")
+                .setPositiveButton("Delete", (dialog, which) -> {
+                    deleteUserImage(user);
                 })
                 .setNegativeButton("Cancel", (dialog, which) -> {
                     dialog.dismiss();
@@ -197,13 +247,10 @@ public class UserListFragment extends Fragment {
 
     private void deleteUserImage(User user) {
         // Call deleteImage to delete the associated image
-        firebase.deletUserImage(user.getId(), user.getImageURL());
-
-        // Remove the event from the RecyclerView
-        int position = userAdapter.getUsers().indexOf(user);
-        if (position != -1) {
-            userAdapter.getUsers().remove(position);
-            userAdapter.notifyItemRemoved(position);
+        if (user.getImageURL() != null) {
+            firebase.deleteUserImage(user.getEmail());
+        } else {
+            Toast.makeText(getContext(), "No user image to delete", Toast.LENGTH_SHORT).show();
         }
     }
 }

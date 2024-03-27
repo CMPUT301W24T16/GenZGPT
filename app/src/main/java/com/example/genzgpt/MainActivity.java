@@ -60,9 +60,11 @@ public class MainActivity extends AppCompatActivity {
                         .commit();
                 return true;
             } else if (id == R.id.qr) {
+                // Create a new instance of QRCodeFragment
+                QRCodeFragment qrCodeFragment = new QRCodeFragment();
                 getSupportFragmentManager()
                         .beginTransaction()
-                        .replace(R.id.BaseFragment, QRCodeActivity)
+                        .replace(R.id.BaseFragment, qrCodeFragment)
                         .commit();
                 return true;
             } else if (id == R.id.event_host) {
@@ -106,12 +108,24 @@ public class MainActivity extends AppCompatActivity {
             AppUser.setUserId(preferences.getString("id", null));
         }
 
-        navBar = findViewById(R.id.bottomNavigationView);
+        // Go to another Activity if the user needs to put in their information.
+        // Putting this before setContentView will stop Main Activity from showing initially
+        sendToFirstTime();
 
+        navBar = findViewById(R.id.bottomNavigationView);
         navBar.setOnItemSelectedListener(navListener);
         navBar.setSelectedItemId(R.id.home);
     }
 
+    /**
+     * Sends the user to a first time sign in if they have need to do this already.
+     */
+    public void sendToFirstTime() {
+        if (!hasSignedIn) {
+            Intent toFirst = new Intent(MainActivity.this, FirstSignInActivity.class);
+            startActivity(toFirst);
+        }
+    }
 
     /**
      * Handles saving data into the app for future usages.
