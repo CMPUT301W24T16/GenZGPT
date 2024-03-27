@@ -101,6 +101,13 @@ public class FirstSignInActivity extends AppCompatActivity {
                         // Assign the id for the new user into the app
                         AppUser.setUserId(userId);
                         AppUser.setHasSignedIn(true);
+
+                        SharedPreferences preferences = FirstSignInActivity.this.getSharedPreferences("com.example.genzgpt",
+                                Context.MODE_PRIVATE);
+
+                        preferences.edit().putBoolean("signIn", AppUser.getHasSignedIn()).apply();
+                        preferences.edit().putString("id", AppUser.getUserId()).apply();
+
                         Log.e("FSI UserId", userId);
                         Log.e("User Creation", "Successful User Creation");
                         finish();
@@ -123,8 +130,11 @@ public class FirstSignInActivity extends AppCompatActivity {
 
         // Set the adminButton to send to the admin sign in page.
         adminButton.setOnClickListener( v -> {
-            Intent toAdmin = new Intent(FirstSignInActivity.this, AdminActivity.class);
-            startActivity(toAdmin);
+            SharedPreferences preferences = FirstSignInActivity.this.getSharedPreferences("com.example.genzgpt",
+                    Context.MODE_PRIVATE);
+
+            preferences.edit().putBoolean("admin", true).apply();
+            finish();
         });
     }
 
