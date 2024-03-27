@@ -1,12 +1,16 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--An image of an arrow used for returns to other parts of the app.-->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="24dp"
     android:height="24dp"
     android:viewportWidth="24"
     android:viewportHeight="24">
-    <path
-        android:fillColor="#FF000000"
-        android:pathData="M12,2L10.59,3.41 17.17,10H2v2h15.17l-6.58,6.59L12,22l10,-10z"/>
-</vector>
 
+    <!-- Wrap the path in a group and apply a rotation -->
+    <group
+        android:pivotX="12"
+        android:pivotY="12"
+        android:rotation="180">
+        <path
+            android:fillColor="#FF000000"
+            android:pathData="M12,2L10.59,3.41 17.17,10H2v2h15.17l-6.58,6.59L12,22l10,-10z"/>
+    </group>
+</vector>
