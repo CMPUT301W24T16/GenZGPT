@@ -107,7 +107,7 @@ public class EventInfoFragment extends Fragment {
     }
 
     public void signUpForEvent() {
-        fetchUserData(AppUser.getInstance().getId(), true);
+        fetchUserData(AppUser.getUserId(), true);
     }
 
     public void withdrawFromEvent() {
