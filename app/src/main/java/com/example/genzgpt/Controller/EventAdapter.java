@@ -41,7 +41,6 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> 
 
 
     }
-
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Event event = eventList.get(position);
@@ -50,26 +49,42 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> 
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
         String dateString = dateFormat.format(event.getEventDate());
         holder.eventDate.setText(dateString);
+
         if (event.getImageURL() != null && !event.getImageURL().isEmpty()) {
             Picasso.get()
                     .load(event.getImageURL())
                     .placeholder(R.drawable.ic_launcher_background)
                     .into(holder.eventImage);
         }
+
         String currentUserId = AppUser.getInstance().getId();
-        boolean isOrganizer = false;
-        for (String organizer : event.getOrganizers()) {
-            if (organizer.equals(currentUserId)) {
-                System.out.println("Current user is an organizer for this event: " + event.getEventName());
-                isOrganizer = true;
-                break;
-            }
-        }
+        boolean isOrganizer = event.getOrganizers().contains(currentUserId);
 
         if (isOrganizer) {
             holder.eventIndicator.setVisibility(View.VISIBLE);
+            holder.hostName.setText(AppUser.getInstance().getFirstName() + " " + AppUser.getInstance().getLastName());
         } else {
-            holder.eventIndicator.setVisibility(View.GONE);
+            if (!event.getOrganizers().isEmpty()) {
+                String organizerId = event.getOrganizers().get(0);
+                Firebase firebase = new Firebase();
+                firebase.getUserData(organizerId, new Firebase.OnUserLoadedListener() {
+                    @Override
+                    public void onUserLoaded(User user) {
+                        String organizerName = user.getFirstName() + " " + user.getLastName();
+                        holder.hostName.setText(organizerName);
+                    }
+
+                    @Override
+                    public void onUserNotFound() {
+                        holder.hostName.setText("Unknown Organizer");
+                    }
+
+                    @Override
+                    public void onUserLoadFailed(Exception e) {
+                        holder.hostName.setText("Error loading name");
+                    }
+                });
+            }
         }
     }
 
@@ -83,7 +98,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> 
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        TextView eventName, eventLocation, eventDate, eventIndicator;
+        TextView eventName, eventLocation, eventDate, eventIndicator, hostName;
         ImageView eventImage, profileImage;
 
         public ViewHolder(@NonNull View itemView, final OnSettingButtonClickListener listener) {
@@ -94,6 +109,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> 
             eventImage = itemView.findViewById(R.id.eventImage);
             eventIndicator = itemView.findViewById(R.id.eventIndicator);
             profileImage = itemView.findViewById(R.id.profileImage);
+            hostName = itemView.findViewById(R.id.attendeeOrHostName);
 
 
             itemView.setOnClickListener(new View.OnClickListener() {
