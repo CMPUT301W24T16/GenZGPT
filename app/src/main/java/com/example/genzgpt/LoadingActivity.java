@@ -19,16 +19,6 @@ public class LoadingActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_loading);
-
-        SharedPreferences preferences = this.getSharedPreferences("com.example.genzgpt",
-                Context.MODE_PRIVATE);
-
-        isSignedIn = preferences.getBoolean("signIn", false);
-        isAdmin = preferences.getBoolean("admin", false);
-
-        sendToFirstTime();
-        sendToAdmin();
-        sendToMain();
     }
 
     /**
@@ -36,6 +26,7 @@ public class LoadingActivity extends AppCompatActivity {
      */
     public void sendToFirstTime() {
         if (!isSignedIn) {
+            Log.d("Loading", "Sent to First Time");
             Intent toFirst = new Intent(LoadingActivity.this, FirstSignInActivity.class);
             startActivity(toFirst);
         }
@@ -46,6 +37,7 @@ public class LoadingActivity extends AppCompatActivity {
      */
     public void sendToAdmin() {
         if (isAdmin) {
+            Log.d("Loading", "Sent to Admin");
             Intent toAdmin = new Intent(LoadingActivity.this, AdminActivity.class);
             startActivity(toAdmin);
         }
@@ -53,6 +45,7 @@ public class LoadingActivity extends AppCompatActivity {
 
     public void sendToMain() {
         if (isSignedIn) {
+            Log.d("Loading", "Sent to Main");
             Intent toMain = new Intent(LoadingActivity.this, MainActivity.class);
             startActivity(toMain);
         }
@@ -67,7 +60,30 @@ public class LoadingActivity extends AppCompatActivity {
 
         Log.e("Resume", "Resume Works");
         isSignedIn = preferences.getBoolean("signIn", false);
+        String test = String.valueOf(isSignedIn);
+        Log.d("isSignedIn", test);
         isAdmin = preferences.getBoolean("admin", false);
+
+        AppUser.setUserId(preferences.getString("id", null));
+
+        sendToFirstTime();
+        sendToAdmin();
+        sendToMain();
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+
+        SharedPreferences preferences = this.getSharedPreferences("com.example.genzgpt",
+                Context.MODE_PRIVATE);
+
+        Log.e("Restart", "Restart Works");
+        isSignedIn = preferences.getBoolean("signIn", false);
+        String test = String.valueOf(isSignedIn);
+        Log.d("isSignedIn", test);
+        isAdmin = preferences.getBoolean("admin", false);
+        AppUser.setUserId(preferences.getString("id", null));
         sendToFirstTime();
         sendToAdmin();
         sendToMain();

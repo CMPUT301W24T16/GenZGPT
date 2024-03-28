@@ -113,32 +113,9 @@ public class MainActivity extends AppCompatActivity {
             AppUser.setUserId(preferences.getString("id", null));
         }
 
-        if (hasSignedIn) {
-            Firebase firebase = new Firebase();
-
-            boolean exists = firebase.confirmUserExists(AppUser.getUserId());
-
-            if (!exists) {
-                openDeletionMessage();
-            }
-        }
-        // Go to another Activity if the user needs to put in their information.
-        // Putting this before setContentView will stop Main Activity from showing initially
-        sendToFirstTime();
-
         navBar = findViewById(R.id.bottomNavigationView);
         navBar.setOnItemSelectedListener(navListener);
         navBar.setSelectedItemId(R.id.home);
-    }
-
-    /**
-     * Sends the user to a first time sign in if they have need to do this already.
-     */
-    public void sendToFirstTime() {
-        if (!hasSignedIn) {
-            Intent toFirst = new Intent(MainActivity.this, FirstSignInActivity.class);
-            startActivity(toFirst);
-        }
     }
 
     /**
@@ -155,15 +132,47 @@ public class MainActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
 
+        SharedPreferences preferences = this.getSharedPreferences("com.example.genzgpt",
+                Context.MODE_PRIVATE);
+
+        AppUser.setUserId(preferences.getString("id", null));
+
         Firebase firebase = new Firebase();
 
-        boolean exists = firebase.confirmUserExists(AppUser.getUserId());
+        //FIXME You might want to take parts of this code into other parts of the app
+        // ******DO NOT******* EVER copy and paste this code exactly. It is spaghetti, and it
+        // took us two hours to fix the problems caused by this monstrosity
+        /*
+        Log.d("MainActivity", AppUser.getUserId());
+        firebase.getUserData(AppUser.getUserId(), new Firebase.OnUserLoadedListener() {
+            @Override
+            public void onUserLoaded(User user) {
+                // initialize the AppUser in case it hasn't already been done
+                Log.d("MainActivity", "User was found");
+                AppUser.setHasSignedIn(true);
+            }
 
-        if (!exists) {
+            @Override
+            public void onUserNotFound() {
+                // If the user is not found, it must have been deleted
+                Log.d("MainActivity", "User not found.");
+                AppUser.setHasSignedIn(false);
+            }
+
+            @Override
+            public void onUserLoadFailed(Exception e) {
+                Log.e("MainActivity", "User retrieval failed.");
+                AppUser.setHasSignedIn(false);
+            }
+        });
+
+        if (!(AppUser.getHasSignedIn())) {
             openDeletionMessage();
         }
+        */
     }
 
+    /*
     public void openDeletionMessage() {
         //FIXME Opens up a prompt that the user's account has been deleted
         // may need a good amount of refactoring. I just put this here to
@@ -174,9 +183,10 @@ public class MainActivity extends AppCompatActivity {
         hasSignedIn = false;
         SharedPreferences preferences = this.getSharedPreferences("com.example.genzgpt",
                 Context.MODE_PRIVATE);
-
+        Log.e("MainActivity", "Why Does User Not Exist?");
         preferences.edit().putBoolean("signIn", hasSignedIn).apply();
 
         finish();
     }
+    */
 }

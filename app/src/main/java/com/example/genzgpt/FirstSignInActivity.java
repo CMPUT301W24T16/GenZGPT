@@ -108,6 +108,7 @@ public class FirstSignInActivity extends AppCompatActivity {
                                 Context.MODE_PRIVATE);
 
                         preferences.edit().putBoolean("signIn", AppUser.getHasSignedIn()).apply();
+                        Log.d("FirstsignIn", String.valueOf(AppUser.getHasSignedIn()));
                         preferences.edit().putString("id", AppUser.getUserId()).apply();
 
                         Log.e("FSI UserId", userId);

@@ -7,7 +7,7 @@ public class AppUser extends User{
     private static String userId;
     private static String userEmail;
     private static boolean hasSignedIn;
-    private static AppUser instance;
+    //private static AppUser instance;
 
     /**
      * A constructor for the AppUser Class.
@@ -54,6 +54,9 @@ public class AppUser extends User{
     public AppUser(String firstName, String lastName, long phone, String email, Boolean geolocation, String imageURL) {
         super(firstName, lastName, phone, email, geolocation, imageURL);
     }
+
+    //FIXME: THIS CODE WILL UNLEASH A PLAGUE UPON THIS APP. NEVER, AND I MEAN EVER, UNLEASH THIS CODE. YOU HAVE BEEN WARNED!
+    /*
     public static synchronized AppUser getInstance() {
         if (instance == null) {
             // Handle error or initialize with default values
@@ -76,6 +79,7 @@ public class AppUser extends User{
                     user.getPhone(), user.getEmail(), user.isGeolocation(), user.getImageURL());
         }
     }
+    */
 
     /**
      * A getter for the static version of the User's Id

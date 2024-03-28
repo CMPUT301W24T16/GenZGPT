@@ -1283,14 +1283,14 @@ public class Firebase {
             @Override
             public void onUserLoaded(User user) {
                 // initialize the AppUser in case it hasn't already been done
-                AppUser.initInstance(user);
+                Log.d("User Found", "User was found");
                 AppUser.setHasSignedIn(true);
             }
 
             @Override
             public void onUserNotFound() {
                 // If the user is not found, it must have been deleted
-                Log.d("Firebase", "User not found in MainActivity.");
+                Log.d("Firebase", "User not found.");
                 AppUser.setHasSignedIn(false);
             }
 
