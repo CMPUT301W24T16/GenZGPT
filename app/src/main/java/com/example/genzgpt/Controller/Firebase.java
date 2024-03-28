@@ -362,7 +362,7 @@ public class Firebase {
                                     getUserData(email, new OnUserLoadedListener() {
                                         @Override
                                         public void onUserLoaded(User user) {
-                                            event.addOrganizer(user);
+                                            event.addOrganizer(user.getId());
                                             if (event.getOrganizers().size() == organizerEmails.size()) {
                                                 fetchRegisteredAttendees(eventName,
                                                         new OnRegisteredAttendeesLoadedListener() {
@@ -449,26 +449,6 @@ public class Firebase {
 
         void onEventLoadFailed(Exception e);
     }
-    /**
-     * Creates a new event and adds the provided user as an organizer.
-     *
-     * @param event The event to be created.
-     * @param user The user to add as an organizer.
-     *  The callback listener for the event creation and organizer registration process.
-     */
-    public void addEvent(Event event, User user) {
-        System.out.println("Creating event and registering organizer: " + user.getFirstName() + " " + user.getLastName());
-        Map<String, Object> eventMap = event.toMap();
-        CollectionReference eventsRef = db.collection("events");
-        eventsRef.add(eventMap).addOnSuccessListener(documentReference -> {
-            System.out.println("Event created with ID: " + documentReference.getId());
-            DocumentReference eventRef = eventsRef.document(documentReference.getId());
-            eventRef.update("organizers", FieldValue.arrayUnion(user.getId()))
-                    .addOnSuccessListener(aVoid -> System.out.println("Organizer registered for the event successfully"))
-                    .addOnFailureListener(e -> System.err.println("Error adding organizer to event: " + e.getMessage()));
-        }).addOnFailureListener(e -> System.err.println("Error creating event: " + e.getMessage()));
-    }
-
 
 
     /**
@@ -568,6 +548,7 @@ public class Firebase {
      * @param event
      */
     public void createEvent(Event event, User organizer) {
+        event.addOrganizer(organizer.getId());
         try {
             // Create a new event document
             DocumentReference eventRef = db.collection("events").document();
@@ -593,7 +574,6 @@ public class Firebase {
 
             eventRef.set(eventData)
                     .addOnSuccessListener(aVoid -> {
-                        // Event created successfully
                         Log.i("Firebase", "Event created successfully");
                     })
                     .addOnFailureListener(e -> {
@@ -819,6 +799,8 @@ public class Firebase {
                         Long maxAttendeesLong = document.getLong("maxAttendees");
                         Integer maxAttendees = maxAttendeesLong != null ? maxAttendeesLong.intValue() : null;
                         String imageURL = document.getString("imageURL");
+                        List<User> organizers = (List<User>) document.get("organizers");
+                        List<User> registeredAttendees = (List<User>) document.get("registeredAttendees");
 
                         // Check for nulls to avoid adding incomplete events
                         if (eventName != null && eventDate != null && location != null) {
@@ -880,7 +862,13 @@ public class Firebase {
         Long maxAttendeesLong = document.getLong("maxAttendees");
         Integer maxAttendees = maxAttendeesLong != null ? maxAttendeesLong.intValue() : null;
         String imageURL = document.getString("imageURL");
-        return new Event(eventId, eventName, eventDate, location, maxAttendees, imageURL);
+        List<String> organizers = (List<String>) document.get("organizers");
+        List<User> registeredAttendees = (List<User>) document.get("registeredAttendees");
+        System.out.println("organizers: " + organizers + " registeredAttendees: " + registeredAttendees);
+        Event event = new Event(eventId, eventName, eventDate, location, maxAttendees, imageURL);
+        event.setOrganizers(organizers);
+        event.setRegisteredAttendees(registeredAttendees);
+        return event;
     }
 
     public interface OnUserEventsLoadedListener {
@@ -1111,7 +1099,6 @@ public class Firebase {
                     // Now only store the user's ID as the attendee
                     eventRef.update("registeredAttendees", FieldValue.arrayUnion(user.getId()))
                             .addOnSuccessListener(aVoid -> {
-                                System.out.println("User registered for the event successfully.");
                                 listener.onAttendeeRegistered();
                             })
                             .addOnFailureListener(e -> {
@@ -1204,7 +1191,7 @@ public class Firebase {
                                     getUserData(email, new OnUserLoadedListener() {
                                         @Override
                                         public void onUserLoaded(User user) {
-                                            event.addOrganizer(user);
+                                            event.addOrganizer(user.getId());
                                             if (event.getOrganizers().size() == organizerEmails.size()) {
                                                 fetchRegisteredAttendees(eventName, new OnRegisteredAttendeesLoadedListener() {
                                                     @Override

@@ -7,7 +7,10 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.genzgpt.Model.AppUser;
 import com.example.genzgpt.Model.Event;
+import com.example.genzgpt.Model.User;
 import com.example.genzgpt.R;
 import com.squareup.picasso.Picasso;
 
@@ -53,6 +56,21 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> 
                     .placeholder(R.drawable.ic_launcher_background)
                     .into(holder.eventImage);
         }
+        String currentUserId = AppUser.getInstance().getId();
+        boolean isOrganizer = false;
+        for (String organizer : event.getOrganizers()) {
+            if (organizer.equals(currentUserId)) {
+                System.out.println("Current user is an organizer for this event: " + event.getEventName());
+                isOrganizer = true;
+                break;
+            }
+        }
+
+        if (isOrganizer) {
+            holder.eventIndicator.setVisibility(View.VISIBLE);
+        } else {
+            holder.eventIndicator.setVisibility(View.GONE);
+        }
     }
 
     @Override
@@ -65,9 +83,8 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> 
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        TextView eventName, eventLocation, eventDate;
-        ImageView eventImage;
-        ImageButton settingButton;
+        TextView eventName, eventLocation, eventDate, eventIndicator;
+        ImageView eventImage, profileImage;
 
         public ViewHolder(@NonNull View itemView, final OnSettingButtonClickListener listener) {
             super(itemView);
@@ -75,6 +92,9 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> 
             eventLocation = itemView.findViewById(R.id.eventLocation);
             eventDate = itemView.findViewById(R.id.eventDate);
             eventImage = itemView.findViewById(R.id.eventImage);
+            eventIndicator = itemView.findViewById(R.id.eventIndicator);
+            profileImage = itemView.findViewById(R.id.profileImage);
+
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override

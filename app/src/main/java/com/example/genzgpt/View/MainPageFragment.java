@@ -24,7 +24,6 @@ import com.example.genzgpt.Model.AppUser;
 
 /**
  * A fragment subclass serving as the main page display for the user.
- * Use the {@link MainPageFragment#newInstance} factory method to create an instance of this fragment.
  */
 public class MainPageFragment extends Fragment implements EventAdapter.EventClickListener {
     @Override
@@ -33,49 +32,20 @@ public class MainPageFragment extends Fragment implements EventAdapter.EventClic
         switchFragment(eventInfoFragment, R.id.BaseFragment);
     }
 
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    private String mParam1;
-    private String mParam2;
 
     private Firebase firebase;
     private TextView userName;
     private List<Event> events = new ArrayList<>();
     private EventAdapter eventAdapter;
 
-    public MainPageFragment() {
-        // Required empty public constructor
-    }
-
-    /**
-     * Factory method to create a new instance of this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment MainPageFragment.
-     */
-    public static MainPageFragment newInstance(String param1, String param2) {
-        MainPageFragment fragment = new MainPageFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
         firebase = new Firebase();
         eventAdapter = new EventAdapter(events, new EventAdapter.OnSettingButtonClickListener() {
             @Override
             public void onSettingButtonClick(Event event) {
-                Log.d("MainPageFragment", "Setting button clicked for event: " + event.getEventName());
+                Log.d("MainPageFragment", "Setting button clicked for event: " + event.getOrganizers());
             }
         }, this); // 'this' refers to MainPageFragment which now implements EventClickListener
     }
