@@ -67,6 +67,8 @@ public class MainActivityTest {
         Espresso.onView(withId(R.id.BaseFragment)).check(matches(isDisplayed()));
     }
 
+    // FIXME I got rid of sendToFirstTime this is probably unnecessary now. I am so sorry Farha.
+    /*
     @Test
     public void testSendToFirstTime() {
         // Given
@@ -81,5 +83,6 @@ public class MainActivityTest {
         // Then
         Intents.intended(IntentMatchers.hasComponent(toFirstIntent.getComponent()));
     }
+     */
 
 }

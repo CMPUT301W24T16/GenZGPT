@@ -6,6 +6,7 @@ import android.net.Uri;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.example.genzgpt.Model.AppUser;
 import com.example.genzgpt.Model.Event;
 import com.example.genzgpt.Model.User;
 import com.google.firebase.firestore.CollectionReference;
@@ -1275,5 +1276,31 @@ public class Firebase {
                         listener.onEventLoadFailed(task.getException());
                     }
                 });
+    }
+
+    public boolean confirmUserExists(String id) {
+        getUserData(id, new Firebase.OnUserLoadedListener() {
+            @Override
+            public void onUserLoaded(User user) {
+                // initialize the AppUser in case it hasn't already been done
+                Log.d("User Found", "User was found");
+                AppUser.setHasSignedIn(true);
+            }
+
+            @Override
+            public void onUserNotFound() {
+                // If the user is not found, it must have been deleted
+                Log.d("Firebase", "User not found.");
+                AppUser.setHasSignedIn(false);
+            }
+
+            @Override
+            public void onUserLoadFailed(Exception e) {
+                Log.e("Firebase", "User retrieval failed.");
+                AppUser.setHasSignedIn(false);
+            }
+        });
+
+        return AppUser.getHasSignedIn();
     }
 }

@@ -116,7 +116,7 @@ public class MainPageFragment extends Fragment implements EventAdapter.EventClic
 
     private void fetchEvents() {
         events.clear();
-        String currentUserId = AppUser.getInstance().getId();
+        String currentUserId = AppUser.getUserId();
         firebase.fetchUserEvents(currentUserId, new Firebase.OnUserEventsLoadedListener() {
 
             @Override
@@ -139,7 +139,7 @@ public class MainPageFragment extends Fragment implements EventAdapter.EventClic
 
     private void fetchUserData() {
 
-        firebase.getUserData(AppUser.getInstance().getId(), new Firebase.OnUserLoadedListener() {
+        firebase.getUserData(AppUser.getUserId(), new Firebase.OnUserLoadedListener() {
             @Override
             public void onUserLoaded(User user) {
                 greetUserBasedOnTime(user);

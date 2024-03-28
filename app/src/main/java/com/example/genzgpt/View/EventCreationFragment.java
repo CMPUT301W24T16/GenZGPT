@@ -158,8 +158,23 @@ public class EventCreationFragment extends Fragment {
         );
         // Add the new event to Firebase
         Firebase firebase = new Firebase();
-        AppUser appUserInstance = AppUser.getInstance();
-        firebase.createEvent(newEvent, appUserInstance);
+        firebase.getUserData(AppUser.getUserId(), new Firebase.OnUserLoadedListener() {
+            @Override
+            public void onUserLoaded(User user) {
+                firebase.createEvent(newEvent, user);
+            }
+
+            @Override
+            public void onUserNotFound() {
+                Log.d("spaghetti code", "aaahahaahah");
+            }
+
+            @Override
+            public void onUserLoadFailed(Exception e) {
+                Log.d("spaghetti code", "aaahahaahah");
+            }
+        });
+
         getParentFragmentManager().popBackStack();
     }
 

@@ -2,6 +2,8 @@ package com.example.genzgpt;
 
 import static android.app.PendingIntent.getActivity;
 
+import static androidx.core.content.ContentProviderCompat.requireContext;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -12,7 +14,10 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 
+import com.bumptech.glide.Glide;
+import com.example.genzgpt.Controller.Firebase;
 import com.example.genzgpt.Model.AppUser;
+import com.example.genzgpt.Model.User;
 import com.example.genzgpt.View.MyEventsFragment;
 import com.example.genzgpt.View.QRCodeFragment;
 import com.example.genzgpt.View.AllEventsFragment;
@@ -98,42 +103,19 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        SharedPreferences preferences = this.getSharedPreferences("com.example.genzgpt", Context.MODE_PRIVATE);
+        // Get information that should be stored between runs of the app
+        SharedPreferences preferences = this.getSharedPreferences("com.example.genzgpt",
+                Context.MODE_PRIVATE);
+
+        // Confirm whether or not a user has signed in on this application.
         hasSignedIn = preferences.getBoolean("signIn", false);
-
-        if (hasSignedIn) {
-            System.out.println("User has signed in: " + preferences.getString("id", "") +  preferences.getString("firstName", "") + preferences.getString("lastName", "") + preferences.getLong("phoneNumber", 0) + preferences.getString("email", "") + preferences.getBoolean("geolocation", false) + preferences.getString("imageURL", "default_image_url"));
-            String id = preferences.getString("id", "");
-            String firstName = preferences.getString("firstName", "Default First Name");
-            String lastName = preferences.getString("lastName", "Default Last Name");
-            long phone = preferences.getLong("phoneNumber", 0);
-            String email = preferences.getString("email", "");
-            boolean geolocation = preferences.getBoolean("geolocation", false);
-            String imageURL = preferences.getString("imageURL", "default_image_url");
-
-            // Initialize the AppUser singleton instance with the retrieved data
-            AppUser.initInstance(id, firstName, lastName, phone, email, geolocation, imageURL);
-        } else {
-            // Redirect to sign-in activity if not signed in
-            Intent toFirst = new Intent(MainActivity.this, FirstSignInActivity.class);
-            startActivity(toFirst);
-            finish();
+        if (preferences.contains("id")) {
+            AppUser.setUserId(preferences.getString("id", null));
         }
-
 
         navBar = findViewById(R.id.bottomNavigationView);
         navBar.setOnItemSelectedListener(navListener);
         navBar.setSelectedItemId(R.id.home);
-
-    }
-    /**
-     * Sends the user to a first time sign in if they have need to do this already.
-     */
-    public void sendToFirstTime() {
-        if (!hasSignedIn) {
-            Intent toFirst = new Intent(MainActivity.this, FirstSignInActivity.class);
-            startActivity(toFirst);
-        }
     }
 
     /**
@@ -144,49 +126,67 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
-        SharedPreferences preferences = this.getSharedPreferences("com.example.genzgpt",
-                Context.MODE_PRIVATE);
-
-        preferences.edit().putBoolean("signIn", AppUser.getHasSignedIn()).apply();
-        preferences.edit().putString("id", AppUser.getUserId()).apply();
     }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-
-        SharedPreferences preferences = this.getSharedPreferences("com.example.genzgpt",
-                Context.MODE_PRIVATE);
-
-        preferences.edit().putBoolean("signIn", AppUser.getHasSignedIn()).apply();
-        preferences.edit().putString("id", AppUser.getUserId()).apply();
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-
-        SharedPreferences preferences = this.getSharedPreferences("com.example.genzgpt",
-                Context.MODE_PRIVATE);
-
-        preferences.edit().putBoolean("signIn", AppUser.getHasSignedIn()).apply();
-        preferences.edit().putString("id", AppUser.getUserId()).apply();
-    }
-
-
-    /**
-     * Handles resuming Main Activity (this is used for when we travel from FirstSignIn Currently)
-     */
     @Override
     protected void onResume() {
         super.onResume();
 
-        if (AppUser.getHasSignedIn() && AppUser.getUserId() != null) {
-            SharedPreferences preferences = this.getSharedPreferences("com.example.genzgpt",
-                    Context.MODE_PRIVATE);
+        SharedPreferences preferences = this.getSharedPreferences("com.example.genzgpt",
+                Context.MODE_PRIVATE);
 
-            preferences.edit().putBoolean("signIn", AppUser.getHasSignedIn()).apply();
-            preferences.edit().putString("id", AppUser.getUserId()).apply();
+        AppUser.setUserId(preferences.getString("id", null));
+
+        Firebase firebase = new Firebase();
+
+        //FIXME You might want to take parts of this code into other parts of the app
+        // ******DO NOT******* EVER copy and paste this code exactly. It is spaghetti, and it
+        // took us two hours to fix the problems caused by this monstrosity
+        /*
+        Log.d("MainActivity", AppUser.getUserId());
+        firebase.getUserData(AppUser.getUserId(), new Firebase.OnUserLoadedListener() {
+            @Override
+            public void onUserLoaded(User user) {
+                // initialize the AppUser in case it hasn't already been done
+                Log.d("MainActivity", "User was found");
+                AppUser.setHasSignedIn(true);
+            }
+
+            @Override
+            public void onUserNotFound() {
+                // If the user is not found, it must have been deleted
+                Log.d("MainActivity", "User not found.");
+                AppUser.setHasSignedIn(false);
+            }
+
+            @Override
+            public void onUserLoadFailed(Exception e) {
+                Log.e("MainActivity", "User retrieval failed.");
+                AppUser.setHasSignedIn(false);
+            }
+        });
+
+        if (!(AppUser.getHasSignedIn())) {
+            openDeletionMessage();
         }
+        */
     }
+
+    /*
+    public void openDeletionMessage() {
+        //FIXME Opens up a prompt that the user's account has been deleted
+        // may need a good amount of refactoring. I just put this here to
+        // ensure nothing goes wrong right now.
+        // Current implementation just sets hasSignedIn to false
+
+        // ensure hasSignedIn is no longer true
+        hasSignedIn = false;
+        SharedPreferences preferences = this.getSharedPreferences("com.example.genzgpt",
+                Context.MODE_PRIVATE);
+        Log.e("MainActivity", "Why Does User Not Exist?");
+        preferences.edit().putBoolean("signIn", hasSignedIn).apply();
+
+        finish();
+    }
+    */
 }
