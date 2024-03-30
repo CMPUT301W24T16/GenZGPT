@@ -1302,4 +1302,37 @@ public class Firebase {
 
         return AppUser.getHasSignedIn();
     }
+
+    /**
+     * removes the current user from the list of registered attendees for a specific event.
+     * @param eventId the id for the event that registered attendees will be removed from
+     * @param userId the id of the user that will be removed from the list of registered attendees
+     * @param listener the listener for the removal of the user from the list of registered attendees
+     */
+    public void removeUserFromRegisteredAttendees(String eventId, String userId, OnAttendeeRemovedListener listener) {
+        try {
+            DocumentReference eventRef = db.collection("events").document(eventId);
+
+            eventRef.update("registeredAttendees", FieldValue.arrayRemove(userId))
+                    .addOnSuccessListener(aVoid -> {
+                        // User removed from registeredAttendees successfully
+                        Log.i("Firebase", "User removed from registeredAttendees successfully");
+                        listener.onAttendeeRemoved();
+                    })
+                    .addOnFailureListener(e -> {
+                        // Error occurred while removing user from registeredAttendees
+                        Log.e("Firebase", "Error removing user from registeredAttendees: " + e.getMessage());
+                        listener.onAttendeeRemovalFailed(e);
+                    });
+        } catch (Exception e) {
+            // Handle any exceptions that occur during the process
+            Log.e("Firebase", "Error removing user from registeredAttendees: " + e.getMessage());
+        }
+    }
+
+    public interface OnAttendeeRemovedListener {
+        void onAttendeeRemoved();
+
+        void onAttendeeRemovalFailed(Exception e);
+    }
 }
