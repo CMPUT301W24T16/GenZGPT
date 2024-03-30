@@ -1,12 +1,20 @@
 package com.example.genzgpt.Controller;
 
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.core.app.NotificationCompat;
 
+import com.example.genzgpt.Model.AppNotification;
+import com.example.genzgpt.Model.MessageNotification;
+import com.example.genzgpt.Model.MilestoneNotification;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -103,6 +111,25 @@ public class FirebaseMessages extends FirebaseMessagingService {
     }
 
     /**
+     * Sends a message to a phone using Firebase Messaging
+     * @param deviceToken
+     * The token of the device to send a message to.
+     * @param title
+     * The title of the message to send.
+     * @param content
+     * The content of the message to send.
+     * @param type
+     * The type of message to send.
+     */
+    public void sendMessageToDevice(String deviceToken, String title, String content, String type) {
+        RemoteMessage message = new RemoteMessage.Builder(deviceToken)
+                .addData("title", title)
+                .addData("content", content)
+                .setMessageType(type)
+                .build();
+    }
+
+    /**
      * Sends a message to multiple devices.
      * @param deviceTokens The device tokens of the recipients.
      * @param messageData The data to be sent in the message.
@@ -110,6 +137,24 @@ public class FirebaseMessages extends FirebaseMessagingService {
     public void sendMessageToMultipleDevices(List<String> deviceTokens, Map<String, String> messageData) {
         for (String deviceToken : deviceTokens) {
             sendMessageToDevice(deviceToken, messageData);
+        }
+    }
+
+    /**
+     * Sends a message to multiple devices.
+     * @param deviceTokens
+     * The device tokens of the recipients.
+     * @param title
+     * The title of the message to send.
+     * @param content
+     * The content of the message to send.
+     * @param type
+     * The type of message to send.
+     */
+    public void sendMessageToMultipleDevices(List<String> deviceTokens, String title,
+                                             String content, String type) {
+        for (String deviceToken : deviceTokens) {
+            sendMessageToDevice(deviceToken, title, content, type);
         }
     }
 
@@ -177,4 +222,72 @@ public class FirebaseMessages extends FirebaseMessagingService {
         Log.d("FirebaseMessages", "FMSFlow: Device token retrieved");
     }
 
+    /**
+     * Displays a notification on the current device
+     * @param notification
+     * An AppNotification that will be used to provide info about what to display
+     * @param id
+     * The unique identifier for
+     */
+    public void displayNotification(AppNotification notification, int id) {
+        // FIXME need to check for permissions in this function somewhere.
+        // get the notification to display
+        Notification displayable = notification.getDisplayable(context);
+
+        // get the manager for all the notifications
+        NotificationManager manager = (NotificationManager) getSystemService(
+                Context.NOTIFICATION_SERVICE);
+
+        // check if a notification channel is necessary on this device
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel(notification.getChannelID(),
+                    notification.getChannelName(), NotificationManager.IMPORTANCE_DEFAULT);
+
+            // you can implement the below line if you wish. Just need to give classes a channelDescription
+            //channel.setDescription(notification.getChannelDescription());
+
+            // This does nothing if the channel already exists
+            manager.createNotificationChannel(channel);
+        }
+
+        manager.notify(id, displayable);
+    }
+
+    /**
+     * Handles what happens when a user receives a message on their phone.
+     * @param remoteMessage Remote message that has been received.
+     */
+    @Override
+    public void onMessageReceived(@NonNull RemoteMessage remoteMessage) {
+        super.onMessageReceived(remoteMessage);
+
+        // get information from the RemoteMessage
+        String notiType = remoteMessage.getMessageType();
+        Map<String, String> messageData = remoteMessage.getData();
+        String title = messageData.get("title");
+        String content = messageData.get("content");
+
+        // FIXME Not sure if this is ever null due to method description
+        String notiId = remoteMessage.getMessageId();
+
+        if (notiId == null) {
+            Log.d("NotificationIdError", "Firebase did not give notification an ID");
+        }
+        int notificationId = Integer.parseInt(notiId);
+
+        AppNotification notification;
+
+        // do different things depending on the notification type
+        if (notiType.equals("milestone")) {
+            notification = new MilestoneNotification(title, Integer.parseInt(content));
+        }
+        else if (notiType.equals("message")) {
+            notification = new MessageNotification(title, content);
+        }
+        else {
+            notification = new MessageNotification("Error!", "We broke something");
+        }
+
+        displayNotification(notification, notificationId);
+    }
 }

@@ -2,6 +2,7 @@ package com.example.genzgpt.Model;
 
 import static androidx.core.app.NotificationCompat.VISIBILITY_PUBLIC;
 
+import android.app.Notification;
 import android.content.Context;
 
 import androidx.annotation.NonNull;
@@ -55,15 +56,18 @@ public class MessageNotification extends AppNotification {
      * @return
      *      A way for other processes to build a message notification.
      */
-    public NotificationCompat.Builder getBuilder(@NonNull Context context) {
+    public Notification getDisplayable(@NonNull Context context) {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(
                 context.getApplicationContext(), channelID)
                 .setSmallIcon(R.drawable.test_picture) // FIXME: set to app icon later
                 .setContentTitle(title)
                 .setContentText(message)
+                .setWhen(System.currentTimeMillis())
+                .setAutoCancel(true)
                 .setStyle(new NotificationCompat.BigTextStyle().bigText(message))
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .setVisibility(VISIBILITY_PUBLIC);
-        return builder;
+
+        return builder.build();
     }
 }

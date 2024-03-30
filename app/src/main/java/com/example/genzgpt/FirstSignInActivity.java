@@ -65,6 +65,7 @@ public class FirstSignInActivity extends AppCompatActivity {
             // FIXME Put procedural generation here
             String imageURL = null;
 
+            // Check if input parameters are valid
             boolean isValidFirst = isValidName(firstName);
             boolean isValidLast = isValidName(lastName);
             boolean isValidPhone = isValidPhone(phoneStr);
@@ -99,13 +100,15 @@ public class FirstSignInActivity extends AppCompatActivity {
                 firebase.createUser(newUser, new Firebase.OnUserCreatedListener() {
                     @Override
                     public void onUserCreated(String userId) {
-                        // Assign the id for the new user into the app
+                        // Assign the id for the new user into the app and confirm sign in
                         AppUser.setUserId(userId);
                         AppUser.setHasSignedIn(true);
 
-                        SharedPreferences preferences = FirstSignInActivity.this.getSharedPreferences("com.example.genzgpt",
-                                Context.MODE_PRIVATE);
+                        SharedPreferences preferences =
+                                FirstSignInActivity.this.getSharedPreferences(
+                                        "com.example.genzgpt", Context.MODE_PRIVATE);
 
+                        // Store info that the user has signed in for future app usage
                         preferences.edit().putBoolean("signIn", AppUser.getHasSignedIn()).apply();
                         Log.d("FirstsignIn", String.valueOf(AppUser.getHasSignedIn()));
                         preferences.edit().putString("id", AppUser.getUserId()).apply();
@@ -113,9 +116,10 @@ public class FirstSignInActivity extends AppCompatActivity {
                         Log.e("FSI UserId", userId);
                         Log.e("User Creation", "Successful User Creation");
 
-                        // FIXME UNCOMMENT THIS LINE
-                        // FirebaseMessages fms = new FirebaseMessages(getApplicationContext());
-                        // FMSFLow(userId);
+                        // Set up Firebase Messaging for this account.
+                        FirebaseMessages fms = new FirebaseMessages(getApplicationContext());
+                        fms.FMSFlow(userId);
+
                         finish();
                     }
 
