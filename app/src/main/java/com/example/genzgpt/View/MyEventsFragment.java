@@ -114,5 +114,8 @@ public class MyEventsFragment extends EventsFragment {
             }
         });
     }
-
+    @Override
+    protected boolean shouldShowCheckInQrCodeOption() {
+        return true;
+    }
 }

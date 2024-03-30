@@ -23,6 +23,7 @@ import com.example.genzgpt.R;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -180,14 +181,18 @@ abstract class EventsFragment extends Fragment {
                         .into(eventImage);
             }
 
+            // Inside the bind method of EventViewHolder in EventsFragment
             itemView.setOnClickListener(v -> {
-                // Context for creating AlertDialog
                 final Context context = v.getContext();
+                ArrayList<String> optionsList = new ArrayList<>(Arrays.asList("Registered Attendees", "Attendees", "Event Info", "Cancel"));
 
-                // Options for the user to select
-                final CharSequence[] options = {"Registered Attendees", "Attendees", "Event Info","Cancel"};
+                // Conditional option addition for MyEventsFragment
+                if (shouldShowCheckInQrCodeOption()) {
+                    optionsList.add(3, "View Check-In QR Code"); // Adding at index 3 before "Cancel"
+                }
 
-                // Creating AlertDialog.Builder
+                CharSequence[] options = optionsList.toArray(new CharSequence[0]);
+
                 AlertDialog.Builder builder = new AlertDialog.Builder(context);
                 builder.setTitle("Choose an option");
 
@@ -205,16 +210,18 @@ abstract class EventsFragment extends Fragment {
                         // Navigate to AttendeeListFragment
                         EventInfoFragment eventInfoFragment = new EventInfoFragment(event);
                         switchFragment(context, eventInfoFragment, R.id.BaseFragment);
-                    } else if (options[item].equals("Cancel")) {
+                    } else if (options[item].equals("View Check-In QR Code")) {
+                        CheckInQRCodeFragment checkInQRCodeFragment = new CheckInQRCodeFragment(event);
+                        switchFragment(context, checkInQRCodeFragment, R.id.BaseFragment);
+                    }
+                    else if (options[item].equals("Cancel")) {
                         dialog.dismiss();
                     }
                 });
 
-                // Showing the AlertDialog
                 builder.show();
             });
         }
-
 
         /**
          * A re-usable switch between two different fragments.
@@ -237,5 +244,7 @@ abstract class EventsFragment extends Fragment {
             fragmentTransaction.commit();
         }
     }
-
+    protected boolean shouldShowCheckInQrCodeOption() {
+        return false;
+    }
 }
