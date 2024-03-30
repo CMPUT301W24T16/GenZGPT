@@ -181,9 +181,10 @@ abstract class EventsFragment extends Fragment {
                         .into(eventImage);
             }
 
-            // Inside the bind method of EventViewHolder in EventsFragment
             itemView.setOnClickListener(v -> {
+                // Context for creating AlertDialog
                 final Context context = v.getContext();
+                // Options for the user to select
                 ArrayList<String> optionsList = new ArrayList<>(Arrays.asList("Registered Attendees", "Attendees", "Event Info", "Cancel"));
 
                 // Conditional option addition for MyEventsFragment
@@ -218,7 +219,7 @@ abstract class EventsFragment extends Fragment {
                         dialog.dismiss();
                     }
                 });
-
+                // Showing the AlertDialog
                 builder.show();
             });
         }
