@@ -1315,4 +1315,6 @@ public class Firebase {
 
         return AppUser.getHasSignedIn();
     }
+
+
 }

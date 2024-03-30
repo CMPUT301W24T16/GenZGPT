@@ -68,6 +68,11 @@ public class FirebaseMessages extends FirebaseMessagingService {
 
     }
 
+    /**
+     * Stores the device token in Firestore.
+     * @param token The device token to be stored.
+     * @param userId The ID of the user to store the device token for.
+     */
     private void storeDeviceTokenOnFirebase(String token, String userId){
         if (userId != null) {
             // Update the user document in Firestore with the device token
@@ -174,7 +179,7 @@ public class FirebaseMessages extends FirebaseMessagingService {
     public void FMSFlow(String userId){
         this.userId = userId;
         getDeviceToken(userId);
-        Log.d("FirebaseMessages", "FMSFlow: Device token retrieved");
+        Log.d("FirebaseMessages", "FMSFlow: Device token sent to Firestore");
     }
 
 }
