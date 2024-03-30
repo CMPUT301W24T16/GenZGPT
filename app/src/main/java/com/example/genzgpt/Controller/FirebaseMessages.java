@@ -2,7 +2,6 @@ package com.example.genzgpt.Controller;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.os.Message;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -10,6 +9,7 @@ import androidx.annotation.NonNull;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
@@ -23,22 +23,31 @@ import java.util.Map;
 public class FirebaseMessages extends FirebaseMessagingService {
 
     private final Context context;
+    private final FirebaseFirestore db;
+    private String userId;
+    private final int milestone1 = 1;
+    private final int milestone2 = 5;
+    private final int milestone3 = 10;
+    private final int milestone4 = 25;
+
 
     public FirebaseMessages(Context context) {
         this.context = context;
+        db = FirebaseFirestore.getInstance();
     }
 
     /**
      * Retrieves the device token from Firebase Cloud Messaging.
      */
-    public void getDeviceToken() {
+    public void getDeviceToken(String userId) {
         FirebaseMessaging.getInstance().getToken()
                 .addOnCompleteListener(new OnCompleteListener<String>() {
                     @Override
                     public void onComplete(@NonNull Task<String> task) {
                         if (task.isSuccessful()) {
                             String token = task.getResult();
-                            storeDeviceToken(token);
+                            storeDeviceTokenOnDevice(token);
+                            storeDeviceTokenOnFirebase(token, userId);
                         } else {
                             Log.e("FirebaseMessages", "Failed to retrieve device token", task.getException());
                             // Display an error message to the user if necessary
@@ -51,11 +60,33 @@ public class FirebaseMessages extends FirebaseMessagingService {
      * Stores the device token in SharedPreferences.
      * @param token The device token to be stored.
      */
-    private void storeDeviceToken(String token) {
+    private void storeDeviceTokenOnDevice(String token) {
         SharedPreferences preferences = context.getSharedPreferences("MyPrefs", Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = preferences.edit();
         editor.putString("deviceToken", token);
         editor.apply();
+
+    }
+
+    private void storeDeviceTokenOnFirebase(String token, String userId){
+        if (userId != null) {
+            // Update the user document in Firestore with the device token
+            db.collection("users").document(userId)
+                    .update("deviceToken", token)
+                    .addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            if (task.isSuccessful()) {
+                                Log.d("FirebaseMessages", "Device token stored in Firestore");
+                            } else {
+                                Log.e("FirebaseMessages", "Failed to store device token in Firestore", task.getException());
+                            }
+                        }
+                    });
+        }
+        else {
+            Log.e("FirebaseMessages", "User ID is null");
+        }
     }
 
     /**
@@ -102,7 +133,7 @@ public class FirebaseMessages extends FirebaseMessagingService {
 
     /**
      *displays a toast message when a message is sent successfully
-     * @param messageId
+     * @param messageId the id of the message
      */
     @Override
     public void onMessageSent(@NonNull String messageId) {
@@ -113,8 +144,8 @@ public class FirebaseMessages extends FirebaseMessagingService {
 
     /**
      *displays a toast message when a message is not sent successfully
-     * @param messageId
-     * @param exception
+     * @param messageId the id of the message
+     * @param exception the error thrown on failure
      */
     @Override
     public void onSendError(@NonNull String messageId, @NonNull Exception exception) {
@@ -126,21 +157,24 @@ public class FirebaseMessages extends FirebaseMessagingService {
 
     /**
      *displays a toast message when a new token is generated
-     * @param token
+     * @param token device token
      */
     @Override
     public void onNewToken(@NonNull String token) {
         super.onNewToken(token);
         // Update the stored device token
-        storeDeviceToken(token);
+        storeDeviceTokenOnDevice(token);
+        storeDeviceTokenOnFirebase(token, this.userId);
     }
 
     /**
-     * Sends the device token to the server.
-     * @param deviceToken The device token to be sent.
+     * This method is used to do the correct steps to handle account creation
+     * @param userId the id of the user
      */
-    public void sendDeviceTokenToFirebase(String deviceToken) {
-        // Send the device token to the server
-
+    public void FMSFlow(String userId){
+        this.userId = userId;
+        getDeviceToken(userId);
+        Log.d("FirebaseMessages", "FMSFlow: Device token retrieved");
     }
+
 }
