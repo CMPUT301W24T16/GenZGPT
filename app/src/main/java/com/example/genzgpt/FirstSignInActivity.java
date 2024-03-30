@@ -19,6 +19,7 @@ import android.widget.Switch;
 import android.widget.Toast;
 
 import com.example.genzgpt.Controller.Firebase;
+import com.example.genzgpt.Controller.FirebaseMessages;
 import com.example.genzgpt.Model.AppUser;
 import com.example.genzgpt.Model.User;
 import com.example.genzgpt.View.AdminLoginFragment;
@@ -32,8 +33,6 @@ public class FirstSignInActivity extends AppCompatActivity {
     EditText phoneNumber;
     Spinner theme;
     Switch geolocation;
-    AdminLoginFragment adminSignIn = new AdminLoginFragment();
-    private boolean isValidSignIn = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -113,6 +112,10 @@ public class FirstSignInActivity extends AppCompatActivity {
 
                         Log.e("FSI UserId", userId);
                         Log.e("User Creation", "Successful User Creation");
+
+                        // FIXME UNCOMMENT THIS LINE
+                        // FirebaseMessages fms = new FirebaseMessages(getApplicationContext());
+                        // FMSFLow(userId);
                         finish();
                     }
 
@@ -141,6 +144,14 @@ public class FirstSignInActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Checks if a name contains only letters.
+     * @param name
+     * The name that will be checked
+     *
+     * @return
+     * true if the name contains only letters.
+     */
     private boolean isValidName(String name) {
         if (name.isEmpty()) {
             return false;
@@ -156,6 +167,13 @@ public class FirstSignInActivity extends AppCompatActivity {
         return true;
     }
 
+    /**
+     * Checks if a phone number is valid based on certain parameters.
+     * @param phone
+     * The phone number to check.
+     * @return
+     * True if the phone number is valid.
+     */
     private boolean isValidPhone(String phone) {
         // FIXME May want to change number from 10
         return (phone.length() == 4 || phone.length() >= 10);
