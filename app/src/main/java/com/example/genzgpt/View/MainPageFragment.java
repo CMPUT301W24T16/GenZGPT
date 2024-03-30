@@ -37,6 +37,7 @@ public class MainPageFragment extends Fragment implements EventAdapter.EventClic
     private TextView userName;
     private List<Event> events = new ArrayList<>();
     private EventAdapter eventAdapter;
+    private User currentUser;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -47,7 +48,7 @@ public class MainPageFragment extends Fragment implements EventAdapter.EventClic
             public void onSettingButtonClick(Event event) {
                 Log.d("MainPageFragment", "Setting button clicked for event: " + event.getOrganizers());
             }
-        }, this); // 'this' refers to MainPageFragment which now implements EventClickListener
+        }, this);
     }
 
     @Override
@@ -113,7 +114,7 @@ public class MainPageFragment extends Fragment implements EventAdapter.EventClic
             @Override
             public void onUserLoaded(User user) {
                 greetUserBasedOnTime(user);
-            }
+                }
 
             @Override
             public void onUserNotFound() {
