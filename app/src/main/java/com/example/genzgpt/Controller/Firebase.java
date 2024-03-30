@@ -1168,6 +1168,12 @@ public class Firebase {
                 });
     }
 
+    /**
+     * Retrieves the event data from firebase
+     *
+     * @return the user details for a particular email.
+     * @param eventId
+     */
     public void getEventDataById(String eventId, OnEventLoadedListener listener) {
         db.collection("events")
                 .document(eventId)
@@ -1265,6 +1271,12 @@ public class Firebase {
                 });
     }
 
+    /**
+     * Retrieves the user data from Firebase.
+     *
+     * @return the user details for a particular email.
+     * @param id
+     */
     public boolean confirmUserExists(String id) {
         getUserData(id, new Firebase.OnUserLoadedListener() {
             @Override
