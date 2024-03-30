@@ -1348,4 +1348,48 @@ public class Firebase {
 
         void onAttendeeRemovalFailed(Exception e);
     }
+
+    /**
+     * change a past event into a new event, so the organizer can reuse the event ID.
+     * This will allow them to reuse QR codes that are associated with the event ID.
+     * it empties the list of registered attendees, checked-in attendees, and organizers.
+     * it then adds the current user as the organizer.
+     * @param eventId the event that will be updated
+     * @param newEventName the new name for the event
+     * @param newEventDate the new date for the event
+     * @param newLocation the new location for the event
+     * @param newMaxAttendees the new maximum number of attendees for the event
+     * @param newImageURL the new image URL for the event
+     * @param listener the listener for the event update
+     */
+    public void reusePastEvent(String userId, String eventId, String newEventName, Date newEventDate, String newLocation, int newMaxAttendees, String newImageURL, OnEventUpdatedListener listener) {
+        DocumentReference eventRef = db.collection("events").document(eventId);
+
+        Map<String, Object> updates = new HashMap<>();
+        updates.put("eventName", newEventName);
+        updates.put("eventDate", newEventDate);
+        updates.put("location", newLocation);
+        updates.put("maxAttendees", newMaxAttendees);
+        updates.put("imageURL", newImageURL);
+        updates.put("registeredAttendees", new ArrayList<>());
+        updates.put("checkedInAttendees", new ArrayList<>());
+        updates.put("organizers", new ArrayList<>());
+
+        //todo Will need updates as we change firebase schema
+
+        eventRef.update(updates)
+                .addOnSuccessListener(aVoid -> {
+                    Log.d("Firebase", "Event transformed successfully");
+                    //add the current user as the organizer
+                    eventRef.update("organizers", FieldValue.arrayUnion(userId))
+                            .addOnSuccessListener(aVoid1 -> {
+                                Log.d("Firebase", "Organizer added successfully");
+                            });
+                    listener.onEventUpdated();
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("Firebase", "Error transforming event: " + e.getMessage());
+                    listener.onEventUpdateFailed(e);
+                });
+    }
 }
