@@ -1,16 +1,21 @@
 package com.example.genzgpt.Controller;
 
+import android.Manifest;
+import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.util.Log;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
+import androidx.core.content.ContextCompat;
 
 import com.example.genzgpt.Model.AppNotification;
 import com.example.genzgpt.Model.MessageNotification;
@@ -250,7 +255,17 @@ public class FirebaseMessages extends FirebaseMessagingService {
             manager.createNotificationChannel(channel);
         }
 
-        manager.notify(id, displayable);
+        // TODO CONFIRM THAT THIS ACTUALLY WORKS ON A DEVICE
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS)
+                    == PackageManager.PERMISSION_GRANTED) {
+                manager.notify(id, displayable);
+            }
+        }
+        else {
+            manager.notify(id, displayable);
+        }
+
     }
 
     /**

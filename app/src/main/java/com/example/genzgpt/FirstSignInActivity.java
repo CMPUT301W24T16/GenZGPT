@@ -4,10 +4,13 @@ import static java.lang.Character.isLetter;
 import static java.lang.Long.parseLong;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -50,6 +53,8 @@ public class FirstSignInActivity extends AppCompatActivity {
 
         theme = findViewById(R.id.theme_spinner);
         geolocation = findViewById(R.id.geolocation_switch);
+
+        requestNotificationPermissions();
 
         profileButton.setOnClickListener( v -> {
             // Get the information for a user profile.
@@ -116,7 +121,7 @@ public class FirstSignInActivity extends AppCompatActivity {
                         Log.e("FSI UserId", userId);
                         Log.e("User Creation", "Successful User Creation");
 
-                        // Set up Firebase Messaging for this account.
+                        // Set up Firebase Messaging for this user.
                         FirebaseMessages fms = new FirebaseMessages(getApplicationContext());
                         fms.FMSFlow(userId);
 
@@ -176,15 +181,43 @@ public class FirstSignInActivity extends AppCompatActivity {
      * @param phone
      * The phone number to check.
      * @return
-     * True if the phone number is valid.
+     * True if the phone number is valid. False Otherwise.
      */
     private boolean isValidPhone(String phone) {
         // FIXME May want to change number from 10
         return (phone.length() == 4 || phone.length() >= 10);
     }
 
+    /**
+     * Checks if the email provided is valid based on certain parameters.
+     * @param email
+     * The email to verify is valid.
+     * @return
+     * True if the email is valid. False otherwise.
+     */
     private boolean isValidEmail(String email) {
         // FIXME NEED TO GET JAVA EMAIL package
         return (!email.isEmpty());
     }
+
+    /**
+     * Requests permission to receive push notifications from the app.
+     */
+   private void requestNotificationPermissions() {
+        // if we are on a build that requires this request
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+
+            // if the permission has not been given already somehow
+            if (ActivityCompat.checkSelfPermission(getApplicationContext(),
+                   android.Manifest.permission.POST_NOTIFICATIONS)
+                    != PackageManager.PERMISSION_GRANTED) {
+
+                ActivityCompat.requestPermissions(this,
+                        new String[]{android.Manifest.permission.POST_NOTIFICATIONS}, 7);
+            }
+
+        }
+
+    }
+
 }
