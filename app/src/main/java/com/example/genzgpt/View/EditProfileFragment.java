@@ -66,8 +66,6 @@ public class EditProfileFragment extends DialogFragment {
                 result -> {
                     if (result != null) {
                         ImageViewUpdater.updateImageView(getActivity(), result, profilePicture);
-                        profilePicture.setScaleType(ImageView.ScaleType.CENTER_CROP);
-                        profilePicture.setLayoutParams(new LinearLayout.LayoutParams(350, 350));
                         selectedImageUri = result;
                     }
                 });

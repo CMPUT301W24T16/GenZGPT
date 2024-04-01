@@ -8,8 +8,8 @@
 
     <ImageView
         android:id="@+id/event_poster"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
+        android:layout_width="400dp"
+        android:layout_height="225dp"
         android:background="@drawable/rounded_black_background"
         android:src="@drawable/ic_launcher_foreground"
         app:layout_constraintDimensionRatio="16:9"
