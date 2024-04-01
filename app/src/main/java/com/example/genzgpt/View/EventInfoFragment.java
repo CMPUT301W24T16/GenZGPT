@@ -159,8 +159,8 @@ public class EventInfoFragment extends Fragment {
         String savedImageURL = MediaStore.Images.Media.insertImage(
                 requireContext().getContentResolver(),
                 bitmap,
-                event.getEventName(), // Use event name as part of the image title
-                "QR Code for " + event.getEventName()); // Use event name as part of the image description
+                event.getEventName() +" Registration", // Use event name as part of the image title
+                "Registration QR Code for " + event.getEventName()); // Use event name as part of the image description
 
         if (savedImageURL == null) {
             Toast.makeText(getContext(), "Failed to save QR code", Toast.LENGTH_SHORT).show();

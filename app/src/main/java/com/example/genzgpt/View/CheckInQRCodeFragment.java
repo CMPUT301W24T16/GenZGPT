@@ -1,11 +1,17 @@
 package com.example.genzgpt.View;
 
+import android.app.AlertDialog;
 import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
+import android.provider.MediaStore;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.Toast;
+
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import com.example.genzgpt.Model.Event;
@@ -52,7 +58,39 @@ public class CheckInQRCodeFragment extends Fragment {
             Bitmap checkInQrCode = QRCodeGenerator.generateCheckInQRCode(event.getEventId(), 200, 200);
             if (checkInQrCode != null) {
                 qrCodeImageView.setImageBitmap(checkInQrCode);
+                qrCodeImageView.setOnClickListener(v -> showSaveQrCodeDialog());
             }
+        }
+    }
+    private void showSaveQrCodeDialog() {
+        new AlertDialog.Builder(getContext())
+                .setTitle("Save QR Code")
+                .setMessage("Do you want to save this QR code to your device?")
+                .setPositiveButton("Yes", (dialog, which) -> saveQrCodeToDevice())
+                .setNegativeButton("No", (dialog, which) -> dialog.dismiss())
+                .create().show();
+    }
+    private void saveQrCodeToDevice() {
+        if (qrCodeImageView.getDrawable() == null) {
+            Toast.makeText(getContext(), "QR Code image is not available", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Convert ImageView content to Bitmap
+        Bitmap bitmap = ((BitmapDrawable) qrCodeImageView.getDrawable()).getBitmap();
+
+        // Use MediaStore to save the bitmap
+        String savedImageURL = MediaStore.Images.Media.insertImage(
+                requireContext().getContentResolver(),
+                bitmap,
+                event.getEventName() + " Check-in", // Use event name as part of the image title
+                "Check-in QR Code for " + event.getEventName()); // Use event name as part of the image description
+
+        if (savedImageURL == null) {
+            Toast.makeText(getContext(), "Failed to save QR code", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(getContext(), "QR Code saved to Gallery", Toast.LENGTH_SHORT).show();
+            Log.d("EventInfoFragment", "Image saved to: " + savedImageURL);
         }
     }
 }
