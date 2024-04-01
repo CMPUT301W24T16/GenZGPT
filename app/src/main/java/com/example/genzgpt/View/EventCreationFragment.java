@@ -1,42 +1,30 @@
 package com.example.genzgpt.View;
 
-import android.app.Activity;
 import android.app.DatePickerDialog;
-import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import androidx.activity.OnBackPressedCallback;
-import androidx.activity.result.ActivityResult;
-import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentResultListener;
-import com.google.firebase.firestore.FirebaseFirestore;
 
-import com.example.genzgpt.Controller.GalleryHandler;
 import com.example.genzgpt.Controller.ImageViewUpdater;
-import com.example.genzgpt.MainActivity;
 import com.example.genzgpt.Model.Event;
 import com.example.genzgpt.Model.User;
 import com.example.genzgpt.R;
 import com.google.android.material.appbar.MaterialToolbar;
-import com.google.firebase.firestore.FirebaseFirestore;
 import com.example.genzgpt.Controller.Firebase;
 import com.example.genzgpt.Model.AppUser;
 
@@ -98,6 +86,9 @@ public class EventCreationFragment extends Fragment {
         });
     }
 
+    /**
+     * Shows a DatePickerDialog to allow the user to select the event date.
+     */
     private void showDatePickerDialog() {
         int year = eventDateCalendar.get(Calendar.YEAR);
         int month = eventDateCalendar.get(Calendar.MONTH);
@@ -113,18 +104,26 @@ public class EventCreationFragment extends Fragment {
         datePickerDialog.show();
     }
 
+    /**
+     * Updates the eventDateEditText field with the selected date.
+     */
     private void updateLabel() {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         eventDateEditText.setText(sdf.format(eventDateCalendar.getTime()));
     }
 
+    /**
+     * Gathers input from the user and attempts to create a new event. Performs validation
+     * to ensure required fields are filled and that maxAttendees, if provided, is an integer.
+     * Shows a toast message if validation fails or if the event creation is successful.
+     */
     private void createEvent() {
         String eventName = eventNameEditText.getText().toString();
         String location = locationEditText.getText().toString();
         String maxAttendeesStr = maxAttendeesEditText.getText().toString();
         int maxAttendees = Integer.MAX_VALUE; // Default if no input
         if (TextUtils.isEmpty(eventName) || eventDateCalendar == null || TextUtils.isEmpty(location)) {
-            Toast.makeText(getContext(), "Please full all required fields.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), "Please fill all required fields.", Toast.LENGTH_SHORT).show();
             return;
         }
         String imageURL = null; // Initialize imageURL to null
@@ -161,6 +160,15 @@ public class EventCreationFragment extends Fragment {
         }
     }
 
+    /**
+     * Helper method to finalize event creation, including uploading the event image
+     * (if selected) to Firebase Storage and saving the event details to Firestore.
+     *
+     * @param eventName The name of the event.
+     * @param location The location of the event.
+     * @param imageURL The URL of the uploaded event image; null if no image was selected.
+     * @param maxAttendees The maximum number of attendees; defaults to Integer.MAX_VALUE if not specified.
+     */
     private void createAndSaveEvent(String eventName, String location, @Nullable String imageURL, Integer maxAttendees) {
         Event newEvent = new Event(
                 "",
@@ -192,6 +200,9 @@ public class EventCreationFragment extends Fragment {
         getParentFragmentManager().popBackStack();
     }
 
+    /**
+     * Initiates the process of selecting an image from the device's gallery.
+     */
     private void selectImage() {
         galleryLauncher.launch("image/*");
     }
