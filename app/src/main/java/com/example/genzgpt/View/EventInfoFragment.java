@@ -79,7 +79,7 @@ public class EventInfoFragment extends Fragment {
             }
         });
 
-        view.findViewById(R.id.back_button).setOnClickListener(v -> getParentFragmentManager().popBackStack());
+        view.findViewById(R.id.backArrowImageView).setOnClickListener(v -> getParentFragmentManager().popBackStack());
         return view;
     }
 
