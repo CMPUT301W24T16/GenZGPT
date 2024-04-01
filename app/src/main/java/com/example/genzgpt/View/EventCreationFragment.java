@@ -45,7 +45,7 @@ import java.util.Calendar;
 
 public class EventCreationFragment extends Fragment {
 
-    private EditText eventNameEditText, eventDateEditText, locationEditText;
+    private EditText eventNameEditText, eventDateEditText, locationEditText, maxAttendeesEditText;
     private ImageView eventImageView;
     private Button selectImageButton, createEventButton;
     private Calendar eventDateCalendar;
@@ -70,6 +70,7 @@ public class EventCreationFragment extends Fragment {
         eventImageView = view.findViewById(R.id.eventImageView);
         selectImageButton = view.findViewById(R.id.selectImageButton);
         createEventButton = view.findViewById(R.id.createEventButton);
+        maxAttendeesEditText = view.findViewById(R.id.maxAttendeesEditText);
 
         eventDateEditText.setOnClickListener(v -> showDatePickerDialog());
         createEventButton.setOnClickListener(v -> createEvent());
