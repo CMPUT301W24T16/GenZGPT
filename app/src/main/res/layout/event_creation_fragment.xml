@@ -88,6 +88,7 @@
             android:id="@+id/maxAttendeesEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:inputType="number"
             android:hint="Max Attendees (optional)" />
     </com.google.android.material.textfield.TextInputLayout>
 

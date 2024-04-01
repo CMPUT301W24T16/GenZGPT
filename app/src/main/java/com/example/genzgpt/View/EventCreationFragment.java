@@ -121,19 +121,32 @@ public class EventCreationFragment extends Fragment {
     private void createEvent() {
         String eventName = eventNameEditText.getText().toString();
         String location = locationEditText.getText().toString();
+        String maxAttendeesStr = maxAttendeesEditText.getText().toString();
+        int maxAttendees = Integer.MAX_VALUE; // Default if no input
         if (TextUtils.isEmpty(eventName) || eventDateCalendar == null || TextUtils.isEmpty(location)) {
+            Toast.makeText(getContext(), "Please full all required fields.", Toast.LENGTH_SHORT).show();
             return;
         }
-
         String imageURL = null; // Initialize imageURL to null
+
+        // Check if maxAttendeesStr is not empty and is an integer
+        if (!maxAttendeesStr.isEmpty()) {
+            try {
+                maxAttendees = Integer.parseInt(maxAttendeesStr);
+            } catch (NumberFormatException e) {
+                Toast.makeText(getContext(), "Max attendees field must to be an integer or empty.", Toast.LENGTH_SHORT).show();
+                return; // Stop the method execution if input is not valid
+            }
+        }
 
         if (selectedImageUri != null) {
             // Upload image to Firebase Storage and get the download URL
+            int finalMaxAttendees = maxAttendees;
             Firebase.uploadImageAndGetUrl("event_images/" + System.currentTimeMillis() + ".jpg", selectedImageUri, new Firebase.OnUploadCompleteListener() {
                 @Override
                 public void onUploadComplete(String imageURL) {
                     // Image upload is complete, now create the Event
-                    createAndSaveEvent(eventName, location, imageURL);
+                    createAndSaveEvent(eventName, location, imageURL, finalMaxAttendees);
                 }
 
                 @Override
@@ -144,17 +157,17 @@ public class EventCreationFragment extends Fragment {
             });
         } else {
             // If selectedImageUri is null, proceed to create event without imageURL
-            createAndSaveEvent(eventName, location, null);
+            createAndSaveEvent(eventName, location, null, maxAttendees);
         }
     }
 
-    private void createAndSaveEvent(String eventName, String location, @Nullable String imageURL) {
+    private void createAndSaveEvent(String eventName, String location, @Nullable String imageURL, Integer maxAttendees) {
         Event newEvent = new Event(
                 "",
                 eventName,
                 eventDateCalendar.getTime(),
                 location,
-                100,
+                maxAttendees,
                 imageURL
         );
         // Add the new event to Firebase
