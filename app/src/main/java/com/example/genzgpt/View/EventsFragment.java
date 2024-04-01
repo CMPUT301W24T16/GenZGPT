@@ -185,11 +185,19 @@ abstract class EventsFragment extends Fragment {
                 // Context for creating AlertDialog
                 final Context context = v.getContext();
                 // Options for the user to select
-                ArrayList<String> optionsList = new ArrayList<>(Arrays.asList("Registered Attendees", "Attendees", "Event Info", "Cancel"));
+                ArrayList<String> optionsList = new ArrayList<>(Arrays.asList("Event Info", "Cancel"));
 
                 // Conditional option addition for MyEventsFragment
                 if (shouldShowCheckInQrCodeOption()) {
-                    optionsList.add(3, "View Check-In QR Code"); // Adding at index 3 before "Cancel"
+                    optionsList.add(1, "View Check-In QR Code");
+                }
+                // Conditional option addition for MyEventsFragment
+                if (shouldShowRegisteredAttendeesOption()) {
+                    optionsList.add(2, "Registered Attendees");
+                }
+                // Conditional option addition for MyEventsFragment
+                if (shouldShowCheckedInAttendeesOption()) {
+                    optionsList.add(3, "Attendees");
                 }
 
                 CharSequence[] options = optionsList.toArray(new CharSequence[0]);
@@ -246,6 +254,12 @@ abstract class EventsFragment extends Fragment {
         }
     }
     protected boolean shouldShowCheckInQrCodeOption() {
+        return false;
+    }
+    protected boolean shouldShowRegisteredAttendeesOption() {
+        return false;
+    }
+    protected boolean shouldShowCheckedInAttendeesOption() {
         return false;
     }
 }

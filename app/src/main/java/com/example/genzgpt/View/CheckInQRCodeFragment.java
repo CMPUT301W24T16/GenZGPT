@@ -32,6 +32,16 @@ public class CheckInQRCodeFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_check_in_qr_code, container, false);
         qrCodeImageView = view.findViewById(R.id.qr_code_image_view);
+        ImageView backArrowImageView = view.findViewById(R.id.backArrowImageView);
+        backArrowImageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Perform action on back arrow click, typically go back
+                if (getActivity() != null) {
+                    getActivity().onBackPressed();
+                }
+            }
+        });
         displayCheckInQrCode();
         return view;
     }

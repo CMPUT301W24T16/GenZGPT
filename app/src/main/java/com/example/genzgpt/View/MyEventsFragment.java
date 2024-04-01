@@ -118,4 +118,12 @@ public class MyEventsFragment extends EventsFragment {
     protected boolean shouldShowCheckInQrCodeOption() {
         return true;
     }
+    @Override
+    protected boolean shouldShowRegisteredAttendeesOption() {
+        return true;
+    }
+    @Override
+    protected boolean shouldShowCheckedInAttendeesOption() {
+        return true;
+    }
 }
