@@ -3,10 +3,13 @@ package com.example.genzgpt.View;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -34,6 +37,7 @@ abstract class EventsFragment extends Fragment {
     protected RecyclerView recyclerView;
     protected EventAdapter eventAdapter;
     protected List<Event> eventList;
+    protected List<Event> originalEventList = new ArrayList<>();
     protected Firebase firebase;
 
     // All EventsFragment subclasses will fetchEvents, but which they fetch will differ.
@@ -60,17 +64,49 @@ abstract class EventsFragment extends Fragment {
         recyclerView = view.findViewById(R.id.eventsRecyclerView);
         recyclerView.addItemDecoration(new SpacingItemDecoration(spacingInPixels));
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-
+        EditText searchEditText = view.findViewById(R.id.searchEditText);
         eventList = new ArrayList<>();
         eventAdapter = new EventAdapter(eventList);
         recyclerView.setAdapter(eventAdapter);
-
         firebase = new Firebase();
+
+        searchEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                // Filter the events as the user types
+                filterEvents(s.toString());
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
+        });
 
         // Fetch the list of events from Firestore and update the RecyclerView
         fetchEvents();
 
         return view;
+    }
+
+    /**
+     * Filters the event list based on a query and updates the RecyclerView.
+     *
+     * @param query The text to filter the event list by.
+     */
+    protected void filterEvents(String query) {
+        List<Event> filteredList = new ArrayList<>();
+        for (Event event : originalEventList) {
+            if (event.getEventName().toLowerCase().contains(query.toLowerCase())) {
+                filteredList.add(event);
+            }
+        }
+
+        // Update the RecyclerView with the filtered list
+        eventAdapter.setEvents(filteredList);
     }
 
     /**

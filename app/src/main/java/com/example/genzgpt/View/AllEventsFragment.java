@@ -25,12 +25,14 @@ public class AllEventsFragment extends EventsFragment {
      * Fetches all events from Firestore and updates the RecyclerView
      */
     protected void fetchEvents() {
-        eventList.clear();
         firebase.fetchEvents(new Firebase.OnEventsLoadedListener() {
             @Override
-            public void onEventsLoaded(List<Event> loadedEvents) {
+            public void onEventsLoaded(List<Event> events) {
                 eventList.clear();
-                eventList.addAll(loadedEvents);
+                eventList.addAll(events);
+                // Also update the originalEventList with the fetched events
+                originalEventList.clear();
+                originalEventList.addAll(events);
                 eventAdapter.notifyDataSetChanged();
             }
 
