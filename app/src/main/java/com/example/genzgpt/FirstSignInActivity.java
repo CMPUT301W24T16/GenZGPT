@@ -4,10 +4,13 @@ import static java.lang.Character.isLetter;
 import static java.lang.Long.parseLong;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -19,6 +22,7 @@ import android.widget.Switch;
 import android.widget.Toast;
 
 import com.example.genzgpt.Controller.Firebase;
+import com.example.genzgpt.Controller.FirebaseMessages;
 import com.example.genzgpt.Model.AppUser;
 import com.example.genzgpt.Model.User;
 import com.example.genzgpt.View.AdminLoginFragment;
@@ -32,8 +36,6 @@ public class FirstSignInActivity extends AppCompatActivity {
     EditText phoneNumber;
     Spinner theme;
     Switch geolocation;
-    AdminLoginFragment adminSignIn = new AdminLoginFragment();
-    private boolean isValidSignIn = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +54,8 @@ public class FirstSignInActivity extends AppCompatActivity {
         theme = findViewById(R.id.theme_spinner);
         geolocation = findViewById(R.id.geolocation_switch);
 
+        requestNotificationPermissions();
+
         profileButton.setOnClickListener( v -> {
             // Get the information for a user profile.
             String firstName = profileFirstName.getText().toString().trim();
@@ -66,6 +70,7 @@ public class FirstSignInActivity extends AppCompatActivity {
             // FIXME Put procedural generation here
             String imageURL = null;
 
+            // Check if input parameters are valid
             boolean isValidFirst = isValidName(firstName);
             boolean isValidLast = isValidName(lastName);
             boolean isValidPhone = isValidPhone(phoneStr);
@@ -100,19 +105,26 @@ public class FirstSignInActivity extends AppCompatActivity {
                 firebase.createUser(newUser, new Firebase.OnUserCreatedListener() {
                     @Override
                     public void onUserCreated(String userId) {
-                        // Assign the id for the new user into the app
+                        // Assign the id for the new user into the app and confirm sign in
                         AppUser.setUserId(userId);
                         AppUser.setHasSignedIn(true);
 
-                        SharedPreferences preferences = FirstSignInActivity.this.getSharedPreferences("com.example.genzgpt",
-                                Context.MODE_PRIVATE);
+                        SharedPreferences preferences =
+                                FirstSignInActivity.this.getSharedPreferences(
+                                        "com.example.genzgpt", Context.MODE_PRIVATE);
 
+                        // Store info that the user has signed in for future app usage
                         preferences.edit().putBoolean("signIn", AppUser.getHasSignedIn()).apply();
                         Log.d("FirstsignIn", String.valueOf(AppUser.getHasSignedIn()));
                         preferences.edit().putString("id", AppUser.getUserId()).apply();
 
                         Log.e("FSI UserId", userId);
                         Log.e("User Creation", "Successful User Creation");
+
+                        // Set up Firebase Messaging for this user.
+                        FirebaseMessages fms = new FirebaseMessages(getApplicationContext());
+                        fms.FMSFlow(userId);
+
                         finish();
                     }
 
@@ -141,6 +153,14 @@ public class FirstSignInActivity extends AppCompatActivity {
         });
     }
 
+    /**
+     * Checks if a name contains only letters.
+     * @param name
+     * The name that will be checked
+     *
+     * @return
+     * true if the name contains only letters.
+     */
     private boolean isValidName(String name) {
         if (name.isEmpty()) {
             return false;
@@ -156,13 +176,48 @@ public class FirstSignInActivity extends AppCompatActivity {
         return true;
     }
 
+    /**
+     * Checks if a phone number is valid based on certain parameters.
+     * @param phone
+     * The phone number to check.
+     * @return
+     * True if the phone number is valid. False Otherwise.
+     */
     private boolean isValidPhone(String phone) {
         // FIXME May want to change number from 10
         return (phone.length() == 4 || phone.length() >= 10);
     }
 
+    /**
+     * Checks if the email provided is valid based on certain parameters.
+     * @param email
+     * The email to verify is valid.
+     * @return
+     * True if the email is valid. False otherwise.
+     */
     private boolean isValidEmail(String email) {
         // FIXME NEED TO GET JAVA EMAIL package
         return (!email.isEmpty());
     }
+
+    /**
+     * Requests permission to receive push notifications from the app.
+     */
+   private void requestNotificationPermissions() {
+        // if we are on a build that requires this request
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+
+            // if the permission has not been given already somehow
+            if (ActivityCompat.checkSelfPermission(getApplicationContext(),
+                   android.Manifest.permission.POST_NOTIFICATIONS)
+                    != PackageManager.PERMISSION_GRANTED) {
+
+                ActivityCompat.requestPermissions(this,
+                        new String[]{android.Manifest.permission.POST_NOTIFICATIONS}, 7);
+            }
+
+        }
+
+    }
+
 }
