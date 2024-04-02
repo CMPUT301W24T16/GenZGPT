@@ -3,10 +3,13 @@ package com.example.genzgpt.View;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -23,6 +26,7 @@ import com.example.genzgpt.R;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import com.google.firebase.firestore.FirebaseFirestore;
 
@@ -33,6 +37,7 @@ abstract class EventsFragment extends Fragment {
     protected RecyclerView recyclerView;
     protected EventAdapter eventAdapter;
     protected List<Event> eventList;
+    protected List<Event> originalEventList = new ArrayList<>();
     protected Firebase firebase;
 
     // All EventsFragment subclasses will fetchEvents, but which they fetch will differ.
@@ -59,17 +64,49 @@ abstract class EventsFragment extends Fragment {
         recyclerView = view.findViewById(R.id.eventsRecyclerView);
         recyclerView.addItemDecoration(new SpacingItemDecoration(spacingInPixels));
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-
+        EditText searchEditText = view.findViewById(R.id.searchEditText);
         eventList = new ArrayList<>();
         eventAdapter = new EventAdapter(eventList);
         recyclerView.setAdapter(eventAdapter);
-
         firebase = new Firebase();
+
+        searchEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                // Filter the events as the user types
+                filterEvents(s.toString());
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
+        });
 
         // Fetch the list of events from Firestore and update the RecyclerView
         fetchEvents();
 
         return view;
+    }
+
+    /**
+     * Filters the event list based on a query and updates the RecyclerView.
+     *
+     * @param query The text to filter the event list by.
+     */
+    protected void filterEvents(String query) {
+        List<Event> filteredList = new ArrayList<>();
+        for (Event event : originalEventList) {
+            if (event.getEventName().toLowerCase().contains(query.toLowerCase())) {
+                filteredList.add(event);
+            }
+        }
+
+        // Update the RecyclerView with the filtered list
+        eventAdapter.setEvents(filteredList);
     }
 
     /**
@@ -183,11 +220,24 @@ abstract class EventsFragment extends Fragment {
             itemView.setOnClickListener(v -> {
                 // Context for creating AlertDialog
                 final Context context = v.getContext();
-
                 // Options for the user to select
-                final CharSequence[] options = {"Registered Attendees", "Attendees", "Event Info","Cancel"};
+                ArrayList<String> optionsList = new ArrayList<>(Arrays.asList("Event Info", "Cancel"));
 
-                // Creating AlertDialog.Builder
+                // Conditional option addition for MyEventsFragment
+                if (shouldShowCheckInQrCodeOption()) {
+                    optionsList.add(1, "View Check-In QR Code");
+                }
+                // Conditional option addition for MyEventsFragment
+                if (shouldShowRegisteredAttendeesOption()) {
+                    optionsList.add(2, "Registered Attendees");
+                }
+                // Conditional option addition for MyEventsFragment
+                if (shouldShowCheckedInAttendeesOption()) {
+                    optionsList.add(3, "Attendees");
+                }
+
+                CharSequence[] options = optionsList.toArray(new CharSequence[0]);
+
                 AlertDialog.Builder builder = new AlertDialog.Builder(context);
                 builder.setTitle("Choose an option");
 
@@ -205,16 +255,18 @@ abstract class EventsFragment extends Fragment {
                         // Navigate to AttendeeListFragment
                         EventInfoFragment eventInfoFragment = new EventInfoFragment(event);
                         switchFragment(context, eventInfoFragment, R.id.BaseFragment);
-                    } else if (options[item].equals("Cancel")) {
+                    } else if (options[item].equals("View Check-In QR Code")) {
+                        CheckInQRCodeFragment checkInQRCodeFragment = new CheckInQRCodeFragment(event);
+                        switchFragment(context, checkInQRCodeFragment, R.id.BaseFragment);
+                    }
+                    else if (options[item].equals("Cancel")) {
                         dialog.dismiss();
                     }
                 });
-
                 // Showing the AlertDialog
                 builder.show();
             });
         }
-
 
         /**
          * A re-usable switch between two different fragments.
@@ -237,5 +289,13 @@ abstract class EventsFragment extends Fragment {
             fragmentTransaction.commit();
         }
     }
-
+    protected boolean shouldShowCheckInQrCodeOption() {
+        return false;
+    }
+    protected boolean shouldShowRegisteredAttendeesOption() {
+        return false;
+    }
+    protected boolean shouldShowCheckedInAttendeesOption() {
+        return false;
+    }
 }
