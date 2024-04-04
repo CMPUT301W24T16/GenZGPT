@@ -41,8 +41,7 @@ public class EventInfoFragment extends Fragment {
     private ImageView eventImageView, qrCodeImageView;
     private Firebase firebase;
     private Button signUpButton;
-    private boolean isUserSignedUp = false;
-//    AppUser appUserInstance = AppUser.getInstance();
+    private boolean isUserSignedUp;
 
 
     /**
@@ -67,10 +66,12 @@ public class EventInfoFragment extends Fragment {
         // Inflates the layout and initializes UI components
         View view = inflater.inflate(R.layout.event_info_fragment, container, false);
         initializeViews(view);
+
+
         displayEventData();
         firebase = new Firebase();
-
         signUpButton = view.findViewById(R.id.sign_up_button);
+        checkUserRegistrationStatus();
         signUpButton.setOnClickListener(v -> {
             if (!isUserSignedUp) {
                 signUpForEvent();
@@ -94,6 +95,26 @@ public class EventInfoFragment extends Fragment {
             }
         });
     }
+
+    private void checkUserRegistrationStatus() {
+        String currentUserId = AppUser.getUserId();
+        // Ensure there is a user ID to check against
+        if (currentUserId != null) {
+            if (event.getRegisteredAttendees() != null && event.getRegisteredAttendees().contains(currentUserId)) {
+                isUserSignedUp = true;
+                signUpButton.setText("Withdraw");
+            } else if (event.getOrganizers() != null && event.getOrganizers().contains(currentUserId)) {
+                signUpButton.setVisibility(View.GONE);
+            } else {
+                isUserSignedUp = false;
+                signUpButton.setText("Sign Up");
+            }
+        } else {
+            // Handle the scenario where there is no valid user ID
+            signUpButton.setEnabled(false);
+        }
+    }
+
 
     private void initializeViews(View view) {
         // Initialization logic
@@ -128,6 +149,7 @@ public class EventInfoFragment extends Fragment {
                 // Set an OnClickListener for the ImageView
                 qrCodeImageView.setOnClickListener(v -> showSaveQrCodeDialog());
             }
+//
         }
     }
 
@@ -173,8 +195,7 @@ public class EventInfoFragment extends Fragment {
     }
 
     public void withdrawFromEvent() {
-        // Implement logic to withdraw the user from the event
-//        fetchUserData(AppUser.getInstance().getEmail(), false);
+        fetchUserData(AppUser.getUserId(), false);
     }
 
     /**
@@ -186,6 +207,7 @@ public class EventInfoFragment extends Fragment {
      */
     private void fetchUserData(String userId, boolean isSignUp) {
         firebase.getUserData(userId, new Firebase.OnUserLoadedListener() {
+
             @Override
             public void onUserLoaded(User user) {
 
@@ -246,10 +268,23 @@ public class EventInfoFragment extends Fragment {
      * @param user The user to unregister from the event.
      */
     private void unregisterUserFromEvent(User user) {
-        // Implement the logic to unregister the user from the event
-        // After successfully unregistering, update the button and flag
-        Toast.makeText(getContext(), "You have withdrawn from the event!", Toast.LENGTH_SHORT).show();
-        isUserSignedUp = false;
-        signUpButton.setText("Sign Up");
+        firebase.removeUserFromRegisteredAttendees(event.getEventId(), user.getId(), new Firebase.OnAttendeeRemovedListener() {
+            @Override
+            public void onAttendeeRemoved() {
+                Toast.makeText(getContext(), "You have withdrawn from the event.", Toast.LENGTH_SHORT).show();
+                isUserSignedUp = false;
+                if (getActivity() != null) {
+                    getActivity().runOnUiThread(() -> {
+                        getParentFragmentManager().popBackStack();
+                    });
+                }
+            }
+
+            @Override
+            public void onAttendeeRemovalFailed(Exception e) {
+                Toast.makeText(getContext(), "Failed to withdraw from the event.", Toast.LENGTH_SHORT).show();
+            }
+        });
     }
+
 }
