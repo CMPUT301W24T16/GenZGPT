@@ -1,9 +1,13 @@
 package com.example.genzgpt.Controller;
 
 
+import static androidx.camera.core.impl.utils.ContextUtil.getApplicationContext;
+
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.location.Address;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -17,6 +21,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
+
 import com.example.genzgpt.R;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
@@ -26,6 +31,10 @@ import org.osmdroid.tileprovider.tilesource.TileSourceFactory;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
 import org.osmdroid.views.overlay.Marker;
+//import org.osmdroid.nominatim
+
+import java.io.IOException;
+import java.util.List;
 
 /**
  * This class handles Geolocation Tracking for the user, includes permission requests and location pulls.
@@ -52,13 +61,10 @@ public class GeolocationTracking extends Fragment implements LocationListener {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view;
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(getActivity());
-        if (checkPermission(android.Manifest.permission.ACCESS_FINE_LOCATION)){
-            view = inflater.inflate(R.layout.map_view_fragment, container, false);
-        } else {
+        if(!(checkPermission(android.Manifest.permission.ACCESS_FINE_LOCATION))){
             requestPermission();
-            view = inflater.inflate(R.layout.map_view_fragment, container, false);
-
         }
+        view = inflater.inflate(R.layout.map_view_fragment, container, false);
         return view;
     }
 
@@ -93,6 +99,22 @@ public class GeolocationTracking extends Fragment implements LocationListener {
             }
         }
     }
+    /*
+    private GeoPoint getLocationFromAddress(String address) {
+        GeoPoint geoPoint = null;
+        try {
+            @SuppressLint("RestrictedAPI")
+            List<Address> addresses = new Nominatim(getApplicationContext(requireActivity())).getFromLocationName(address, 1);
+            if (addresses != null && !addresses.isEmpty()) {
+                Address firstAddress = addresses.get(0);
+                geoPoint = new GeoPoint(firstAddress.getLatitude(), firstAddress.getLongitude());
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return geoPoint;
+    }
+     */
 
     @Override
     public void onLocationChanged(Location location) {

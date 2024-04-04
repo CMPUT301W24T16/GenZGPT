@@ -1,5 +1,6 @@
 package com.example.genzgpt.Model;
 
+import android.app.Notification;
 import android.content.Context;
 
 import androidx.annotation.NonNull;
@@ -9,7 +10,7 @@ import androidx.core.app.NotificationCompat;
  * The General Structure for a notification that is used in this app.
  * FIXME: Currently does nothing
  */
-abstract class AppNotification {
+public abstract class AppNotification {
     /**
      * The message that the notification will be sent with.
      */
@@ -49,7 +50,7 @@ abstract class AppNotification {
      * @return
      *      The method of building the specific notification that should be sent out.
      */
-    abstract NotificationCompat.Builder getBuilder(@NonNull Context context);
+   public abstract Notification getDisplayable(@NonNull Context context);
 
     /**
      * Allows access to the channelID of an AppNotification.
@@ -82,6 +83,7 @@ abstract class AppNotification {
     /**
      * A getter for the notificationID for a specific
      * @return
+     * The unique identifier for the notification.
      */
     public int getNotificationID() {
         return notificationID;

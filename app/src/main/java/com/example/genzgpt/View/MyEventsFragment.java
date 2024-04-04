@@ -5,16 +5,24 @@ import android.os.Bundle;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.genzgpt.Controller.Firebase;
+import com.example.genzgpt.Model.AppUser;
+import com.example.genzgpt.Model.Event;
 import com.example.genzgpt.R;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -24,11 +32,13 @@ import java.util.ArrayList;
  */
 public class MyEventsFragment extends EventsFragment {
     private TextView pageName;
+    private Firebase firebase;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.event_list_fragment, container, false);
 
+        firebase = new Firebase();
         // Change the name of the page to My Events
         pageName = view.findViewById(R.id.allEventsTitle);
         pageName.setText("My Events");
@@ -37,10 +47,27 @@ public class MyEventsFragment extends EventsFragment {
         recyclerView = view.findViewById(R.id.eventsRecyclerView);
         recyclerView.addItemDecoration(new SpacingItemDecoration(spacingInPixels));
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        EditText searchEditText = view.findViewById(R.id.searchEditText);
 
         eventList = new ArrayList<>();
         eventAdapter = new EventAdapter(eventList);
         recyclerView.setAdapter(eventAdapter);
+
+        searchEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                // Filter the events as the user types
+                filterEvents(s.toString());
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+            }
+        });
 
         firebase = new Firebase();
 
@@ -87,6 +114,38 @@ public class MyEventsFragment extends EventsFragment {
 
 
     protected void fetchEvents() {
-        // FIXME NEEDS TO ONLY FETCH EVENTS THE USER IS SIGNED UP FOR OR ORGANIZING
+        // Assuming AppUser.getInstance().getId() returns the current user's ID
+        String userId = AppUser.getUserId();
+
+        firebase.fetchEventsForOrganizer(userId, new Firebase.OnEventsLoadedListener() {
+            @Override
+            public void onEventsLoaded(List<Event> events) {
+                eventList.clear();
+                eventList.addAll(events);
+                // Also update the originalEventList with the fetched events
+                originalEventList.clear();
+                originalEventList.addAll(events);
+                eventAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onEventsLoadFailed(Exception e) {
+                // Handle the error, possibly by showing an error message to the user
+                Log.e("MyEventsFragment", "Error loading events: " + e.getMessage());
+                Toast.makeText(getContext(), "Failed to load events.", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+    @Override
+    protected boolean shouldShowCheckInQrCodeOption() {
+        return true;
+    }
+    @Override
+    protected boolean shouldShowRegisteredAttendeesOption() {
+        return true;
+    }
+    @Override
+    protected boolean shouldShowCheckedInAttendeesOption() {
+        return true;
     }
 }

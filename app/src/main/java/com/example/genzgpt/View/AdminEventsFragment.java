@@ -13,6 +13,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.Toast;
 
 import com.example.genzgpt.Controller.Firebase;
 import com.example.genzgpt.Model.Event;
@@ -101,13 +102,11 @@ public class AdminEventsFragment extends EventsFragment {
      */
     private void deleteEventImage(Event event) {
         // Call deleteImage to delete the associated image
-        firebase.deleteEventImage(event.getEventId(), event.getImageURL());
-
-        // Remove the event from the RecyclerView
-        int position = eventAdapter.getEvents().indexOf(event);
-        if (position != -1) {
-            eventAdapter.getEvents().remove(position);
-            eventAdapter.notifyItemRemoved(position);
+        if (event.getImageURL() != null) {
+            firebase.deleteEventImage(event.getEventName());
+        }
+        else {
+            Toast.makeText(getContext(), "No event image to delete", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -140,6 +139,22 @@ public class AdminEventsFragment extends EventsFragment {
     }
 
     /**
+     * Shows a dialog to confirm the deletion of the event
+     */
+    private void showDeleteEventImageDialog(Event event) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setTitle("Delete Event Image")
+                .setMessage("Are you sure you want to delete this event image?")
+                .setPositiveButton("Delete", (dialog, which) -> {
+                    deleteEventImage(event);
+                })
+                .setNegativeButton("Cancel", (dialog, which) -> {
+                    dialog.dismiss();
+                })
+                .show();
+    }
+
+    /**
      * Fetches all events from Firebase and updates the RecyclerView
      */
     protected void fetchEvents() {
@@ -160,8 +175,6 @@ public class AdminEventsFragment extends EventsFragment {
         });
     }
 
-    //FIXME CAN WE JUST REMOVE EVENTADAPTER AND EVENTVIEWHOLDER FROM BEING NESTED CLASSES TO MAKE
-    // THIS EASIER?
     /**
      * Allows for an Event to be handled by the RecyclerView in an AdminEventsFragment
      */
@@ -237,7 +250,6 @@ public class AdminEventsFragment extends EventsFragment {
             if (event.getImageURL() != null && !event.getImageURL().isEmpty()) {
                 Picasso.get()
                         .load(event.getImageURL())
-//                        .resize(200, 200) // Specify the desired width and height
                         .into(eventImage);
             }
 
@@ -270,14 +282,33 @@ public class AdminEventsFragment extends EventsFragment {
                         dialog.dismiss();
                     }
                 });
+                builder.show();
+            });
 
-                itemView.setOnLongClickListener(vv -> {
-                    showDeleteEventDialog(event);
-                    return true;
+            itemView.setOnLongClickListener(v -> {
+                // Context for creating AlertDialog
+                final Context context = v.getContext();
+
+                // Options for the user to select
+                final CharSequence[] deleteOptions = {"Delete Event", "Delete Event Image", "Cancel"};
+
+                // Creating AlertDialog.Builder
+                AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                builder.setTitle("Choose an option");
+
+                // Setting the options
+                builder.setItems(deleteOptions, (dialog, item) -> {
+                    if (deleteOptions[item].equals("Delete Event")) {
+                        showDeleteEventDialog(event);
+                    } else if (deleteOptions[item].equals("Delete Event Image")) {
+                        showDeleteEventImageDialog(event);
+                    } else if (deleteOptions[item].equals("Cancel")) {
+                        dialog.dismiss();
+                    }
                 });
 
-                // Showing the AlertDialog
                 builder.show();
+                return true; // Consume the long click
             });
         }
     }

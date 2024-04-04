@@ -1,53 +1,46 @@
 package com.example.genzgpt.View;
 
-import android.app.Activity;
 import android.app.DatePickerDialog;
-import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import androidx.activity.OnBackPressedCallback;
-import androidx.activity.result.ActivityResult;
-import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentResultListener;
-import com.google.firebase.firestore.FirebaseFirestore;
 
-import com.example.genzgpt.Controller.GalleryHandler;
 import com.example.genzgpt.Controller.ImageViewUpdater;
-import com.example.genzgpt.MainActivity;
 import com.example.genzgpt.Model.Event;
 import com.example.genzgpt.Model.User;
 import com.example.genzgpt.R;
 import com.google.android.material.appbar.MaterialToolbar;
-import com.google.firebase.firestore.FirebaseFirestore;
 import com.example.genzgpt.Controller.Firebase;
+import com.example.genzgpt.Model.AppUser;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 
 public class EventCreationFragment extends Fragment {
 
-    private EditText eventNameEditText, eventDateEditText, locationEditText;
+    private EditText eventNameEditText, eventDateEditText, locationEditText, maxAttendeesEditText;
     private ImageView eventImageView;
     private Button selectImageButton, createEventButton;
     private Calendar eventDateCalendar;
-    private ActivityResultLauncher<Intent> galleryLauncher;
+    private ActivityResultLauncher<String> galleryLauncher;
+
     private Uri selectedImageUri;
+
 
     @Nullable
     @Override
@@ -65,33 +58,19 @@ public class EventCreationFragment extends Fragment {
         eventImageView = view.findViewById(R.id.eventImageView);
         selectImageButton = view.findViewById(R.id.selectImageButton);
         createEventButton = view.findViewById(R.id.createEventButton);
+        maxAttendeesEditText = view.findViewById(R.id.maxAttendeesEditText);
 
         eventDateEditText.setOnClickListener(v -> showDatePickerDialog());
         createEventButton.setOnClickListener(v -> createEvent());
         selectImageButton.setOnClickListener(v -> selectImage());
 
-        // Register a FragmentResultListener to handle the result from the GalleryHandler
-        getParentFragmentManager().setFragmentResultListener("galleryResult",
-                this, new FragmentResultListener() {
-                    @Override
-                    public void onFragmentResult(@NonNull String requestKey, @NonNull Bundle result) {
-                        Uri selectedImageUri = result.getParcelable("selectedImageUri");
-                        processGalleryResult(Activity.RESULT_OK, new Intent().setData(selectedImageUri));
+        galleryLauncher = registerForActivityResult(new ActivityResultContracts.GetContent(),
+                result -> {
+                    if (result != null) {
+                        ImageViewUpdater.updateImageView(getActivity(), result, eventImageView);
+                        selectedImageUri = result;
                     }
                 });
-
-        // Initialize the ActivityResultLauncher
-        galleryLauncher = registerForActivityResult(
-                new ActivityResultContracts.StartActivityForResult(),
-                new ActivityResultCallback<ActivityResult>() {
-                    @Override
-                    public void onActivityResult(ActivityResult result) {
-                        int resultCode = result.getResultCode();
-                        Intent data = result.getData();
-                        processGalleryResult(resultCode, data);
-                    }
-                }
-        );
 
         return view;
     }
@@ -107,6 +86,9 @@ public class EventCreationFragment extends Fragment {
         });
     }
 
+    /**
+     * Shows a DatePickerDialog to allow the user to select the event date.
+     */
     private void showDatePickerDialog() {
         int year = eventDateCalendar.get(Calendar.YEAR);
         int month = eventDateCalendar.get(Calendar.MONTH);
@@ -122,38 +104,48 @@ public class EventCreationFragment extends Fragment {
         datePickerDialog.show();
     }
 
+    /**
+     * Updates the eventDateEditText field with the selected date.
+     */
     private void updateLabel() {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         eventDateEditText.setText(sdf.format(eventDateCalendar.getTime()));
     }
 
+    /**
+     * Gathers input from the user and attempts to create a new event. Performs validation
+     * to ensure required fields are filled and that maxAttendees, if provided, is an integer.
+     * Shows a toast message if validation fails or if the event creation is successful.
+     */
     private void createEvent() {
         String eventName = eventNameEditText.getText().toString();
         String location = locationEditText.getText().toString();
+        String maxAttendeesStr = maxAttendeesEditText.getText().toString();
+        int maxAttendees = Integer.MAX_VALUE; // Default if no input
         if (TextUtils.isEmpty(eventName) || eventDateCalendar == null || TextUtils.isEmpty(location)) {
+            Toast.makeText(getContext(), "Please fill all required fields.", Toast.LENGTH_SHORT).show();
             return;
+        }
+        String imageURL = null; // Initialize imageURL to null
+
+        // Check if maxAttendeesStr is not empty and is an integer
+        if (!maxAttendeesStr.isEmpty()) {
+            try {
+                maxAttendees = Integer.parseInt(maxAttendeesStr);
+            } catch (NumberFormatException e) {
+                Toast.makeText(getContext(), "Max attendees field must to be an integer or empty.", Toast.LENGTH_SHORT).show();
+                return; // Stop the method execution if input is not valid
+            }
         }
 
         if (selectedImageUri != null) {
             // Upload image to Firebase Storage and get the download URL
+            int finalMaxAttendees = maxAttendees;
             Firebase.uploadImageAndGetUrl("event_images/" + System.currentTimeMillis() + ".jpg", selectedImageUri, new Firebase.OnUploadCompleteListener() {
                 @Override
                 public void onUploadComplete(String imageURL) {
                     // Image upload is complete, now create the Event
-                    Event newEvent = new Event(
-                            "",
-                            eventName,
-                            eventDateCalendar.getTime(),
-                            location,
-                            100,
-                            imageURL // Set the imageURL obtained from Firebase Storage
-                    );
-
-                    // Add the new event to Firebase
-                    Firebase firebase = new Firebase();
-                    firebase.addEvent(newEvent);
-
-                    getParentFragmentManager().popBackStack();
+                    createAndSaveEvent(eventName, location, imageURL, finalMaxAttendees);
                 }
 
                 @Override
@@ -162,17 +154,56 @@ public class EventCreationFragment extends Fragment {
                     Log.e("Firebase", "Failed to upload image: " + errorMessage);
                 }
             });
+        } else {
+            // If selectedImageUri is null, proceed to create event without imageURL
+            createAndSaveEvent(eventName, location, null, maxAttendees);
         }
     }
 
+    /**
+     * Helper method to finalize event creation, including uploading the event image
+     * (if selected) to Firebase Storage and saving the event details to Firestore.
+     *
+     * @param eventName The name of the event.
+     * @param location The location of the event.
+     * @param imageURL The URL of the uploaded event image; null if no image was selected.
+     * @param maxAttendees The maximum number of attendees; defaults to Integer.MAX_VALUE if not specified.
+     */
+    private void createAndSaveEvent(String eventName, String location, @Nullable String imageURL, Integer maxAttendees) {
+        Event newEvent = new Event(
+                "",
+                eventName,
+                eventDateCalendar.getTime(),
+                location,
+                maxAttendees,
+                imageURL
+        );
+        // Add the new event to Firebase
+        Firebase firebase = new Firebase();
+        firebase.getUserData(AppUser.getUserId(), new Firebase.OnUserLoadedListener() {
+            @Override
+            public void onUserLoaded(User user) {
+                firebase.createEvent(newEvent, user);
+            }
+
+            @Override
+            public void onUserNotFound() {
+                Log.d("spaghetti code", "aaahahaahah");
+            }
+
+            @Override
+            public void onUserLoadFailed(Exception e) {
+                Log.d("spaghetti code", "aaahahaahah");
+            }
+        });
+
+        getParentFragmentManager().popBackStack();
+    }
+
+    /**
+     * Initiates the process of selecting an image from the device's gallery.
+     */
     private void selectImage() {
-        galleryLauncher.launch(new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI));
-    }
-
-    private void processGalleryResult(int resultCode, Intent data) {
-        if (resultCode == Activity.RESULT_OK && data != null) {
-            selectedImageUri = data.getData();
-            ImageViewUpdater.updateImageView(requireActivity(), selectedImageUri, eventImageView);
-        }
+        galleryLauncher.launch("image/*");
     }
 }

@@ -89,7 +89,7 @@ public class AttendeeManager {
      * @return The list of registered attendees.
      */
     public List<User> getRegisteredAttendees() {
-        return new ArrayList<>(registeredAttendees);
+        return registeredAttendees;
     }
 
     /**
@@ -137,4 +137,6 @@ public class AttendeeManager {
     }
     public void setRegisteredAttendees(List<User> registeredAttendees){
         this.registeredAttendees = registeredAttendees;}
+
 }
+
