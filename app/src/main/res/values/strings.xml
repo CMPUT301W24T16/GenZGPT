@@ -28,5 +28,6 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="withdraw">Withdraw</string>
     <string name="sign_up">Sign Up</string>
+    <string name="my_events">My Events</string>
 
 </resources>
