@@ -20,13 +20,13 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.example.genzgpt.Controller.Firebase;
 import com.example.genzgpt.Controller.ImageViewUpdater;
+import com.example.genzgpt.Model.AppUser;
 import com.example.genzgpt.Model.Event;
 import com.example.genzgpt.Model.User;
 import com.example.genzgpt.R;
 import com.google.android.material.appbar.MaterialToolbar;
-import com.example.genzgpt.Controller.Firebase;
-import com.example.genzgpt.Model.AppUser;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -35,7 +35,6 @@ public class EventCreationFragment extends Fragment {
 
     private EditText eventNameEditText, eventDateEditText, locationEditText, maxAttendeesEditText;
     private ImageView eventImageView;
-    private Button selectImageButton, createEventButton;
     private Calendar eventDateCalendar;
     private ActivityResultLauncher<String> galleryLauncher;
 
@@ -56,8 +55,8 @@ public class EventCreationFragment extends Fragment {
         eventDateEditText = view.findViewById(R.id.eventDateEditText);
         locationEditText = view.findViewById(R.id.locationEditText);
         eventImageView = view.findViewById(R.id.eventImageView);
-        selectImageButton = view.findViewById(R.id.selectImageButton);
-        createEventButton = view.findViewById(R.id.createEventButton);
+        Button selectImageButton = view.findViewById(R.id.selectImageButton);
+        Button createEventButton = view.findViewById(R.id.createEventButton);
         maxAttendeesEditText = view.findViewById(R.id.maxAttendeesEditText);
 
         eventDateEditText.setOnClickListener(v -> showDatePickerDialog());
@@ -94,7 +93,7 @@ public class EventCreationFragment extends Fragment {
         int month = eventDateCalendar.get(Calendar.MONTH);
         int day = eventDateCalendar.get(Calendar.DAY_OF_MONTH);
 
-        DatePickerDialog datePickerDialog = new DatePickerDialog(getContext(), (view, year1, monthOfYear, dayOfMonth) -> {
+        DatePickerDialog datePickerDialog = new DatePickerDialog(requireContext(), (view, year1, monthOfYear, dayOfMonth) -> {
             eventDateCalendar.set(Calendar.YEAR, year1);
             eventDateCalendar.set(Calendar.MONTH, monthOfYear);
             eventDateCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
@@ -126,7 +125,6 @@ public class EventCreationFragment extends Fragment {
             Toast.makeText(getContext(), "Please fill all required fields.", Toast.LENGTH_SHORT).show();
             return;
         }
-        String imageURL = null; // Initialize imageURL to null
 
         // Check if maxAttendeesStr is not empty and is an integer
         if (!maxAttendeesStr.isEmpty()) {
