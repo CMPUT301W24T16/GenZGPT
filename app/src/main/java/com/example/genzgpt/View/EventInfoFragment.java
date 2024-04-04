@@ -247,17 +247,23 @@ public class EventInfoFragment extends Fragment {
 
             @Override
             public void onAttendeeRegistrationFailed(Exception e) {
-                Toast.makeText(getContext(), "Failed to sign up for the event!", Toast.LENGTH_SHORT).show();
+                // display a specific error message
+                if (e.getMessage().contains("Event is at full capacity")) {
+                    Toast.makeText(getContext(), "Event is at full capacity. Cannot sign up.", Toast.LENGTH_LONG).show();
+                } else {
+                    // For other errors
+                    Toast.makeText(getContext(), "Failed to sign up for the event. Please try again later.", Toast.LENGTH_LONG).show();
+                }
             }
 
             @Override
             public void onEventNotFound() {
-
+                Toast.makeText(getContext(), "Event not found.", Toast.LENGTH_LONG).show();
             }
 
             @Override
             public void onEventLoadFailed(Exception e) {
-
+                Toast.makeText(getContext(), "Failed to load event data. Please try again later.", Toast.LENGTH_LONG).show();
             }
         });
     }
