@@ -95,9 +95,6 @@ public class MainPageFragment extends Fragment implements EventAdapter.EventClic
                 events.clear();
                 events.addAll(eventList);
                 eventAdapter.notifyDataSetChanged();
-                for (Event event : eventList) {
-                    Log.d("EventListFragment", "Event: " + event.getOrganizers() + " " + event.getEventName());
-                }
 
             }
 

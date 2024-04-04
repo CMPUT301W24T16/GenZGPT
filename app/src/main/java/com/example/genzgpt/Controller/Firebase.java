@@ -800,12 +800,14 @@ public class Firebase {
                         Long maxAttendeesLong = document.getLong("maxAttendees");
                         Integer maxAttendees = maxAttendeesLong != null ? maxAttendeesLong.intValue() : null;
                         String imageURL = document.getString("imageURL");
-                        List<User> organizers = (List<User>) document.get("organizers");
+                        List<String> organizers = (List<String>) document.get("organizers");
                         List<User> registeredAttendees = (List<User>) document.get("registeredAttendees");
 
                         // Check for nulls to avoid adding incomplete events
                         if (eventName != null && eventDate != null && location != null) {
                             Event event = new Event(eventId, eventName, eventDate, location, maxAttendees, imageURL);
+                            event.setOrganizers(organizers);
+                            event.setRegisteredAttendees(registeredAttendees);
                             eventList.add(event);
                         }
                     }
@@ -1153,10 +1155,13 @@ public class Firebase {
                         Long maxAttendeesLong = document.getLong("maxAttendees");
                         Integer maxAttendees = maxAttendeesLong != null ? maxAttendeesLong.intValue() : null;
                         String imageURL = document.getString("imageURL");
+                        List<User> registeredAttendees = (List<User>) document.get("registeredAttendees");
+
 
                         // Check for nulls to avoid adding incomplete events
                         if (eventName != null && eventDate != null && location != null) {
                             Event event = new Event(eventId, eventName, eventDate, location, maxAttendees, imageURL);
+                            event.setRegisteredAttendees(registeredAttendees);
                             eventList.add(event);
                         }
                     }
