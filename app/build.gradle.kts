@@ -1,8 +1,14 @@
 plugins {
     id("com.android.application")
     id("com.google.gms.google-services")
+    id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
 }
-
+secrets{
+    propertiesFileName="local.properties"
+    defaultPropertiesFileName="local.defaults.properties"
+    ignoreList.add("keyToIgnore")
+    ignoreList.add("sdk.*")
+}
 android {
     namespace = "com.example.genzgpt"
     compileSdk = 34
@@ -32,6 +38,7 @@ android {
     }
     buildFeatures {
         viewBinding = true
+        buildConfig = true
     }
 
     tasks.withType<Test> {
@@ -70,7 +77,6 @@ dependencies {
     testImplementation("junit:junit:4.13.2")
     implementation("com.github.bumptech.glide:glide:4.16.0")
     implementation("org.osmdroid:osmdroid-android:6.1.10")
-
     annotationProcessor("com.github.bumptech.glide:compiler:4.12.0")
-
+    implementation("com.google.android.gms:play-services-maps:18.2.0")
 }
