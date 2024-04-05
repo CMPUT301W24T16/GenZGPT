@@ -11,6 +11,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -18,12 +19,10 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.genzgpt.Controller.Firebase;
 import com.example.genzgpt.Model.User;
 import com.example.genzgpt.R;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.squareup.picasso.Picasso;
 
 /**
  * FIXME CAN WE GET ADMINPROFILESFRAGMENT DELETED AND REFACTOR THIS TO BE ADMINPROFILESFRAGMENT?
@@ -33,7 +32,6 @@ import com.squareup.picasso.Picasso;
  * create an instance of this fragment.
  */
 public class UserListFragment extends Fragment {
-    private RecyclerView recyclerView;
     private UserAdapter userAdapter;
     private List<User> userList;
     private Firebase firebase;
@@ -49,7 +47,7 @@ public class UserListFragment extends Fragment {
         View view = inflater.inflate(R.layout.user_list_fragment, container, false);
 
         int spacingInPixels = 16; // Adjust the spacing as needed
-        recyclerView = view.findViewById(R.id.userRecyclerView);
+        RecyclerView recyclerView = view.findViewById(R.id.userRecyclerView);
         recyclerView.addItemDecoration(new SpacingItemDecoration(spacingInPixels));
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
@@ -90,7 +88,7 @@ public class UserListFragment extends Fragment {
      * Adapter for the RecyclerView to display the list of users
      */
     private class UserAdapter extends RecyclerView.Adapter<UserViewHolder> {
-        private List<User> users;
+        private final List<User> users;
 
         public UserAdapter(List<User> users) {
             this.users = users;
@@ -99,6 +97,7 @@ public class UserListFragment extends Fragment {
         /**
          * Create a new ViewHolder for the RecyclerView
          */
+        @NonNull
         @Override
         public UserViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_user, parent, false);
@@ -123,15 +122,6 @@ public class UserListFragment extends Fragment {
         }
 
         /**
-         * Set the list of users to display in the RecyclerView
-         */
-        public void setUsers(List<User> newUsers) {
-            this.users.clear();
-            this.users.addAll(newUsers);
-            notifyDataSetChanged();
-        }
-
-        /**
          * Return the list of users
          */
         public List<User> getUsers() {
@@ -143,9 +133,9 @@ public class UserListFragment extends Fragment {
      * ViewHolder for the RecyclerView to display the user
      */
     private class UserViewHolder extends RecyclerView.ViewHolder {
-        private TextView firstName;
-        private TextView lastName;
-        private TextView email;
+        private final TextView firstName;
+        private final TextView lastName;
+        private final TextView email;
         protected ImageView userImage;
 
 
@@ -211,12 +201,8 @@ public class UserListFragment extends Fragment {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle("Delete User")
                 .setMessage("Are you sure you want to delete this user?")
-                .setPositiveButton("Delete", (dialog, which) -> {
-                    deleteUser(user);
-                })
-                .setNegativeButton("Cancel", (dialog, which) -> {
-                    dialog.dismiss();
-                })
+                .setPositiveButton("Delete", (dialog, which) -> deleteUser(user))
+                .setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss())
                 .show();
     }
 
@@ -224,12 +210,8 @@ public class UserListFragment extends Fragment {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle("Delete User Image")
                 .setMessage("Are you sure you want to delete this user Image?")
-                .setPositiveButton("Delete", (dialog, which) -> {
-                    deleteUserImage(user);
-                })
-                .setNegativeButton("Cancel", (dialog, which) -> {
-                    dialog.dismiss();
-                })
+                .setPositiveButton("Delete", (dialog, which) -> deleteUserImage(user))
+                .setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss())
                 .show();
     }
 
