@@ -260,9 +260,7 @@ public class EventInfoFragment extends Fragment {
                 Toast.makeText(getContext(), "You have withdrawn from the event.", Toast.LENGTH_SHORT).show();
                 isUserSignedUp = false;
                 if (getActivity() != null) {
-                    getActivity().runOnUiThread(() -> {
-                        getParentFragmentManager().popBackStack();
-                    });
+                    getActivity().runOnUiThread(() -> getParentFragmentManager().popBackStack());
                 }
             }
 
