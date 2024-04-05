@@ -29,5 +29,8 @@
     <string name="withdraw">Withdraw</string>
     <string name="sign_up">Sign Up</string>
     <string name="my_events">My Events</string>
+    <string name="black_and_white">Black and White</string>
+    <string name="on">ON</string>
+    <string name="off">OFF</string>
 
 </resources>
