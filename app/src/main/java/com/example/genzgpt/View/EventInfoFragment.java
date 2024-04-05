@@ -254,13 +254,20 @@ public class EventInfoFragment extends Fragment {
      * @param user The user to unregister from the event.
      */
     private void unregisterUserFromEvent(User user) {
+        // Implement the logic to unregister the user from the event
+        // After successfully unregistering, update the button and flag
+        Toast.makeText(getContext(), "You have withdrawn from the event!", Toast.LENGTH_SHORT).show();
+        isUserSignedUp = false;
+        signUpButton.setText(R.string.sign_up);
         firebase.removeUserFromRegisteredAttendees(event.getEventId(), user.getId(), new Firebase.OnAttendeeRemovedListener() {
             @Override
             public void onAttendeeRemoved() {
                 Toast.makeText(getContext(), "You have withdrawn from the event.", Toast.LENGTH_SHORT).show();
                 isUserSignedUp = false;
                 if (getActivity() != null) {
-                    getActivity().runOnUiThread(() -> getParentFragmentManager().popBackStack());
+                    getActivity().runOnUiThread(() -> {
+                        getParentFragmentManager().popBackStack();
+                    });
                 }
             }
 
