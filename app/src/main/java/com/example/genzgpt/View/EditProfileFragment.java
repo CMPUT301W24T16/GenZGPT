@@ -1,7 +1,5 @@
 package com.example.genzgpt.View;
 
-import static com.example.genzgpt.Controller.GalleryHandler.openGallery;
-
 import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -9,15 +7,14 @@ import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -29,18 +26,14 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.SwitchCompat;
-import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.DialogFragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
 
 import com.bumptech.glide.Glide;
-import com.example.genzgpt.Controller.CameraFragment;
+import com.example.genzgpt.Controller.CameraHandler;
 import com.example.genzgpt.Controller.Firebase;
 import com.example.genzgpt.Controller.GalleryHandler;
 import com.example.genzgpt.Controller.ImageViewUpdater;
-import com.example.genzgpt.Model.AppUser;
 import com.example.genzgpt.Model.User;
 import com.example.genzgpt.R;
 
@@ -50,11 +43,12 @@ import com.example.genzgpt.R;
 public class EditProfileFragment extends DialogFragment {
     private String geolocationName;
     private User selectedUser;
-    private static final int PICK_IMAGE_REQUEST = 1;
     private ActivityResultLauncher<String> mGetContent;
     ImageView profilePicture;
     Uri selectedImageUri;
+    private static final int REQUEST_IMAGE_CAPTURE = 101;
 
+    private CameraHandler cameraHandler;
 
     /**
      * Creates a profile fragment
@@ -72,11 +66,10 @@ public class EditProfileFragment extends DialogFragment {
                 result -> {
                     if (result != null) {
                         ImageViewUpdater.updateImageView(getActivity(), result, profilePicture);
-                        profilePicture.setScaleType(ImageView.ScaleType.CENTER_CROP);
-                        profilePicture.setLayoutParams(new LinearLayout.LayoutParams(350, 350));
                         selectedImageUri = result;
                     }
                 });
+        cameraHandler = new CameraHandler(this);
     }
 
     /**
@@ -129,7 +122,7 @@ public class EditProfileFragment extends DialogFragment {
                             mGetContent.launch("image/*");
                             return true;
                         } else if (item.getItemId() == R.id.menu_camera) {
-                            openCamera();
+                            cameraHandler.openCamera();
                             return true;
                         }
                         return false;
@@ -145,7 +138,13 @@ public class EditProfileFragment extends DialogFragment {
              */
             @Override
             public void onClick(View v) {
-                selectedUser.setImageURL("ic_launcher.xml");
+                if (selectedUser.getImageURL() == null) {
+                    Toast.makeText(getContext(), "No image to delete", Toast.LENGTH_SHORT).show();
+                    return; // Exit the method if there's no image to delete
+                }
+                selectedUser.setImageURL(null);
+                profilePicture.setImageResource(R.drawable.ic_launcher_foreground);
+                selectedImageUri = null;
             }
         });
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
@@ -191,30 +190,27 @@ public class EditProfileFragment extends DialogFragment {
         }
     }
 
-    private void openCamera() {
-        CameraFragment cameraFragment = new CameraFragment();
-        FragmentManager fragmentManager = getChildFragmentManager(); // Use getChildFragmentManager() for fragments within fragments
-        FragmentTransaction transaction = fragmentManager.beginTransaction();
-        transaction.replace(R.id.fragment_container, cameraFragment); // Replace with the ID of the container in your EditProfileFragment layout
-        transaction.addToBackStack(null);
-        transaction.commit();
-    }
-
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
-        if (requestCode == PICK_IMAGE_REQUEST && resultCode == Activity.RESULT_OK) {
-            if (data != null) {
-                selectedImageUri = data.getData(); // Remove Uri declaration to avoid creating a new variable
-                // Assuming you have the userID available
-                String userID = selectedUser.getId();
-                // Call Firebase method to upload image for user
-                Firebase firebase = new Firebase();
-                ProgressDialog progressDialog = new ProgressDialog(getContext());
-                progressDialog.setMessage("Uploading image...");
-                progressDialog.show();
-                firebase.uploadImageForUser(userID, selectedImageUri, progressDialog, getContext());
+        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == Activity.RESULT_OK) {
+            if (data != null && data.getExtras() != null) {
+                // Get the captured image
+                Bitmap imageBitmap = (Bitmap) data.getExtras().get("data");
+                // Do something with the image, like set it to ImageView or upload it
+                if (imageBitmap != null) {
+                    // Set the image bitmap to ImageView
+                    profilePicture.setImageBitmap(imageBitmap);
+                    // Convert bitmap to Uri
+                    selectedImageUri = cameraHandler.getImageUri(imageBitmap);
+                }
+            }
+        } else if (requestCode == GalleryHandler.REQUEST_PICK_IMAGE && resultCode == Activity.RESULT_OK) {
+            if (data != null && data.getData() != null) {
+                // Get the selected image URI from gallery
+                selectedImageUri = data.getData();
+                // Set the selected image to ImageView
+                profilePicture.setImageURI(selectedImageUri);
             }
         }
     }

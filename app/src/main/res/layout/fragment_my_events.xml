@@ -13,14 +13,6 @@
         android:orientation="horizontal"
         android:gravity="center_vertical">
 
-        <!-- Back Arrow -->
-        <ImageView
-            android:id="@+id/backButton"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:src="@drawable/ic_back_arrow"
-            android:contentDescription="backButton" />
-
         <!-- Title -->
         <TextView
             android:id="@+id/allEventsTitle"

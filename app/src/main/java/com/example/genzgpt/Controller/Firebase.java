@@ -800,12 +800,14 @@ public class Firebase {
                         Long maxAttendeesLong = document.getLong("maxAttendees");
                         Integer maxAttendees = maxAttendeesLong != null ? maxAttendeesLong.intValue() : null;
                         String imageURL = document.getString("imageURL");
-                        List<User> organizers = (List<User>) document.get("organizers");
+                        List<String> organizers = (List<String>) document.get("organizers");
                         List<User> registeredAttendees = (List<User>) document.get("registeredAttendees");
 
                         // Check for nulls to avoid adding incomplete events
                         if (eventName != null && eventDate != null && location != null) {
                             Event event = new Event(eventId, eventName, eventDate, location, maxAttendees, imageURL);
+                            event.setOrganizers(organizers);
+                            event.setRegisteredAttendees(registeredAttendees);
                             eventList.add(event);
                         }
                     }
@@ -1085,7 +1087,6 @@ public class Firebase {
      * @param listener
      */
     public void registerAttendee(Event event, User user, OnAttendeeRegisteredListener listener) {
-        System.out.println("Registering attendee for event: " + event.getEventName());
         CollectionReference eventsRef = db.collection("events");
         Query query = eventsRef.whereEqualTo("eventName", event.getEventName());
 
@@ -1097,17 +1098,24 @@ public class Firebase {
                     String eventId = eventDocument.getId();
                     DocumentReference eventRef = db.collection("events").document(eventId);
 
-                    // Now only store the user's ID as the attendee
-                    eventRef.update("registeredAttendees", FieldValue.arrayUnion(user.getId()))
-                            .addOnSuccessListener(aVoid -> {
-                                listener.onAttendeeRegistered();
-                            })
-                            .addOnFailureListener(e -> {
-                                System.err.println("Error occurred while registering user for the event: " + e.getMessage());
-                                listener.onAttendeeRegistrationFailed(e);
-                            });
+                    // Fetching current registered attendees and maxAttendees
+                    List<String> registeredAttendees = (List<String>) eventDocument.get("registeredAttendees");
+                    int currentAttendeesCount = registeredAttendees != null ? registeredAttendees.size() : 0;
+                    Long maxAttendees = eventDocument.getLong("maxAttendees");
+
+                    if (maxAttendees == null || currentAttendeesCount < maxAttendees) {
+                        // Register the user if maxAttendees not reached
+                        eventRef.update("registeredAttendees", FieldValue.arrayUnion(user.getId()))
+                                .addOnSuccessListener(aVoid -> listener.onAttendeeRegistered())
+                                .addOnFailureListener(e -> {
+                                    System.err.println("Error occurred while registering user for the event: " + e.getMessage());
+                                    listener.onAttendeeRegistrationFailed(e);
+                                });
+                    } else {
+                        // Max attendees reached
+                        listener.onAttendeeRegistrationFailed(new Exception("Event is at full capacity."));
+                    }
                 } else {
-                    System.out.println("No events found with the specified name.");
                     listener.onEventNotFound();
                 }
             } else {
@@ -1153,10 +1161,13 @@ public class Firebase {
                         Long maxAttendeesLong = document.getLong("maxAttendees");
                         Integer maxAttendees = maxAttendeesLong != null ? maxAttendeesLong.intValue() : null;
                         String imageURL = document.getString("imageURL");
+                        List<User> registeredAttendees = (List<User>) document.get("registeredAttendees");
+
 
                         // Check for nulls to avoid adding incomplete events
                         if (eventName != null && eventDate != null && location != null) {
                             Event event = new Event(eventId, eventName, eventDate, location, maxAttendees, imageURL);
+                            event.setRegisteredAttendees(registeredAttendees);
                             eventList.add(event);
                         }
                     }
