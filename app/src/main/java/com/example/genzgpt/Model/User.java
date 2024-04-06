@@ -21,6 +21,7 @@ public class User {
     private boolean geolocation;
     private List<Role> roles; // Organizer/Attendee
     private String imageURL;
+    private int checkInCount;
 
     /**
      * The constructor for a User.
@@ -163,6 +164,10 @@ public class User {
         return geolocation;
     }
 
+    public int getCheckInCount() {
+        return checkInCount;
+    }
+
     // Setters
 
     /**
@@ -217,6 +222,10 @@ public class User {
      */
     public void setGeolocation(boolean geolocation) {
         this.geolocation = geolocation;
+    }
+
+    public void setCheckInCount(int checkInCount) {
+        this.checkInCount = checkInCount;
     }
 
     /**
