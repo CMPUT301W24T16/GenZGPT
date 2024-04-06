@@ -14,6 +14,7 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.WriteBatch;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -251,8 +252,7 @@ public class Firebase {
     /**
      * Retrieves the user data from Firebase.
      * 
-     * @return the user details for a particular email.
-     * @param userId
+     * @param userId The ID of the user to retrieve.
      */
     public void getUserData(String userId, OnUserLoadedListener listener) {
         db.collection("users")
@@ -334,8 +334,7 @@ public class Firebase {
     /**
      * Retrieves the list of events from the database.
      * 
-     * @return the event details for a particular event name.
-     * @param eventName
+     * @param eventName The name of the event to retrieve.
      */
     public void getEventData(String eventName, OnEventLoadedListener listener) {
         db.collection("events")
@@ -456,7 +455,7 @@ public class Firebase {
      * Retrieves the user data from Firebase.
      * 
      * @return the user details for a particular email.
-     * @param userMap
+     * @param userMap The map containing the user data.
      */
     private User createUserFromMap(Map<String, Object> userMap) {
         String userId = (String) userMap.get("id");
@@ -473,7 +472,7 @@ public class Firebase {
     /**
      * Creates a new user in the database.
      * 
-     * @param user
+     * @param user The user to create.
      */
     public void createUser(User user, OnUserCreatedListener listener) {
         // Check if the email is already used
@@ -545,8 +544,8 @@ public class Firebase {
     /**
      * Creates a new event in the database.
      * 
-     * @param organizer
-     * @param event
+     * @param organizer The user creating the event.
+     * @param event The event to create.
      */
     public void createEvent(Event event, User organizer) {
         event.addOrganizer(organizer.getId());
@@ -569,42 +568,110 @@ public class Firebase {
             organizerIds.add(organizer.getId());
             eventData.put("organizers", organizerIds);
 
-            // Initialize empty lists for registered attendees and checked-in attendees
+            // Initialize an empty list for registered attendees
             eventData.put("registeredAttendees", new ArrayList<>());
             eventData.put("checkedInAttendees", new ArrayList<>());
 
-            eventRef.set(eventData)
+            // Create a new document in the "checkIn" collection for the event
+            DocumentReference checkInRef = db.collection("checkIn").document(eventId);
+            Map<String, Object> checkInData = new HashMap<>();
+            checkInData.put("eventId", eventId);
+            checkInData.put("checkInList", new ArrayList<>());
+
+            // Use a WriteBatch to atomically create the event and check-in documents
+            WriteBatch batch = db.batch();
+            batch.set(eventRef, eventData);
+            batch.set(checkInRef, checkInData);
+
+            batch.commit()
                     .addOnSuccessListener(aVoid -> {
-                        Log.i("Firebase", "Event created successfully");
+                        Log.i("Firebase", "Event and check-in data created successfully");
                     })
                     .addOnFailureListener(e -> {
-                        // Error occurred while creating the event
-                        Log.e("Firebase", "Error creating event: " + e.getMessage());
+                        // Error occurred while creating the event and check-in data
+                        Log.e("Firebase", "Error creating event and check-in data: " + e.getMessage());
                     });
         } catch (Exception e) {
             // Handle any exceptions that occur during the process
-            Log.e("Firebase", "Error creating event: " + e.getMessage());
+            Log.e("Firebase", "Error creating event and check-in data: " + e.getMessage());
         }
     }
 
     /**
      * Adds a user to the list of registered attendees for a specific event.
-     * @param eventId
-     * @param userId
+     * @param eventId The ID of the event.
+     * @param userId The ID of the user to add.
      */
     public void addUserToCheckedInAttendees(String eventId, String userId) {
         try {
             DocumentReference eventRef = db.collection("events").document(eventId);
+            CollectionReference checkInRef = db.collection("checkIn");
+            Query query = checkInRef.whereEqualTo("eventId", eventId);
 
-            eventRef.update("checkedInAttendees", FieldValue.arrayUnion(userId))
-                    .addOnSuccessListener(aVoid -> {
-                        // User added to checkedInAttendees successfully
-                        Log.i("Firebase", "User added to checkedInAttendees successfully");
-                    })
-                    .addOnFailureListener(e -> {
-                        // Error occurred while adding user to checkedInAttendees
-                        Log.e("Firebase", "Error adding user to checkedInAttendees: " + e.getMessage());
-                    });
+            query.get().addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
+                    QuerySnapshot snapshot = task.getResult();
+                    if (snapshot != null && !snapshot.isEmpty()) {
+                        // Get the first matching check-in document
+                        DocumentSnapshot checkInDocument = snapshot.getDocuments().get(0);
+                        String checkInId = checkInDocument.getId();
+
+                        // Get the current "checkInList" array from the check-in document
+                        List<Map<String, Object>> checkInList = (List<Map<String, Object>>) checkInDocument.get("checkInList");
+
+                        boolean userExists = false;
+                        if (checkInList != null) {
+                            for (Map<String, Object> checkInEntry : checkInList) {
+                                if (checkInEntry.get("userId").equals(userId)) {
+                                    // User already exists in the "checkInList"
+                                    userExists = true;
+                                    long count = (long) checkInEntry.get("count");
+                                    checkInEntry.put("count", count + 1);
+                                    break;
+                                }
+                            }
+                        } else {
+                            checkInList = new ArrayList<>();
+                        }
+
+                        if (!userExists) {
+                            // User doesn't exist in the "checkInList", add a new entry
+                            Map<String, Object> newCheckInEntry = new HashMap<>();
+                            newCheckInEntry.put("userId", userId);
+                            newCheckInEntry.put("count", 1);
+                            checkInList.add(newCheckInEntry);
+                        }
+
+                        // Update the "checkInList" array in the check-in document
+                        checkInRef.document(checkInId).update("checkInList", checkInList)
+                                .addOnSuccessListener(aVoid -> {
+                                    // User added to checkInList successfully
+                                    Log.i("Firebase", "User added to checkInList successfully");
+
+                                    // Update the "checkedInAttendees" array in the event document
+                                    eventRef.update("checkedInAttendees", FieldValue.arrayUnion(userId))
+                                            .addOnSuccessListener(aVoid1 -> {
+                                                // User added to checkedInAttendees successfully
+                                                Log.i("Firebase", "User added to checkedInAttendees successfully");
+                                            })
+                                            .addOnFailureListener(e -> {
+                                                // Error occurred while adding user to checkedInAttendees
+                                                Log.e("Firebase", "Error adding user to checkedInAttendees: " + e.getMessage());
+                                            });
+                                })
+                                .addOnFailureListener(e -> {
+                                    // Error occurred while updating checkInList
+                                    Log.e("Firebase", "Error updating checkInList: " + e.getMessage());
+                                });
+                    } else {
+                        // No check-in document found for the specified event
+                        Log.e("Firebase", "No check-in document found for the event");
+                    }
+                } else {
+                    // Error occurred while querying check-in data
+                    Log.e("Firebase", "Error querying check-in data: " + task.getException().getMessage());
+                }
+            });
         } catch (Exception e) {
             // Handle any exceptions that occur during the process
             Log.e("Firebase", "Error adding user to checkedInAttendees: " + e.getMessage());
@@ -614,8 +681,8 @@ public class Firebase {
     /**
      * Adds a user to the list of registered attendees for a specific event.
      * 
-     * @param eventName
-     * @param userId
+     * @param eventName The name of the event.
+     * @param userId The ID of the user to add.
      */
     public void addUserToRegisteredAttendees(String eventName, String userId) {
         try {
@@ -665,7 +732,7 @@ public class Firebase {
     /**
      * Deletes an event from the database.
      * 
-     * @param eventName
+     * @param eventName The name of the event to delete.
      */
     public void deleteEvent(String eventName) {
         try {
@@ -685,6 +752,38 @@ public class Firebase {
                                 .addOnSuccessListener(aVoid -> {
                                     // Event deleted successfully
                                     Log.i("Firebase", "Event deleted successfully");
+
+                                    // Delete the corresponding check-in document
+                                    CollectionReference checkInRef = db.collection("checkIn");
+                                    Query checkInQuery = checkInRef.whereEqualTo("eventId", eventId);
+
+                                    checkInQuery.get().addOnCompleteListener(checkInTask -> {
+                                        if (checkInTask.isSuccessful()) {
+                                            QuerySnapshot checkInSnapshot = checkInTask.getResult();
+                                            if (checkInSnapshot != null && !checkInSnapshot.isEmpty()) {
+                                                // Get the first matching check-in document
+                                                DocumentSnapshot checkInDocument = checkInSnapshot.getDocuments().get(0);
+                                                String checkInId = checkInDocument.getId();
+
+                                                // Delete the check-in document
+                                                checkInRef.document(checkInId).delete()
+                                                        .addOnSuccessListener(aVoid2 -> {
+                                                            // Check-in data deleted successfully
+                                                            Log.i("Firebase", "Check-in data deleted successfully");
+                                                        })
+                                                        .addOnFailureListener(e -> {
+                                                            // Error occurred while deleting the check-in data
+                                                            Log.e("Firebase", "Error deleting check-in data: " + e.getMessage());
+                                                        });
+                                            } else {
+                                                // No check-in data found for the event
+                                                Log.i("Firebase", "No check-in data found for the event");
+                                            }
+                                        } else {
+                                            // Error occurred while querying check-in data
+                                            Log.e("Firebase", "Error querying check-in data: " + checkInTask.getException().getMessage());
+                                        }
+                                    });
                                 })
                                 .addOnFailureListener(e -> {
                                     // Error occurred while deleting the event
@@ -701,14 +800,14 @@ public class Firebase {
             });
         } catch (Exception e) {
             // Handle any exceptions that occur during the process
-            Log.e("Firebase", "Error deleting event: " + e.getMessage());
+            Log.e("Firebase", "Error deleting event and check-in data: " + e.getMessage());
         }
     }
 
     /**
      * Deletes a user from the database.
      * 
-     * @param userId
+     * @param userId The ID of the user to delete.
      */
     public void deleteUser(String userId) {
         try {
@@ -747,9 +846,7 @@ public class Firebase {
 
     /**
      * Retrieves the list of all users from the database.
-     * 
-     * @return list of events
-     *         Synchronous method
+     *
      */
     public void fetchUsers(OnUsersLoadedListener listener) {
         db.collection("users").get()
@@ -824,6 +921,13 @@ public class Firebase {
 
         void onEventsLoadFailed(Exception e);
     }
+
+    /**
+     * Retrieves the list of events from the database.
+     *
+     * @param userId The ID of the user to retrieve events for.
+     * @param listener Listener for handling events retrieval.
+     */
     public void fetchUserEvents(String userId, OnUserEventsLoadedListener listener) {
         List<Event> eventList = new ArrayList<>();
 
@@ -857,6 +961,13 @@ public class Firebase {
                     listener.onEventsLoadFailed(e);
                 });
     }
+
+    /**
+     * Converts a Firestore document to an Event object.
+     *
+     * @param document The Firestore document to convert.
+     * @return The Event object.
+     */
     private Event documentToObject(DocumentSnapshot document) {
         String eventId = document.getId(); // Use document ID as event ID
         String eventName = document.getString("eventName");
@@ -883,21 +994,28 @@ public class Firebase {
      * Retrieves the list of checked-in attendees for a specific event from the
      * database.
      * 
-     * @param eventName
-     * @return list of checked-in attendees
-     *         asynchronous method
+     * @param eventId The ID of the event to retrieve checked-in attendees for.
      */
-    public void fetchCheckedInAttendees(String eventName, OnCheckInAttendeesLoadedListener listener) {
-        CollectionReference eventsRef = db.collection("events");
-        Query query = eventsRef.whereEqualTo("eventName", eventName);
+    public void fetchCheckedInAttendees(String eventId, OnCheckInAttendeesLoadedListener listener) {
+        CollectionReference checkInRef = db.collection("checkIn");
+        Query query = checkInRef.whereEqualTo("eventId", eventId);
 
         query.get().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 QuerySnapshot snapshot = task.getResult();
                 if (snapshot != null && !snapshot.isEmpty()) {
-                    // Assuming there is only one event with the given name
-                    DocumentSnapshot eventDocument = snapshot.getDocuments().get(0);
-                    List<String> checkedInAttendeeIds = (List<String>) eventDocument.get("checkedInAttendees");
+                    List<String> checkedInAttendeeIds = new ArrayList<>();
+
+                    // Iterate through the documents in the "checkIn" collection
+                    for (DocumentSnapshot document : snapshot.getDocuments()) {
+                        List<Map<String, Object>> checkInList = (List<Map<String, Object>>) document.get("checkInList");
+                        if (checkInList != null) {
+                            for (Map<String, Object> checkInEntry : checkInList) {
+                                String userId = (String) checkInEntry.get("userId");
+                                checkedInAttendeeIds.add(userId);
+                            }
+                        }
+                    }
 
                     // Create a list to store the User objects
                     List<User> checkedInAttendees = new ArrayList<>();
@@ -932,11 +1050,11 @@ public class Firebase {
                         });
                     }
                 } else {
-                    // No events found with the specified name
-                    listener.onCheckInAttendeesLoadFailed(new Exception("No events found with the name: " + eventName));
+                    // No check-in data found for the specified event
+                    listener.onCheckInAttendeesLoaded(new ArrayList<>());
                 }
             } else {
-                // Error occurred while querying events
+                // Error occurred while querying check-in data
                 listener.onCheckInAttendeesLoadFailed(task.getException());
             }
         });
@@ -952,9 +1070,7 @@ public class Firebase {
      * Retrieves the list of registered attendees for a specific event from the
      * database.
      * 
-     * @param eventName
-     * @return list of registered attendees
-     *         asynchronous method
+     * @param eventName The name of the event to retrieve registered attendees for.
      */
     public void fetchRegisteredAttendees(String eventName, OnRegisteredAttendeesLoadedListener listener) {
         CollectionReference eventsRef = db.collection("events");
@@ -1025,7 +1141,7 @@ public class Firebase {
     /**
      * Updates the user data in the database.
      * 
-     * @param user
+     * @param user The user to update.
      */
     public void updateUser(User user, OnUserUpdatedListener listener) {
         String userId = user.getId();
@@ -1082,9 +1198,9 @@ public class Firebase {
     /**
      * Registers a user for a specific event.
      * 
-     * @param event
-     * @param user
-     * @param listener
+     * @param event The event to register for.
+     * @param user The user to register.
+     * @param listener Listener for handling registration events.
      */
     public void registerAttendee(Event event, User user, OnAttendeeRegisteredListener listener) {
         CollectionReference eventsRef = db.collection("events");
@@ -1143,9 +1259,7 @@ public class Firebase {
 
     /**
      * Retrieves the list of events for a specific organizer from the database.
-     * @param userId
-     * @return list of events
-     * asynchronous method
+     * @param userId The ID of the user to retrieve events for.
      */
     public void fetchEventsForOrganizer(String userId, OnEventsLoadedListener listener) {
         db.collection("events")
@@ -1182,8 +1296,7 @@ public class Firebase {
     /**
      * Retrieves the event data from firebase
      *
-     * @return the user details for a particular email.
-     * @param eventId
+     * @param eventId The ID of the event to retrieve.
      */
     public void getEventDataById(String eventId, OnEventLoadedListener listener) {
         db.collection("events")
@@ -1286,7 +1399,7 @@ public class Firebase {
      * Retrieves the user data from Firebase.
      *
      * @return the user details for a particular email.
-     * @param id
+     * @param id The id of the user to retrieve.
      */
     public boolean confirmUserExists(String id) {
         getUserData(id, new Firebase.OnUserLoadedListener() {
@@ -1348,46 +1461,110 @@ public class Firebase {
     }
 
     /**
-     * change a past event into a new event, so the organizer can reuse the event ID.
+     * Change a past event into a new event, so the organizer can reuse the event ID.
      * This will allow them to reuse QR codes that are associated with the event ID.
-     * it empties the list of registered attendees, checked-in attendees, and organizers.
-     * it then adds the current user as the organizer.
-     * @param eventId the event that will be updated
-     * @param newEventName the new name for the event
-     * @param newEventDate the new date for the event
-     * @param newLocation the new location for the event
+     * It empties the list of registered attendees, checked-in attendees, and organizers.
+     * It then adds the current user as the organizer.
+     * It also clears the corresponding check-in data for the event.
+     *
+     * @param userId          the ID of the current user
+     * @param eventId         the event that will be updated
+     * @param newEventName    the new name for the event
+     * @param newEventDate    the new date for the event
+     * @param newLocation     the new location for the event
      * @param newMaxAttendees the new maximum number of attendees for the event
-     * @param newImageURL the new image URL for the event
-     * @param listener the listener for the event update
+     * @param newImageURL     the new image URL for the event
+     * @param listener        the listener for the event update
      */
     public void reusePastEvent(String userId, String eventId, String newEventName, Date newEventDate, String newLocation, int newMaxAttendees, String newImageURL, OnEventUpdatedListener listener) {
         DocumentReference eventRef = db.collection("events").document(eventId);
+        CollectionReference checkInRef = db.collection("checkIn");
+        Query query = checkInRef.whereEqualTo("eventId", eventId);
 
-        Map<String, Object> updates = new HashMap<>();
-        updates.put("eventName", newEventName);
-        updates.put("eventDate", newEventDate);
-        updates.put("location", newLocation);
-        updates.put("maxAttendees", newMaxAttendees);
-        updates.put("imageURL", newImageURL);
-        updates.put("registeredAttendees", new ArrayList<>());
-        updates.put("checkedInAttendees", new ArrayList<>());
-        updates.put("organizers", new ArrayList<>());
+        query.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                QuerySnapshot snapshot = task.getResult();
+                if (snapshot != null && !snapshot.isEmpty()) {
+                    // Get the check-in document ID
+                    String checkInId = snapshot.getDocuments().get(0).getId();
 
-        //todo Will need updates as we change firebase schema
+                    // Clear the "checkInList" array in the check-in document
+                    checkInRef.document(checkInId).update("checkInList", new ArrayList<>())
+                            .addOnSuccessListener(aVoid -> {
+                                Log.d("Firebase", "Check-in data cleared successfully");
 
-        eventRef.update(updates)
-                .addOnSuccessListener(aVoid -> {
-                    Log.d("Firebase", "Event transformed successfully");
-                    //add the current user as the organizer
-                    eventRef.update("organizers", FieldValue.arrayUnion(userId))
-                            .addOnSuccessListener(aVoid1 -> {
-                                Log.d("Firebase", "Organizer added successfully");
+                                // Update the event document
+                                Map<String, Object> updates = new HashMap<>();
+                                updates.put("eventName", newEventName);
+                                updates.put("eventDate", newEventDate);
+                                updates.put("location", newLocation);
+                                updates.put("maxAttendees", newMaxAttendees);
+                                updates.put("imageURL", newImageURL);
+                                updates.put("registeredAttendees", new ArrayList<>());
+                                updates.put("checkedInAttendees", new ArrayList<>());
+                                updates.put("organizers", new ArrayList<>());
+
+                                eventRef.update(updates)
+                                        .addOnSuccessListener(aVoid1 -> {
+                                            Log.d("Firebase", "Event transformed successfully");
+                                            // Add the current user as the organizer
+                                            eventRef.update("organizers", FieldValue.arrayUnion(userId))
+                                                    .addOnSuccessListener(aVoid2 -> {
+                                                        Log.d("Firebase", "Organizer added successfully");
+                                                        listener.onEventUpdated();
+                                                    })
+                                                    .addOnFailureListener(e -> {
+                                                        Log.e("Firebase", "Error adding organizer: " + e.getMessage());
+                                                        listener.onEventUpdateFailed(e);
+                                                    });
+                                        })
+                                        .addOnFailureListener(e -> {
+                                            Log.e("Firebase", "Error transforming event: " + e.getMessage());
+                                            listener.onEventUpdateFailed(e);
+                                        });
+                            })
+                            .addOnFailureListener(e -> {
+                                Log.e("Firebase", "Error clearing check-in data: " + e.getMessage());
+                                listener.onEventUpdateFailed(e);
                             });
-                    listener.onEventUpdated();
-                })
-                .addOnFailureListener(e -> {
-                    Log.e("Firebase", "Error transforming event: " + e.getMessage());
-                    listener.onEventUpdateFailed(e);
-                });
+                } else {
+                    // No check-in document found for the event
+                    Log.d("Firebase", "No check-in data found for the event");
+                    // Update the event document without clearing check-in data
+                    Map<String, Object> updates = new HashMap<>();
+                    updates.put("eventName", newEventName);
+                    updates.put("eventDate", newEventDate);
+                    updates.put("location", newLocation);
+                    updates.put("maxAttendees", newMaxAttendees);
+                    updates.put("imageURL", newImageURL);
+                    updates.put("registeredAttendees", new ArrayList<>());
+                    updates.put("checkedInAttendees", new ArrayList<>());
+                    updates.put("organizers", new ArrayList<>());
+
+                    eventRef.update(updates)
+                            .addOnSuccessListener(aVoid -> {
+                                Log.d("Firebase", "Event transformed successfully");
+                                // Add the current user as the organizer
+                                eventRef.update("organizers", FieldValue.arrayUnion(userId))
+                                        .addOnSuccessListener(aVoid1 -> {
+                                            Log.d("Firebase", "Organizer added successfully");
+                                            listener.onEventUpdated();
+                                        })
+                                        .addOnFailureListener(e -> {
+                                            Log.e("Firebase", "Error adding organizer: " + e.getMessage());
+                                            listener.onEventUpdateFailed(e);
+                                        });
+                            })
+                            .addOnFailureListener(e -> {
+                                Log.e("Firebase", "Error transforming event: " + e.getMessage());
+                                listener.onEventUpdateFailed(e);
+                            });
+                }
+            } else {
+                // Error occurred while querying check-in data
+                Log.e("Firebase", "Error querying check-in data: " + task.getException().getMessage());
+                listener.onEventUpdateFailed(task.getException());
+            }
+        });
     }
 }
