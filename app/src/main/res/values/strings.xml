@@ -1,5 +1,5 @@
 <resources>
-<!--Contains all of the string resources used in the App-->
+    <!--Contains all of the string resources used in the App-->
     <string name="app_name">GenZGPT</string>
     <string name="qr_code_image_desc">QR Code Image</string>
     <string name="save_qr_code">Save</string>

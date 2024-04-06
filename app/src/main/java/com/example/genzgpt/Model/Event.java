@@ -17,7 +17,7 @@ public class Event {
     private String eventName;
     private Date eventDate;
     private String location;
-    private List<User> organizers;
+    private List<String> organizers;
     private AttendeeManager attendeeManager;
     private String imageURL;
 
@@ -43,12 +43,10 @@ public class Event {
     /**
      * Adds an organizer to the event.
      *
-     * @param user The user to be added as an organizer.
+     * @param userId The userId to be added as an organizer.
      */
-    public void addOrganizer(User user) {
-        if (!organizers.contains(user)) {
-            organizers.add(user);
-        }
+    public void addOrganizer(String userId) {
+        organizers.add(userId);
     }
 
 
@@ -141,7 +139,7 @@ public class Event {
      * @return
      * The list of Users considered Oragnizers of an Event.
      */
-    public List<User> getOrganizers() {
+    public List<String> getOrganizers() {
         return organizers;
     }
 
@@ -261,8 +259,8 @@ public class Event {
         attendeeManager.setRegisteredAttendees(registeredAttendees);
     }
 
-    public void setOrganizers(List<User> organizers) {
-        this.organizers = organizers;
+    public void setOrganizers(List<String> organizersId) {
+        this.organizers = organizersId;
     }
 
     public Map<String, Object> toMap() {

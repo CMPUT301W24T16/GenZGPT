@@ -20,7 +20,7 @@
         android:icon="@drawable/navbar_qr"/>
     <item
         android:id="@+id/event_host"
-        android:title="Event Host"
+        android:title="All Events"
         android:icon="@drawable/navbar_event_host"
         />
     <item

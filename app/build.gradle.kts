@@ -1,8 +1,14 @@
 plugins {
     id("com.android.application")
     id("com.google.gms.google-services")
+    id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
 }
-
+secrets{
+    propertiesFileName="local.properties"
+    defaultPropertiesFileName="local.defaults.properties"
+    ignoreList.add("keyToIgnore")
+    ignoreList.add("sdk.*")
+}
 android {
     namespace = "com.example.genzgpt"
     compileSdk = 34
@@ -32,6 +38,7 @@ android {
     }
     buildFeatures {
         viewBinding = true
+        buildConfig = true
     }
 
     tasks.withType<Test> {
@@ -40,7 +47,8 @@ android {
 }
 
 dependencies {
-
+    //implementation files("libs/osmdroid-android-3.0.8.jar")
+    //implementation("org.osmdroid:osmdroid-nominatim:6.1.10")
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("com.google.android.material:material:1.11.0")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
@@ -57,7 +65,7 @@ dependencies {
     implementation("androidx.core:core-ktx:1.12.0")
     implementation("com.google.firebase:firebase-storage:20.3.0")
     implementation("androidx.core:core-ktx:1.12.0")
-    implementation("com.google.android.gms:play-services-location:21.1.0")
+    implementation("com.google.android.gms:play-services-location:21.2.0")
     implementation("com.google.firebase:firebase-firestore:24.10.3")
     testImplementation("junit:junit:4.13.2")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.9.0")
@@ -69,7 +77,6 @@ dependencies {
     testImplementation("junit:junit:4.13.2")
     implementation("com.github.bumptech.glide:glide:4.16.0")
     implementation("org.osmdroid:osmdroid-android:6.1.10")
-
     annotationProcessor("com.github.bumptech.glide:compiler:4.12.0")
-
+    implementation("com.google.android.gms:play-services-maps:18.2.0")
 }
