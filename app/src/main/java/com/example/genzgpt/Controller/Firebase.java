@@ -6,6 +6,7 @@ import android.net.Uri;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.example.genzgpt.Model.AppUser;
 import com.example.genzgpt.Model.Event;
 import com.example.genzgpt.Model.User;
 import com.google.firebase.firestore.CollectionReference;
@@ -362,7 +363,7 @@ public class Firebase {
                                     getUserData(email, new OnUserLoadedListener() {
                                         @Override
                                         public void onUserLoaded(User user) {
-                                            event.addOrganizer(user);
+                                            event.addOrganizer(user.getId());
                                             if (event.getOrganizers().size() == organizerEmails.size()) {
                                                 fetchRegisteredAttendees(eventName,
                                                         new OnRegisteredAttendeesLoadedListener() {
@@ -449,26 +450,6 @@ public class Firebase {
 
         void onEventLoadFailed(Exception e);
     }
-    /**
-     * Creates a new event and adds the provided user as an organizer.
-     *
-     * @param event The event to be created.
-     * @param user The user to add as an organizer.
-     *  The callback listener for the event creation and organizer registration process.
-     */
-    public void addEvent(Event event, User user) {
-        System.out.println("Creating event and registering organizer: " + user.getFirstName() + " " + user.getLastName());
-        Map<String, Object> eventMap = event.toMap();
-        CollectionReference eventsRef = db.collection("events");
-        eventsRef.add(eventMap).addOnSuccessListener(documentReference -> {
-            System.out.println("Event created with ID: " + documentReference.getId());
-            DocumentReference eventRef = eventsRef.document(documentReference.getId());
-            eventRef.update("organizers", FieldValue.arrayUnion(user.getId()))
-                    .addOnSuccessListener(aVoid -> System.out.println("Organizer registered for the event successfully"))
-                    .addOnFailureListener(e -> System.err.println("Error adding organizer to event: " + e.getMessage()));
-        }).addOnFailureListener(e -> System.err.println("Error creating event: " + e.getMessage()));
-    }
-
 
 
     /**
@@ -568,6 +549,7 @@ public class Firebase {
      * @param event
      */
     public void createEvent(Event event, User organizer) {
+        event.addOrganizer(organizer.getId());
         try {
             // Create a new event document
             DocumentReference eventRef = db.collection("events").document();
@@ -593,7 +575,6 @@ public class Firebase {
 
             eventRef.set(eventData)
                     .addOnSuccessListener(aVoid -> {
-                        // Event created successfully
                         Log.i("Firebase", "Event created successfully");
                     })
                     .addOnFailureListener(e -> {
@@ -608,42 +589,22 @@ public class Firebase {
 
     /**
      * Adds a user to the list of registered attendees for a specific event.
-     * 
-     * @param eventName
+     * @param eventId
      * @param userId
      */
-    public void addUserToCheckedInAttendees(String eventName, String userId) {
+    public void addUserToCheckedInAttendees(String eventId, String userId) {
         try {
-            CollectionReference eventsRef = db.collection("events");
-            Query query = eventsRef.whereEqualTo("eventName", eventName);
+            DocumentReference eventRef = db.collection("events").document(eventId);
 
-            query.get().addOnCompleteListener(task -> {
-                if (task.isSuccessful()) {
-                    QuerySnapshot snapshot = task.getResult();
-                    if (snapshot != null && !snapshot.isEmpty()) {
-                        // Assuming there is only one event with the given name
-                        DocumentSnapshot eventDocument = snapshot.getDocuments().get(0);
-                        String eventId = eventDocument.getId();
-
-                        DocumentReference eventRef = db.collection("events").document(eventId);
-                        eventRef.update("checkedInAttendees", FieldValue.arrayUnion(userId))
-                                .addOnSuccessListener(aVoid -> {
-                                    // User added to checkedInAttendees successfully
-                                    Log.i("Firebase", "User added to checkedInAttendees successfully");
-                                })
-                                .addOnFailureListener(e -> {
-                                    // Error occurred while adding user to checkedInAttendees
-                                    Log.e("Firebase", "Error adding user to checkedInAttendees: " + e.getMessage());
-                                });
-                    } else {
-                        // No events found with the specified name
-                        Log.i("Firebase", "No events found with the name: " + eventName);
-                    }
-                } else {
-                    // Error occurred while querying events
-                    Log.e("Firebase", "Error querying events: " + task.getException().getMessage());
-                }
-            });
+            eventRef.update("checkedInAttendees", FieldValue.arrayUnion(userId))
+                    .addOnSuccessListener(aVoid -> {
+                        // User added to checkedInAttendees successfully
+                        Log.i("Firebase", "User added to checkedInAttendees successfully");
+                    })
+                    .addOnFailureListener(e -> {
+                        // Error occurred while adding user to checkedInAttendees
+                        Log.e("Firebase", "Error adding user to checkedInAttendees: " + e.getMessage());
+                    });
         } catch (Exception e) {
             // Handle any exceptions that occur during the process
             Log.e("Firebase", "Error adding user to checkedInAttendees: " + e.getMessage());
@@ -839,6 +800,8 @@ public class Firebase {
                         Long maxAttendeesLong = document.getLong("maxAttendees");
                         Integer maxAttendees = maxAttendeesLong != null ? maxAttendeesLong.intValue() : null;
                         String imageURL = document.getString("imageURL");
+                        List<User> organizers = (List<User>) document.get("organizers");
+                        List<User> registeredAttendees = (List<User>) document.get("registeredAttendees");
 
                         // Check for nulls to avoid adding incomplete events
                         if (eventName != null && eventDate != null && location != null) {
@@ -900,7 +863,13 @@ public class Firebase {
         Long maxAttendeesLong = document.getLong("maxAttendees");
         Integer maxAttendees = maxAttendeesLong != null ? maxAttendeesLong.intValue() : null;
         String imageURL = document.getString("imageURL");
-        return new Event(eventId, eventName, eventDate, location, maxAttendees, imageURL);
+        List<String> organizers = (List<String>) document.get("organizers");
+        List<User> registeredAttendees = (List<User>) document.get("registeredAttendees");
+        System.out.println("organizers: " + organizers + " registeredAttendees: " + registeredAttendees);
+        Event event = new Event(eventId, eventName, eventDate, location, maxAttendees, imageURL);
+        event.setOrganizers(organizers);
+        event.setRegisteredAttendees(registeredAttendees);
+        return event;
     }
 
     public interface OnUserEventsLoadedListener {
@@ -1131,7 +1100,6 @@ public class Firebase {
                     // Now only store the user's ID as the attendee
                     eventRef.update("registeredAttendees", FieldValue.arrayUnion(user.getId()))
                             .addOnSuccessListener(aVoid -> {
-                                System.out.println("User registered for the event successfully.");
                                 listener.onAttendeeRegistered();
                             })
                             .addOnFailureListener(e -> {
@@ -1163,5 +1131,208 @@ public class Firebase {
         void onEventUpdated();
 
         void onEventUpdateFailed(Exception e);
+    }
+
+    /**
+     * Retrieves the list of events for a specific organizer from the database.
+     * @param userId
+     * @return list of events
+     * asynchronous method
+     */
+    public void fetchEventsForOrganizer(String userId, OnEventsLoadedListener listener) {
+        db.collection("events")
+                .whereArrayContains("organizers", userId)
+                .get()
+                .addOnSuccessListener(querySnapshot -> {
+                    List<Event> eventList = new ArrayList<>();
+                    for (DocumentSnapshot document : querySnapshot.getDocuments()) {
+                        String eventId = document.getString("eventId");
+                        String eventName = document.getString("eventName");
+                        Date eventDate = document.getDate("eventDate");
+                        String location = document.getString("location");
+                        Long maxAttendeesLong = document.getLong("maxAttendees");
+                        Integer maxAttendees = maxAttendeesLong != null ? maxAttendeesLong.intValue() : null;
+                        String imageURL = document.getString("imageURL");
+
+                        // Check for nulls to avoid adding incomplete events
+                        if (eventName != null && eventDate != null && location != null) {
+                            Event event = new Event(eventId, eventName, eventDate, location, maxAttendees, imageURL);
+                            eventList.add(event);
+                        }
+                    }
+                    listener.onEventsLoaded(eventList);
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("Firebase", "Error fetching events for organizer: " + e.getMessage());
+                    listener.onEventsLoadFailed(e);
+                });
+    }
+
+    /**
+     * Retrieves the event data from firebase
+     *
+     * @return the user details for a particular email.
+     * @param eventId
+     */
+    public void getEventDataById(String eventId, OnEventLoadedListener listener) {
+        db.collection("events")
+                .document(eventId)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        DocumentSnapshot document = task.getResult();
+                        Log.d("Firebase", "DocumentSnapshot data: " + document.getData());
+                        if (document.exists()) {
+                            String eventName = document.getString("eventName");
+                            Date eventDate = document.getDate("eventDate");
+                            String location = document.getString("location");
+                            Integer maxAttendees = document.getLong("maxAttendees") != null ? document.getLong("maxAttendees").intValue() : null;
+                            String imageURL = document.getString("imageURL");
+
+                            Event event = new Event(eventId, eventName, eventDate, location, 0, imageURL);
+                            event.setMaxAttendees(maxAttendees);
+
+                            List<String> organizerEmails = (List<String>) document.get("organizers");
+                            if (organizerEmails != null && !organizerEmails.isEmpty()) {
+                                for (String email : organizerEmails) {
+                                    getUserData(email, new OnUserLoadedListener() {
+                                        @Override
+                                        public void onUserLoaded(User user) {
+                                            event.addOrganizer(user.getId());
+                                            if (event.getOrganizers().size() == organizerEmails.size()) {
+                                                fetchRegisteredAttendees(eventName, new OnRegisteredAttendeesLoadedListener() {
+                                                    @Override
+                                                    public void onRegisteredAttendeesLoaded(List<User> registeredAttendees) {
+                                                        event.setRegisteredAttendees(registeredAttendees);
+                                                        fetchCheckedInAttendees(eventName, new OnCheckInAttendeesLoadedListener() {
+                                                            @Override
+                                                            public void onCheckInAttendeesLoaded(List<User> checkedInAttendees) {
+                                                                event.setCheckedInAttendees(checkedInAttendees);
+                                                                listener.onEventLoaded(event);
+                                                            }
+
+                                                            @Override
+                                                            public void onCheckInAttendeesLoadFailed(Exception e) {
+                                                                listener.onEventLoadFailed(e);
+                                                            }
+                                                        });
+                                                    }
+
+                                                    @Override
+                                                    public void onRegisteredAttendeesLoadFailed(Exception e) {
+                                                        listener.onEventLoadFailed(e);
+                                                    }
+                                                });
+                                            }
+                                        }
+
+                                        @Override
+                                        public void onUserNotFound() {
+                                            Log.d("Firebase", "User not found");
+                                        }
+
+                                        @Override
+                                        public void onUserLoadFailed(Exception e) {
+                                            listener.onEventLoadFailed(e);
+                                        }
+                                    });
+                                }
+                            } else {
+                                fetchRegisteredAttendees(eventName, new OnRegisteredAttendeesLoadedListener() {
+                                    @Override
+                                    public void onRegisteredAttendeesLoaded(List<User> registeredAttendees) {
+                                        event.setRegisteredAttendees(registeredAttendees);
+                                        fetchCheckedInAttendees(eventName, new OnCheckInAttendeesLoadedListener() {
+                                            @Override
+                                            public void onCheckInAttendeesLoaded(List<User> checkedInAttendees) {
+                                                event.setCheckedInAttendees(checkedInAttendees);
+                                                listener.onEventLoaded(event);
+                                            }
+
+                                            @Override
+                                            public void onCheckInAttendeesLoadFailed(Exception e) {
+                                                listener.onEventLoadFailed(e);
+                                            }
+                                        });
+                                    }
+
+                                    @Override
+                                    public void onRegisteredAttendeesLoadFailed(Exception e) {
+                                        listener.onEventLoadFailed(e);
+                                    }
+                                });
+                            }
+                        } else {
+                            listener.onEventNotFound();
+                        }
+                    } else {
+                        listener.onEventLoadFailed(task.getException());
+                    }
+                });
+    }
+
+    /**
+     * Retrieves the user data from Firebase.
+     *
+     * @return the user details for a particular email.
+     * @param id
+     */
+    public boolean confirmUserExists(String id) {
+        getUserData(id, new Firebase.OnUserLoadedListener() {
+            @Override
+            public void onUserLoaded(User user) {
+                // initialize the AppUser in case it hasn't already been done
+                Log.d("User Found", "User was found");
+                AppUser.setHasSignedIn(true);
+            }
+
+            @Override
+            public void onUserNotFound() {
+                // If the user is not found, it must have been deleted
+                Log.d("Firebase", "User not found.");
+                AppUser.setHasSignedIn(false);
+            }
+
+            @Override
+            public void onUserLoadFailed(Exception e) {
+                Log.e("Firebase", "User retrieval failed.");
+                AppUser.setHasSignedIn(false);
+            }
+        });
+
+        return AppUser.getHasSignedIn();
+    }
+
+    /**
+     * removes the current user from the list of registered attendees for a specific event.
+     * @param eventId the id for the event that registered attendees will be removed from
+     * @param userId the id of the user that will be removed from the list of registered attendees
+     * @param listener the listener for the removal of the user from the list of registered attendees
+     */
+    public void removeUserFromRegisteredAttendees(String eventId, String userId, OnAttendeeRemovedListener listener) {
+        try {
+            DocumentReference eventRef = db.collection("events").document(eventId);
+
+            eventRef.update("registeredAttendees", FieldValue.arrayRemove(userId))
+                    .addOnSuccessListener(aVoid -> {
+                        // User removed from registeredAttendees successfully
+                        Log.i("Firebase", "User removed from registeredAttendees successfully");
+                        listener.onAttendeeRemoved();
+                    })
+                    .addOnFailureListener(e -> {
+                        // Error occurred while removing user from registeredAttendees
+                        Log.e("Firebase", "Error removing user from registeredAttendees: " + e.getMessage());
+                        listener.onAttendeeRemovalFailed(e);
+                    });
+        } catch (Exception e) {
+            // Handle any exceptions that occur during the process
+            Log.e("Firebase", "Error removing user from registeredAttendees: " + e.getMessage());
+        }
+    }
+
+    public interface OnAttendeeRemovedListener {
+        void onAttendeeRemoved();
+
+        void onAttendeeRemovalFailed(Exception e);
     }
 }
