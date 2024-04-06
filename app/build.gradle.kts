@@ -47,8 +47,6 @@ android {
 }
 
 dependencies {
-    //implementation files("libs/osmdroid-android-3.0.8.jar")
-    //implementation("org.osmdroid:osmdroid-nominatim:6.1.10")
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("com.google.android.material:material:1.11.0")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
