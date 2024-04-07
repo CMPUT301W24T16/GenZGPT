@@ -29,7 +29,6 @@ import com.example.genzgpt.R;
  * create an instance of this fragment.
  */
 public class UserProfileFragment extends Fragment {
-    private Button editButton;
     private TextView userBanner;
     private ImageView userPicture;
     private TextView userFirstName;
@@ -113,7 +112,7 @@ public class UserProfileFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_user_profile, container, false);
         //Initialize all variables
-        editButton = view.findViewById(R.id.edit_profile_button);
+        Button editButton = view.findViewById(R.id.edit_profile_button);
         userBanner = view.findViewById(R.id.profile_header);
         userPicture = view.findViewById(R.id.profile_picture);
         userFirstName = view.findViewById(R.id.first_name_text);
@@ -164,7 +163,7 @@ public class UserProfileFragment extends Fragment {
         }
     /**
      * Gets the user data from the firebase
-     * @param user
+     * @param user the user
      */
     public void Bind(User user){
         userFirstName.setText(user.getFirstName());
@@ -172,12 +171,12 @@ public class UserProfileFragment extends Fragment {
         userPhoneNumber.setText(String.valueOf(user.getPhone()));
         userEmail.setText(user.getEmail());
         userBanner.setText(user.getFirstName() + " " + user.getLastName());
-        userTheme.setText("Black and White");
-        if (user.isGeolocation() == Boolean.TRUE && checkPermission(android.Manifest.permission.ACCESS_FINE_LOCATION)){
-            userGeolocation.setText("ON");
+        userTheme.setText(R.string.black_and_white);
+        if (user.isGeolocation() == Boolean.TRUE && (geolocation.checkPermission(Manifest.permission.ACCESS_COARSE_LOCATION) && geolocation.checkPermission(Manifest.permission.ACCESS_FINE_LOCATION))){
+            userGeolocation.setText(R.string.on);
         }
-        if (user.isGeolocation() == Boolean.FALSE || (!checkPermission(android.Manifest.permission.ACCESS_FINE_LOCATION))){
-            userGeolocation.setText("OFF");
+        if (user.isGeolocation() == Boolean.FALSE || (!(geolocation.checkPermission(Manifest.permission.ACCESS_COARSE_LOCATION) && geolocation.checkPermission(Manifest.permission.ACCESS_FINE_LOCATION)))){
+            userGeolocation.setText(R.string.off);
         }
     }
     public boolean checkPermission(String permission){

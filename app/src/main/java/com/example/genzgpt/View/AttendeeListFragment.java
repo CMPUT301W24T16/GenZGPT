@@ -1,6 +1,5 @@
 package com.example.genzgpt.View;
 
-import android.app.AlertDialog;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -9,19 +8,17 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.genzgpt.Controller.Firebase;
+import com.example.genzgpt.Model.Event;
 import com.example.genzgpt.Model.User;
 import com.example.genzgpt.R;
-import com.example.genzgpt.View.SpacingItemDecoration;
-import com.example.genzgpt.Model.Event;
-import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -29,11 +26,10 @@ import java.util.List;
  * It displays a list of attendees fetched from Firestore and allows navigation back to the previous screen.
  */
 public class AttendeeListFragment extends Fragment {
-    private RecyclerView recyclerView;
     private UserAdapter userAdapter;
     private List<User> attendeeList;
     private Firebase firebase;
-    private Event event;
+    private final Event event;
 
     /**
      * Constructs a new instance of AttendeeListFragment with a specific event.
@@ -41,7 +37,7 @@ public class AttendeeListFragment extends Fragment {
      */
     public AttendeeListFragment(Event event){
         this.event = event;
-    };
+    }
 
     /**
      * Inflates the fragment's view and initializes its components, such as the RecyclerView for displaying attendees.
@@ -56,7 +52,7 @@ public class AttendeeListFragment extends Fragment {
         View view = inflater.inflate(R.layout.attendee_list_fragment, container, false);
 
         int spacingInPixels = 16; // Adjust the spacing as needed
-        recyclerView = view.findViewById(R.id.attendeesRecyclerView);
+        RecyclerView recyclerView = view.findViewById(R.id.attendeesRecyclerView);
         recyclerView.addItemDecoration(new SpacingItemDecoration(spacingInPixels));
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
@@ -70,13 +66,10 @@ public class AttendeeListFragment extends Fragment {
         fetchCheckedInAttendees(event.getEventName());
 
         ImageView backArrowImageView = view.findViewById(R.id.backArrowImageView);
-        backArrowImageView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Perform action on back arrow click, typically go back
-                if (getActivity() != null) {
-                    getActivity().onBackPressed();
-                }
+        backArrowImageView.setOnClickListener(v -> {
+            // Perform action on back arrow click, typically go back
+            if (getActivity() != null) {
+                getActivity().onBackPressed();
             }
         });
 
@@ -119,13 +112,14 @@ public class AttendeeListFragment extends Fragment {
     /**
      * Adapter class for managing the display of attendees in a RecyclerView.
      */
-    private class UserAdapter extends RecyclerView.Adapter<UserViewHolder> {
-        private List<User> attendees;
+    private static class UserAdapter extends RecyclerView.Adapter<UserViewHolder> {
+        private final List<User> attendees;
 
         public UserAdapter(List<User> attendees) {
             this.attendees = attendees;
         }
 
+        @NonNull
         @Override
         public UserViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_attendee, parent, false);
@@ -143,22 +137,13 @@ public class AttendeeListFragment extends Fragment {
             return attendees.size();
         }
 
-        public void setUsers(List<User> newUsers) {
-            this.attendees.clear();
-            this.attendees.addAll(newUsers);
-            notifyDataSetChanged();
-        }
-
-        public List<User> getUsers() {
-            return attendees;
-        }
     }
 
     /**
      * ViewHolder class for displaying individual attendee items in the RecyclerView.
      */
-    private class UserViewHolder extends RecyclerView.ViewHolder {
-        private TextView personName;
+    private static class UserViewHolder extends RecyclerView.ViewHolder {
+        private final TextView personName;
         //private TextView checkInCount;
 
         public UserViewHolder(View itemView) {
@@ -172,6 +157,4 @@ public class AttendeeListFragment extends Fragment {
             //checkInCount.setText("Checked In: " + user.getCheckInCount());
         }
     }
-
-
 }

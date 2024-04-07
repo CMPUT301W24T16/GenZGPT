@@ -31,7 +31,6 @@ import java.util.List;
  * create an instance of this fragment.
  */
 public class MyEventsFragment extends EventsFragment {
-    private TextView pageName;
     private Firebase firebase;
 
     @Override
@@ -40,8 +39,8 @@ public class MyEventsFragment extends EventsFragment {
 
         firebase = new Firebase();
         // Change the name of the page to My Events
-        pageName = view.findViewById(R.id.allEventsTitle);
-        pageName.setText("My Events");
+        TextView pageName = view.findViewById(R.id.allEventsTitle);
+        pageName.setText(R.string.my_events);
 
         int spacingInPixels = 16; // Adjust the spacing as needed
         recyclerView = view.findViewById(R.id.eventsRecyclerView);
@@ -98,8 +97,7 @@ public class MyEventsFragment extends EventsFragment {
      * @return A new instance of fragment MyEventsFragment.
      */
     public static MyEventsFragment newInstance() {
-        MyEventsFragment fragment = new MyEventsFragment();
-        return fragment;
+        return new MyEventsFragment();
     }
 
     /**

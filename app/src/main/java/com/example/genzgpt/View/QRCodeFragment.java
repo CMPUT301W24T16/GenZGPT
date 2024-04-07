@@ -16,10 +16,9 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.example.genzgpt.Controller.Firebase;
-import com.example.genzgpt.Model.Event;
 import com.example.genzgpt.Model.AppUser;
+import com.example.genzgpt.Model.Event;
 import com.example.genzgpt.R;
-import com.example.genzgpt.View.EventInfoFragment;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
@@ -30,27 +29,24 @@ public class QRCodeFragment extends Fragment {
     private Event loadedEvent;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view;
         firebase = new Firebase();
-        if (checkPermissions()) {
-            view = inflater.inflate(R.layout.qr_activity, container, false);
-            initiateQrScan();
-        } else {
+        if (!checkPermissions()) {
             requestPermissions();
-            view = inflater.inflate(R.layout.qr_activity, container, false);
-            initiateQrScan();
         }
+        view = inflater.inflate(R.layout.qr_activity, container, false);
+        initiateQrScan();
 
         return view;
     }
 
     private boolean checkPermissions() {
-        return ContextCompat.checkSelfPermission(getActivity(), Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED;
+        return ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED;
     }
 
     private void requestPermissions() {
-        ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA_PERMISSION);
+        ActivityCompat.requestPermissions(requireActivity(), new String[]{Manifest.permission.CAMERA}, REQUEST_CAMERA_PERMISSION);
     }
 
     private void initiateQrScan() {

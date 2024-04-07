@@ -7,7 +7,7 @@ import java.util.List;
  * Represents the Organizer role in the event management system.
  */
 public class Organizer extends Role {
-    private List<Event> managedEvents;
+    private final List<Event> managedEvents;
 
     /**
      * Constructor for an Organizer Role.
@@ -47,24 +47,6 @@ public class Organizer extends Role {
     }
 
     /**
-     * Sends push notifications to all checked-in attendees of a specific event.
-     *
-     * @param event   The event for which notifications are sent.
-     * @param message The message to be sent in the push notification.
-     */
-    // US 01.03.01 - Send notifications to all checked-in attendees
-    /*
-     * public void sendPushNotification(Event event, String message) {
-     * List<User> checkedIn = event.getAttendees();
-     * NotificationService notificationService = new NotificationService();
-     * 
-     * for (User u : checkedIn) {
-     * notificationService.sendPushNotificationToUser(u, message);
-     * }
-     * }
-     */
-
-    /**
      * Retrieves the number of times an attendee has checked into a specific event.
      *
      * @param user  The attendee for whom the check-in count is retrieved.
@@ -87,6 +69,4 @@ public class Organizer extends Role {
     public List<User> viewRegisteredInAttendees(Event event) {
         return event.getRegisteredAttendees();
     }
-
-    // More Organizer methods here...
 }
