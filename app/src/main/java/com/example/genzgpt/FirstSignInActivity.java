@@ -102,6 +102,7 @@ public class FirstSignInActivity extends AppCompatActivity {
                         imageURL);
 
                 Firebase firebase = new Firebase();
+                Log.e("FSFB", "We got to this point");
                 firebase.createUser(newUser, new Firebase.OnUserCreatedListener() {
                     @Override
                     public void onUserCreated(String userId) {
@@ -115,11 +116,11 @@ public class FirstSignInActivity extends AppCompatActivity {
 
                         // Store info that the user has signed in for future app usage
                         preferences.edit().putBoolean("signIn", AppUser.getHasSignedIn()).apply();
-                        Log.d("FirstsignIn", String.valueOf(AppUser.getHasSignedIn()));
+                        Log.d("FSFB", String.valueOf(AppUser.getHasSignedIn()));
                         preferences.edit().putString("id", AppUser.getUserId()).apply();
 
                         Log.e("FSI UserId", userId);
-                        Log.e("User Creation", "Successful User Creation");
+                        Log.e("FSFB", "Successful User Creation");
 
                         // Set up Firebase Messaging for this user.
                         FirebaseMessages fms = new FirebaseMessages(getApplicationContext());
@@ -133,11 +134,12 @@ public class FirstSignInActivity extends AppCompatActivity {
                         Toast.makeText(getApplicationContext(),
                                 "The provided email already exists for another user." +
                                 "Please use a different email.", Toast.LENGTH_SHORT).show();
+                        Log.e("FSFB", "EMAIL ALREADY EXISTS");
                     }
 
                     @Override
                     public void onUserCreationFailed(Exception e) {
-                        Log.e("User Creation", "The User was not Created", e);
+                        Log.e("FSFB", "The User was not Created", e);
                     }
                 });
             }
@@ -184,8 +186,7 @@ public class FirstSignInActivity extends AppCompatActivity {
      * True if the phone number is valid. False Otherwise.
      */
     private boolean isValidPhone(String phone) {
-        // FIXME May want to change number from 10
-        return (phone.length() == 4 || phone.length() >= 10);
+        return (phone.length() >= 4 && phone.length() <= 10);
     }
 
     /**
@@ -196,8 +197,7 @@ public class FirstSignInActivity extends AppCompatActivity {
      * True if the email is valid. False otherwise.
      */
     private boolean isValidEmail(String email) {
-        // FIXME NEED TO GET JAVA EMAIL package
-        return (!email.isEmpty());
+        return (email.contains("@") && email.contains("."));
     }
 
     /**
