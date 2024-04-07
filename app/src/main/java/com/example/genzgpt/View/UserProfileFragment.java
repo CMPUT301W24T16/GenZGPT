@@ -1,8 +1,10 @@
 package com.example.genzgpt.View;
 
 import android.Manifest;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import android.util.Log;
@@ -36,7 +38,6 @@ public class UserProfileFragment extends Fragment {
     private TextView userTheme;
     private TextView userGeolocation;
     private Firebase firebase;
-    private GeolocationTracking geolocation;
     private User userCurrent;
 
     /**
@@ -108,7 +109,6 @@ public class UserProfileFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         firebase = new Firebase();
-        geolocation = new GeolocationTracking();
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_user_profile, container, false);
         //Initialize all variables
@@ -178,5 +178,8 @@ public class UserProfileFragment extends Fragment {
         if (user.isGeolocation() == Boolean.FALSE || (!(geolocation.checkPermission(Manifest.permission.ACCESS_COARSE_LOCATION) && geolocation.checkPermission(Manifest.permission.ACCESS_FINE_LOCATION)))){
             userGeolocation.setText(R.string.off);
         }
+    }
+    public boolean checkPermission(String permission){
+        return ContextCompat.checkSelfPermission(getActivity(), permission) == PackageManager.PERMISSION_GRANTED;
     }
 }

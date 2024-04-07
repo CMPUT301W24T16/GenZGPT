@@ -37,7 +37,7 @@ public class EventManager {
      * @param eventId The ID of the event to be removed.
      */
     public void removeEvent(Integer eventId) {
-        events.removeIf(event -> event.getEventId().equals(eventId));
+        events.removeIf(event -> Integer.parseInt(event.getEventId()) == (eventId));
     }
 
 
@@ -47,7 +47,7 @@ public class EventManager {
      * @return An Optional containing the found event if present, or an empty Optional if not found.
      */
     private Optional<Event> findEventById(Integer eventId) {
-        return events.stream().filter(event -> event.getEventId().equals(eventId)).findFirst();
+        return events.stream().filter(event -> Integer.parseInt(event.getEventId()) == (eventId)).findFirst();
     }
 
     /**

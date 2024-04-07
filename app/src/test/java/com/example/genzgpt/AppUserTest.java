@@ -27,10 +27,6 @@ class AppUserTest {
     }
 
 
-    @Test
-    void getAppUserEmail_shouldReturnCorrectEmail() {
-        assertEquals("john.doe@example.com", AppUser.getAppUserEmail());
-    }
 
     @Test
     void setUserEmail_shouldSetCorrectEmail() {

@@ -21,6 +21,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.genzgpt.Controller.Firebase;
+import com.example.genzgpt.Controller.GeolocationTracking;
 import com.example.genzgpt.Model.Event;
 import com.example.genzgpt.R;
 import com.squareup.picasso.Picasso;
@@ -235,6 +236,10 @@ abstract class EventsFragment extends Fragment {
                 if (shouldShowCheckedInAttendeesOption()) {
                     optionsList.add(3, "Attendees");
                 }
+                // Conditional option addition for MyEventsFragment
+                if (shouldShowCheckedInAttendeesOption()) {
+                    optionsList.add(4, "View Map");
+                }
 
                 CharSequence[] options = optionsList.toArray(new CharSequence[0]);
 
@@ -258,6 +263,9 @@ abstract class EventsFragment extends Fragment {
                     } else if (options[item].equals("View Check-In QR Code")) {
                         CheckInQRCodeFragment checkInQRCodeFragment = new CheckInQRCodeFragment(event);
                         switchFragment(context, checkInQRCodeFragment, R.id.BaseFragment);
+                    }else if (options[item].equals("View Map")){
+                        GeolocationTracking geolocationTracking = new GeolocationTracking(event);
+                        switchFragment(context, geolocationTracking, R.id.BaseFragment);
                     }
                     else if (options[item].equals("Cancel")) {
                         dialog.dismiss();
@@ -298,4 +306,5 @@ abstract class EventsFragment extends Fragment {
     protected boolean shouldShowCheckedInAttendeesOption() {
         return false;
     }
+    protected boolean shouldShowMapViewOption(){return false;}
 }

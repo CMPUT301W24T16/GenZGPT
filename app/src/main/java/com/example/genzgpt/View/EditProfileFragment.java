@@ -164,9 +164,8 @@ public class EditProfileFragment extends DialogFragment {
             firebase.updateUser(new_user, new Firebase.OnUserUpdatedListener() {
                 @Override
                 public void onUserUpdated() {
-                    if (getContext() != null) {
-                        Toast.makeText(getContext(),"Successfully updated user information!", Toast.LENGTH_SHORT).show();
-                    }
+                   // Toast.makeText(getActivity(),"Successfully updated user information!", Toast.LENGTH_SHORT).show();
+                    Log.d("Firebase", "Successfully updated");
                 }
                 @Override
                 public void onUserUpdateFailed(Exception e) {

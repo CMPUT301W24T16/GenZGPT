@@ -17,9 +17,9 @@ class EventTest {
     void testAddOrganizer() {
         Event event = createEventWithOrganizers();
         User newOrganizer = new User("3", "Jane", "Doe", 123456789, "jane@example.com", false, "img");
-        event.addOrganizer(newOrganizer);
-        List<User> organizers = event.getOrganizers();
-        assertTrue(organizers.contains(newOrganizer));
+        event.addOrganizer(newOrganizer.getId());
+        List<String> organizers = event.getOrganizers();
+        assertTrue(organizers.contains(newOrganizer.getId()));
     }
 
     @Test
@@ -65,8 +65,8 @@ class EventTest {
         User organizer1 = new User("1", "John", "Doe", 1234567890, "john@example.com", false, "img");
         User organizer2 = new User("2", "Bob", "Smith", 168402749, "bob@example.com", false, null);
 
-        event.addOrganizer(organizer1);
-        event.addOrganizer(organizer2);
+        event.addOrganizer(organizer1.getId());
+        event.addOrganizer(organizer2.getId());
 
         return event;
     }
