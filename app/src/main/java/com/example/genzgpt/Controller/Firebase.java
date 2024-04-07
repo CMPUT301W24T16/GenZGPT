@@ -13,7 +13,9 @@ import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
+import com.google.firebase.firestore.GeoPoint;
 import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.WriteBatch;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -21,6 +23,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -1564,6 +1567,80 @@ public class Firebase {
                 // Error occurred while querying check-in data
                 Log.e("Firebase", "Error querying check-in data: " + task.getException().getMessage());
                 listener.onEventUpdateFailed(task.getException());
+            }
+        });
+    }
+
+    /**
+     * Retrieves Geopoints from the list of locations in the firebase
+     * These locations will be used to check where attendees are checking in from
+     * @param eventName The name of the event to retrieve locations for.
+     * @param listener Listener for handling locations retrieval.
+     */
+    public void retrieveLocations(String eventName, OnLocationsRetrievedListener listener) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        CollectionReference locationsRef = db.collection("events").document(eventName).collection("locations");
+
+        locationsRef.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                List<GeoPoint> locations = new ArrayList<>();
+                for (QueryDocumentSnapshot document : task.getResult()) {
+                    GeoPoint location = document.getGeoPoint("location");
+                    if (location != null) {
+                        locations.add(location);
+                    }
+                }
+                listener.onLocationsRetrieved(locations);
+            } else {
+                Log.e("firebase", "Error getting locations: ", task.getException());
+                listener.onLocationsRetrievalFailed(task.getException());
+            }
+        });
+    }
+
+    public interface OnLocationsRetrievedListener {
+        void onLocationsRetrieved(List<GeoPoint> locations);
+        void onLocationsRetrievalFailed(Exception e);
+    }
+
+    /**
+     * either creates the location list in the event, if it doesn't exist, or adds a new location to the list
+     * These will be stored as geopoints in the firebase
+     * @param eventName The name of the event to add the location to.
+     * @param location The location to add.
+     */
+    public void addLocationToEvent(String eventName, GeoPoint location) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        DocumentReference eventRef = db.collection("events").document(eventName);
+
+        eventRef.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                DocumentSnapshot eventSnapshot = task.getResult();
+                if (eventSnapshot.exists()) {
+                    // Event document exists, add the location to the existing list
+                    eventRef.collection("locations").add(new HashMap<String, Object>() {{
+                        put("location", location);
+                    }}).addOnSuccessListener(documentReference -> {
+                        Log.d("firebase", "Location added to event: " + eventName);
+                    }).addOnFailureListener(e -> {
+                        Log.e("firebase", "Error adding location to event: ", e);
+                    });
+                } else {
+                    // Event document doesn't exist, create it with a new location list
+                    Map<String, Object> eventData = new HashMap<>();
+                    eventData.put("name", eventName);
+                    eventData.put("locations", Arrays.asList(new HashMap<String, Object>() {{
+                        put("location", location);
+                    }}));
+
+                    eventRef.set(eventData).addOnSuccessListener(aVoid -> {
+                        Log.d("firebase", "Event created with location: " + eventName);
+                    }).addOnFailureListener(e -> {
+                        Log.e("firebase", "Error creating event with location: ", e);
+                    });
+                }
+            } else {
+                Log.e("firebase", "Error checking event existence: ", task.getException());
             }
         });
     }
