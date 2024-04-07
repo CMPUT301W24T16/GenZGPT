@@ -8,11 +8,11 @@ import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -21,6 +21,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.genzgpt.Controller.Firebase;
+import com.example.genzgpt.Controller.GeolocationTracking;
 import com.example.genzgpt.Model.Event;
 import com.example.genzgpt.R;
 import com.squareup.picasso.Picasso;
@@ -28,7 +29,6 @@ import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import com.google.firebase.firestore.FirebaseFirestore;
 
 /**
  * The basis for any fragment that handles showing a collection of events.
@@ -113,7 +113,7 @@ abstract class EventsFragment extends Fragment {
      * Switches the current fragment to the new fragment
      */
     protected void switchFragment(Fragment fragment, int idToReplace) {
-        FragmentManager fragmentManager = getActivity().getSupportFragmentManager();
+        FragmentManager fragmentManager = requireActivity().getSupportFragmentManager();
         FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 
         // Replace the current fragment with the new fragment
@@ -128,7 +128,7 @@ abstract class EventsFragment extends Fragment {
      * Allows for an Event to be handled by the RecyclerView in an EventsFragment
      */
     protected class EventAdapter extends RecyclerView.Adapter<EventViewHolder> {
-        private List<Event> events;
+        private final List<Event> events;
 
         /**
          * Constructor for the EventAdapter
@@ -140,6 +140,7 @@ abstract class EventsFragment extends Fragment {
         /**
          * Creates a new view holder and inflates the view
          */
+        @NonNull
         @Override
         public EventViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
             View itemView = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_event, parent, false);
@@ -235,6 +236,10 @@ abstract class EventsFragment extends Fragment {
                 if (shouldShowCheckedInAttendeesOption()) {
                     optionsList.add(3, "Attendees");
                 }
+                // Conditional option addition for MyEventsFragment
+                if (shouldShowCheckedInAttendeesOption()) {
+                    optionsList.add(4, "View Map");
+                }
 
                 CharSequence[] options = optionsList.toArray(new CharSequence[0]);
 
@@ -258,6 +263,9 @@ abstract class EventsFragment extends Fragment {
                     } else if (options[item].equals("View Check-In QR Code")) {
                         CheckInQRCodeFragment checkInQRCodeFragment = new CheckInQRCodeFragment(event);
                         switchFragment(context, checkInQRCodeFragment, R.id.BaseFragment);
+                    }else if (options[item].equals("View Map")){
+                        GeolocationTracking geolocationTracking = new GeolocationTracking(event);
+                        switchFragment(context, geolocationTracking, R.id.BaseFragment);
                     }
                     else if (options[item].equals("Cancel")) {
                         dialog.dismiss();
@@ -298,4 +306,5 @@ abstract class EventsFragment extends Fragment {
     protected boolean shouldShowCheckedInAttendeesOption() {
         return false;
     }
+    protected boolean shouldShowMapViewOption(){return false;}
 }

@@ -84,14 +84,19 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> 
             if (event.getImageURL() != null && !event.getImageURL().isEmpty()) {
                 Picasso.get().load(event.getImageURL()).placeholder(R.drawable.ic_launcher_background).into(eventImage);
             }
-
+            resetOrganizerDetails();
             updateOrganizerDetails(event);
+        }
+
+        private void resetOrganizerDetails() {
+            // Reset the UI components to their default state
+            eventIndicator.setVisibility(View.GONE); // Assume not the organizer by default
+            hostName.setText(""); // Clear previous organizer name
         }
 
         private void updateOrganizerDetails(Event event) {
             String currentUserId = AppUser.getUserId();
             boolean isOrganizer = event.getOrganizers().contains(currentUserId);
-
             if (isOrganizer) {
                 eventIndicator.setVisibility(View.VISIBLE);
                 hostName.setText("You");
@@ -107,8 +112,11 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> 
                 firebase.getUserData(organizerId, new Firebase.OnUserLoadedListener() {
                     @Override
                     public void onUserLoaded(User user) {
-                        String organizerName = user.getFirstName() + " " + user.getLastName();
-                        hostName.setText(organizerName);
+                        // Ensure the ViewHolder is still handling the same event
+                        if (event.equals(eventList.get(getAdapterPosition()))) {
+                            String organizerName = user.getFirstName() + " " + user.getLastName();
+                            hostName.setText(organizerName);
+                        }
                     }
 
                     @Override
@@ -121,7 +129,10 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> 
                         hostName.setText("Error loading name");
                     }
                 });
+            } else {
+                hostName.setText("No Organizers");
             }
         }
     }
+
 }
