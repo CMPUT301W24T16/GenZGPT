@@ -57,8 +57,16 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.GeoPoint;
+
+import com.google.android.libraries.places.api.Places;
+import com.google.android.libraries.places.api.model.Place;
+import com.google.android.libraries.places.api.model.PlaceLikelihood;
+import com.google.android.libraries.places.api.net.FindCurrentPlaceRequest;
+import com.google.android.libraries.places.api.net.FindCurrentPlaceResponse;
+import com.google.android.libraries.places.api.net.PlacesClient;
 
 import android.location.Geocoder;
 
@@ -70,8 +78,10 @@ import java.util.List;
  * This class handles Geolocation Tracking for the user, includes permission requests and location pulls.
  */
 public class GeolocationTracking extends Fragment implements OnMapReadyCallback {
+
     public Event event;
-    public User user;
+
+    public Firebase firebase;
     public static final String TAG = GeolocationTracking.class.getSimpleName();
     private GoogleMap googleMap;
     private FusedLocationProviderClient fusedLocationProviderClient;
@@ -86,9 +96,9 @@ public class GeolocationTracking extends Fragment implements OnMapReadyCallback 
     private static final String KEY_CAMERA_POSITION = "cameraPosition";
     private static final String KEY_LOCATION = "location";
     private static final int MAX_ENTRIES = 5;
+    GeoPoint userLocation;
     //Constructor that takes in an event object
     public GeolocationTracking(Event event){this.event = event;}
-    public GeolocationTracking(User user){this.user = user;}
     //Empty required constructor
     public GeolocationTracking(){}
 
@@ -107,6 +117,7 @@ public class GeolocationTracking extends Fragment implements OnMapReadyCallback 
     @SuppressLint("RestrictedApi")
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+
         View view;
         if (savedInstanceState != null){
             lastKnownLocation = savedInstanceState.getParcelable(KEY_LOCATION);
@@ -144,23 +155,63 @@ public class GeolocationTracking extends Fragment implements OnMapReadyCallback 
      */
     @Override
         public void onMapReady(GoogleMap googleMap){
+            firebase = new Firebase();
             this.googleMap = googleMap;
+            if (lastKnownLocation != null) {
+                dropMarker(googleMap, lastKnownLocation.getLatitude(), lastKnownLocation.getLongitude(), "Event");
+            }
             requestLocationPermission();
+            firebase.retrieveLocations(event.getEventName(), new Firebase.OnLocationsRetrievedListener() {
+                @Override
+                public void onLocationsRetrieved(List<GeoPoint> locations) {
+                    for (GeoPoint location: locations){
+                        double lat = location.getLatitude();
+                        double lng = location.getLongitude();
+                        dropMarker(googleMap, lat, lng, "User");
+                    }
+                }
+
+                @Override
+                public void onLocationsRetrievalFailed(Exception e) {
+                    Log.e("Geolocation", "Location retrieval failed.");
+                }
+            });
             updateLocationUI();
             getEventLocation();
-
         }
 
     /**
      * Drops marker at user's current location
      * @param googleMap
      */
-    public void dropMarker(GoogleMap googleMap){
 
+    public void dropMarker(GoogleMap googleMap, double latitude, double longitude, String title){
             googleMap.addMarker(new MarkerOptions()
-                    .position(new LatLng(lastKnownLocation.getLatitude(), lastKnownLocation.getLongitude()))
-                    .title(user.getFirstName() + "" + user.getLastName()));
-        }
+                    .position(new LatLng(latitude, longitude))
+                    .title(title));
+    }
+
+    /**
+     * obtains the user's location
+     * @return GeoPoint of user's location
+     */
+    @SuppressLint("MissingPermission")
+    public GeoPoint getUserLocation(){
+        fusedLocationProviderClient.getLastLocation().addOnSuccessListener(requireActivity(), new OnSuccessListener<Location>() {
+            @Override
+            public void onSuccess(Location location) {
+                if (location != null) {
+                    double latitude = location.getLatitude();
+                    double longitude = location.getLongitude();
+                    userLocation = new GeoPoint(latitude, longitude);
+                }else{
+                    throw new NullPointerException("Location turned off");
+                }
+            }
+        });
+        return userLocation;
+    }
+
 
     /**
      * Obtains the event's location to set the center of the map
@@ -213,7 +264,6 @@ public class GeolocationTracking extends Fragment implements OnMapReadyCallback 
                 Address location = address.get(0);
                 location.getLatitude();
                 location.getLongitude();
-                Log.v(TAG, "Do you go through this?");
                 point = new GeoPoint((double) (location.getLatitude()),
                         (double) (location.getLongitude()));
                 return point;
