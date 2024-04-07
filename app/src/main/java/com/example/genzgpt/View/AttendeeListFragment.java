@@ -17,6 +17,7 @@ import com.example.genzgpt.Controller.Firebase;
 import com.example.genzgpt.Model.Event;
 import com.example.genzgpt.Model.User;
 import com.example.genzgpt.R;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -140,7 +141,7 @@ public class AttendeeListFragment extends Fragment {
     /**
      * Adapter class for managing the display of attendees in a RecyclerView.
      */
-    private static class UserAdapter extends RecyclerView.Adapter<UserViewHolder> {
+    private class UserAdapter extends RecyclerView.Adapter<UserViewHolder> {
         private final List<User> attendees;
 
         public UserAdapter(List<User> attendees) {

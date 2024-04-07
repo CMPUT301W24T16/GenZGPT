@@ -172,10 +172,10 @@ public class UserProfileFragment extends Fragment {
         userEmail.setText(user.getEmail());
         userBanner.setText(user.getFirstName() + " " + user.getLastName());
         userTheme.setText(R.string.black_and_white);
-        if (user.isGeolocation() == Boolean.TRUE && (geolocation.checkPermission(Manifest.permission.ACCESS_COARSE_LOCATION) && geolocation.checkPermission(Manifest.permission.ACCESS_FINE_LOCATION))){
+        if (user.isGeolocation() == Boolean.TRUE && checkPermission(Manifest.permission.ACCESS_FINE_LOCATION)){
             userGeolocation.setText(R.string.on);
         }
-        if (user.isGeolocation() == Boolean.FALSE || (!(geolocation.checkPermission(Manifest.permission.ACCESS_COARSE_LOCATION) && geolocation.checkPermission(Manifest.permission.ACCESS_FINE_LOCATION)))){
+        if (user.isGeolocation() == Boolean.FALSE || (!checkPermission(Manifest.permission.ACCESS_FINE_LOCATION))){
             userGeolocation.setText(R.string.off);
         }
     }
