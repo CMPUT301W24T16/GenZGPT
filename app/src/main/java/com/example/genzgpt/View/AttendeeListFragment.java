@@ -20,6 +20,7 @@ import com.example.genzgpt.R;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * A Fragment representing a list of attendees for a specific event.
@@ -85,10 +86,37 @@ public class AttendeeListFragment extends Fragment {
         firebase.fetchCheckedInAttendees(eventName, new Firebase.OnCheckInAttendeesLoadedListener() {
             @Override
             public void onCheckInAttendeesLoaded(List<User> loadedAttendees) {
-                attendeeList.clear();
-                attendeeList.addAll(loadedAttendees);
-                userAdapter.notifyDataSetChanged();
-                updateTotalCount();
+                FirebaseFirestore db = FirebaseFirestore.getInstance();
+                db.collection("checkIn")
+                        .whereEqualTo("eventId", event.getEventId())
+                        .get()
+                        .addOnSuccessListener(queryDocumentSnapshots -> {
+                            if (!queryDocumentSnapshots.isEmpty()) {
+                                List<Map<String, Object>> checkInList = (List<Map<String, Object>>) queryDocumentSnapshots.getDocuments().get(0).get("checkInList");
+                                if (checkInList != null) {
+                                    for (User user : loadedAttendees) {
+                                        for (Map<String, Object> checkInEntry : checkInList) {
+                                            if (checkInEntry.get("userId").equals(user.getId())) {
+                                                long count = (long) checkInEntry.get("count");
+                                                user.setCheckInCount((int) count);
+                                                break;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            attendeeList.clear();
+                            attendeeList.addAll(loadedAttendees);
+                            userAdapter.notifyDataSetChanged();
+                            updateTotalCount();
+                        })
+                        .addOnFailureListener(e -> {
+                            Log.e("AttendeeListFragment", "Failed to load check-in data: " + e.getMessage());
+                            attendeeList.clear();
+                            attendeeList.addAll(loadedAttendees);
+                            userAdapter.notifyDataSetChanged();
+                            updateTotalCount();
+                        });
             }
 
             @Override
@@ -142,19 +170,22 @@ public class AttendeeListFragment extends Fragment {
     /**
      * ViewHolder class for displaying individual attendee items in the RecyclerView.
      */
-    private static class UserViewHolder extends RecyclerView.ViewHolder {
-        private final TextView personName;
-        //private TextView checkInCount;
+
+    private class UserViewHolder extends RecyclerView.ViewHolder {
+        private TextView personName;
+        private TextView checkInCount;
+   
+
 
         public UserViewHolder(View itemView) {
             super(itemView);
             personName = itemView.findViewById(R.id.tvPersonName);
-            //checkInCount = itemView.findViewById(R.id.tvCheckedInCount);
+            checkInCount = itemView.findViewById(R.id.tvCheckedInCount);
         }
 
         public void bind(User user) {
             personName.setText(user.getFirstName()+" "+user.getLastName());
-            //checkInCount.setText("Checked In: " + user.getCheckInCount());
+            checkInCount.setText("Checked In: " + user.getCheckInCount());
         }
     }
 }
