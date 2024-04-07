@@ -4,6 +4,7 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.util.Log;
 
 /**
  * Generates a deterministic profile picture based on a user's name.
@@ -16,6 +17,8 @@ public class ProfileGenerator {
     private final int CREATE_HEIGHT = 5;
     private final Bitmap.Config CONFIG = Bitmap.Config.ARGB_8888;
     private final int bgColour = Color.rgb(240, 248, 250);
+    private final int upscaling = 100;
+    private final int downscaling = -50;
 
     /**
      * An empty constructor for the ProfileGenerator.
@@ -66,18 +69,41 @@ public class ProfileGenerator {
         char extraChar;
 
         if (first.length() >= 2) {
-            extraChar = first.charAt(1);
+            extraChar = first.toLowerCase().charAt(1);
         }
         else if (last.length() >= 2) {
-            extraChar = last.charAt(1);
+            extraChar = last.toLowerCase().charAt(1);
         }
         else {
-            extraChar = ' ';
+            extraChar = '}';
         }
 
-        int r = first.charAt(0);
-        int g = last.charAt(0);
-        int b = extraChar;
+        // create the r value for the colour (arbitrary method)
+        int r = first.toLowerCase().charAt(0);
+        if (r <= 109) {
+            r += upscaling;
+        }
+        else {
+            r += downscaling;
+        }
+
+        // create the g value for the colour (arbitrary method)
+        int g = last.toLowerCase().charAt(0);
+        if (g <= 109) {
+            g += upscaling;
+        }
+        else {
+            g += (upscaling/2);
+        }
+
+        // create the b value for the colour (arbitrary method)
+        int b = (extraChar);
+        if (b <= 109) {
+            b += downscaling;
+        }
+        else {
+            b += upscaling;
+        }
 
         return Color.rgb(r,g,b);
     }
@@ -96,12 +122,12 @@ public class ProfileGenerator {
 
         // Concatenate the binary values for the hash codes of each character in first.
         for (int i = 0; i < first.length(); i++) {
-            binary.append(Integer.toBinaryString((first.charAt(i))).hashCode());
+            binary.append(Integer.toBinaryString((first.charAt(i))));
         }
 
         // Concatenate the binary values for the hash codes of each character in last.
         for (int i = 0; i < last.length(); i++) {
-            binary.append(Integer.toBinaryString((last.charAt(i))).hashCode());
+            binary.append(Integer.toBinaryString((last.charAt(i))));
         }
 
         // Return the desired hex value String.
@@ -146,11 +172,12 @@ public class ProfileGenerator {
      * The finished version of the bitmap.
      */
     private Bitmap setProfileImage(Bitmap bitmap, int colour, String binary) {
-
         // set the pixels in the bitmap
+        bitmap = bitmap.copy(CONFIG, true);
+        Log.d("BINARY ENCODING", binary);
         for (int y = 0; y < 5; y++) {
             for (int x = 0; x < 5; x++) {
-                if (binary.charAt(x+(y*5)) == 1) {
+                if (binary.charAt(x+(y*5)) == '0') {
                     bitmap.setPixel(x, y, colour);
                 }
             }
@@ -158,7 +185,6 @@ public class ProfileGenerator {
 
         // upscale the bitmap to the correct profile picture size
         bitmap = Bitmap.createScaledBitmap(bitmap, PROFILE_WIDTH, PROFILE_HEIGHT, false);
-
         return bitmap;
     }
 }
