@@ -7,7 +7,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * Class representing an Event
@@ -18,8 +17,8 @@ public class Event {
     private Date eventDate;
     private String location;
     private List<String> organizers;
-    private AttendeeManager attendeeManager;
-    private String imageURL;
+    private final AttendeeManager attendeeManager;
+    private final String imageURL;
 
 
     /**
@@ -43,7 +42,7 @@ public class Event {
     /**
      * Adds an organizer to the event.
      *
-     * @param user The user to be added as an organizer.
+     * @param userId The user to be added as an organizer.
      */
     public void addOrganizer(String userId) {
         organizers.add(userId);

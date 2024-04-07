@@ -1,5 +1,6 @@
 package com.example.genzgpt.View;
 
+import android.app.AlertDialog;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
@@ -12,19 +13,18 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.app.AlertDialog;
 
 import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.example.genzgpt.Controller.Firebase;
+import com.example.genzgpt.Model.AppUser;
 import com.example.genzgpt.Model.Event;
 import com.example.genzgpt.Model.QRCodeGenerator;
 import com.example.genzgpt.Model.User;
 import com.example.genzgpt.R;
 import com.squareup.picasso.Picasso;
-import com.example.genzgpt.Model.AppUser;
 
 import java.util.Objects;
 
@@ -37,7 +37,9 @@ import java.util.Objects;
 public class EventInfoFragment extends Fragment {
 
     private Event event;
-    private TextView eventNameTextView, eventDateTextView, eventLocationTextView, eventAttendeesTextView;
+    private TextView eventNameTextView;
+    private TextView eventDateTextView;
+    private TextView eventLocationTextView;
     private ImageView eventImageView, qrCodeImageView;
     private Firebase firebase;
     private Button signUpButton;
@@ -242,22 +244,28 @@ public class EventInfoFragment extends Fragment {
             public void onAttendeeRegistered() {
                 Toast.makeText(getContext(), "You have signed up for the event!", Toast.LENGTH_SHORT).show();
                 isUserSignedUp = true;
-                signUpButton.setText("Withdraw");
+                signUpButton.setText(R.string.withdraw);
             }
 
             @Override
             public void onAttendeeRegistrationFailed(Exception e) {
-                Toast.makeText(getContext(), "Failed to sign up for the event!", Toast.LENGTH_SHORT).show();
+                // display a specific error message
+                if (Objects.requireNonNull(e.getMessage()).contains("Event is at full capacity")) {
+                    Toast.makeText(getContext(), "Event is at full capacity. Cannot sign up.", Toast.LENGTH_LONG).show();
+                } else {
+                    // For other errors
+                    Toast.makeText(getContext(), "Failed to sign up for the event. Please try again later.", Toast.LENGTH_LONG).show();
+                }
             }
 
             @Override
             public void onEventNotFound() {
-
+                Toast.makeText(getContext(), "Event not found.", Toast.LENGTH_LONG).show();
             }
 
             @Override
             public void onEventLoadFailed(Exception e) {
-
+                Toast.makeText(getContext(), "Failed to load event data. Please try again later.", Toast.LENGTH_LONG).show();
             }
         });
     }

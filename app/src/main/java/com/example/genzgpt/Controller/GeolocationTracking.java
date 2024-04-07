@@ -1,110 +1,272 @@
+/*
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+ */
+
 package com.example.genzgpt.Controller;
 
+
+
 import android.Manifest;
-import android.app.Activity;
+import android.annotation.SuppressLint;
+
 import android.content.pm.PackageManager;
+import android.location.Address;
 import android.location.Location;
+
 import android.os.Bundle;
-import android.widget.Toast;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+
 
 import androidx.annotation.NonNull;
+
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
+
+
+import com.example.genzgpt.Model.Event;
+
 
 import com.example.genzgpt.R;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.CameraPosition;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.firestore.GeoPoint;
+
+import android.location.Geocoder;
+
+import java.io.IOException;
+import java.util.List;
+
 
 /**
  * This class handles Geolocation Tracking for the user, includes permission requests and location pulls.
  */
-public class GeolocationTracking extends Activity {
-    private FusedLocationProviderClient fusedLocationClient;
-    private String[] permissions = {android.Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.ACCESS_FINE_LOCATION};
+public class GeolocationTracking extends Fragment implements OnMapReadyCallback {
+    public Event event;
+    public static final String TAG = GeolocationTracking.class.getSimpleName();
+    private GoogleMap googleMap;
+    private FusedLocationProviderClient fusedLocationProviderClient;
+    //This will be the default position for the camera (Edmonton, Alberta)
+    private final LatLng defaultLocation = new LatLng(53.5460983,-113.4937266);
+    private static final int DEFAULT_ZOOM = 15;
+    public static final int FINE_LOCATION_PERMISSION = 101;
+    private boolean locationPermissionGranted;
+    private CameraPosition cameraPosition;
+    private Location lastKnownLocation;
+    private static final String KEY_CAMERA_POSITION = "cameraPosition";
+    private static final String KEY_LOCATION = "location";
+    private static final int MAX_ENTRIES = 5;
+    //Constructor that takes in an event object
+    public GeolocationTracking(Event event){this.event = event;}
+    //Empty required constructor
+    public GeolocationTracking(){}
 
     /**
-     * This class represents request codes for the specified permissions.
-     */
-    class RequestCode{
-        static final int COARSE_LOCATION_PERMISSION = 100;
-        static final int FINE_LOCATION_PERMISSION = 101;
-    }
-
-    /**
-     * This method is an onCreate for the activity
-     * @param savedInstanceState If the activity is being re-initialized after
-     *     previously being shut down then this Bundle contains the data it most
-     *     recently supplied in {@link #onSaveInstanceState}.  <b><i>Note: Otherwise it is null.</i></b>
+     * Creates the map to be displayed. If any saved instances, get them and return view.
+     * @param inflater The LayoutInflater object that can be used to inflate
+     * any views in the fragment,
+     * @param container If non-null, this is the parent view that the fragment's
+     * UI should be attached to.  The fragment should not add the view itself,
+     * but this can be used to generate the LayoutParams of the view.
+     * @param savedInstanceState If non-null, this fragment is being re-constructed
+     * from a previous saved state as given here.
      *
+     * @return the view
      */
+    @SuppressLint("RestrictedApi")
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-
-        if (!checkPermission(Manifest.permission.ACCESS_FINE_LOCATION) && !checkPermission(Manifest.permission.ACCESS_COARSE_LOCATION)){
-            //Permission is not granted.
-            Toast.makeText(this, "Geolocation permissions are not enabled.", Toast.LENGTH_SHORT).show();
-            checkPermission(android.Manifest.permission.ACCESS_COARSE_LOCATION);
-            checkPermission(android.Manifest.permission.ACCESS_FINE_LOCATION);
-        } else {
-            fusedLocationClient.getLastLocation().addOnSuccessListener(this, new OnSuccessListener<Location>() {
-                /**
-                 * Method that gets the location if it is successful, if not successful throw exception
-                 * @param location
-                 */
-                @Override
-                public void onSuccess(Location location) {
-                    if (location != null) {
-                        double latitude = location.getLatitude();
-                        double longitude = location.getLongitude();
-                        String position = location.toString();
-                        String locationString = ("Latitude: " + latitude + "| Longitude: " + longitude);
-                    }else{
-                        throw new NullPointerException("Location turned off");
-                    }
-                }
-            });
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view;
+        if (savedInstanceState != null){
+            lastKnownLocation = savedInstanceState.getParcelable(KEY_LOCATION);
+            cameraPosition = savedInstanceState.getParcelable(KEY_CAMERA_POSITION);
         }
+        view = inflater.inflate(R.layout.map_view_fragment, container, false);
+        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(requireActivity());
+
+        SupportMapFragment mapFragment = (SupportMapFragment) getChildFragmentManager()
+                .findFragmentById(R.id.map);
+        try {
+            mapFragment.getMapAsync(this);
+        }catch(NullPointerException e){
+            Log.e("Exception: %s", e.getMessage(), e);
+        }
+        return view;
     }
 
     /**
-     * This method will output the status of the permission request as a Toast prompt
-     * @param requestCode The request code passed in {@link #requestPermissions(String[], int)}.
-     * @param permissions The requested permissions. Never null.
-     * @param grantResults The grant results for the corresponding permissions
-     *     which is either {@link android.content.pm.PackageManager#PERMISSION_GRANTED}
-     *     or {@link android.content.pm.PackageManager#PERMISSION_DENIED}. Never null.
-     *
+     * Saves preferences for the map.
+     * @param outState Bundle in which to place your saved state.
+     */
+        @Override
+        public void onSaveInstanceState(Bundle outState){
+            if (googleMap != null){
+                outState.putParcelable(KEY_CAMERA_POSITION, googleMap.getCameraPosition());
+                outState.putParcelable(KEY_LOCATION, lastKnownLocation);
+            }
+            super.onSaveInstanceState(outState);
+        }
+
+    /**
+     * When the map is ready, display this.
+     * @param googleMap
      */
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == GeolocationTracking.RequestCode.COARSE_LOCATION_PERMISSION || requestCode == GeolocationTracking.RequestCode.FINE_LOCATION_PERMISSION) {
-            if (grantResults.length > 0) {
-                for (int i = 0; i < grantResults.length; i++) {
-                    if (grantResults[i] == PackageManager.PERMISSION_GRANTED) {
-                        Toast.makeText(this, "Permission granted", Toast.LENGTH_SHORT).show();
+        public void onMapReady(GoogleMap googleMap){
+            this.googleMap = googleMap;
+            requestLocationPermission();
+            updateLocationUI();
+            getEventLocation();
 
-                    } else {
-                        Toast.makeText(this, "Permission denied", Toast.LENGTH_SHORT).show();
-                    }
+        }
+
+    /**
+     * Drops marker at user's current location
+     * @param googleMap
+     */
+    public void dropMarker(GoogleMap googleMap){
+            googleMap.addMarker(new MarkerOptions()
+                    .position(new LatLng(lastKnownLocation.getLatitude(), lastKnownLocation.getLongitude()))
+                    .title("Marker"));
+        }
+
+    /**
+     * Obtains the event's location to set the center of the map
+     */
+    private void getEventLocation(){
+                String eventLocation = event.getLocation();
+                GeoPoint geoPoint = getLocationFromAddress(eventLocation);
+            try{
+                if(locationPermissionGranted){
+                    @SuppressLint("MissingPermission")
+                    Task<Location> locationResult = fusedLocationProviderClient.getLastLocation();
+                    locationResult.addOnCompleteListener(requireActivity(), new OnCompleteListener<Location>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Location> task) {
+                            if (task.isSuccessful()){
+                                lastKnownLocation = task.getResult();
+                                if (lastKnownLocation!=null){
+                                    googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
+                                            new LatLng(geoPoint.getLatitude(), geoPoint.getLongitude()), DEFAULT_ZOOM));
+                                }
+                            }else{
+                                Log.d(TAG, "Current location is null. Using defaults.");
+                                Log.e(TAG,"Exception: %s", task.getException());
+                                googleMap.moveCamera(CameraUpdateFactory
+                                        .newLatLngZoom(defaultLocation, DEFAULT_ZOOM));
+                                googleMap.getUiSettings().setMyLocationButtonEnabled(false);
+                            }
+                        }
+                    });
                 }
+            } catch (SecurityException e){
+                Log.e("Exception: %s", e.getMessage(), e);
             }
         }
+
+    /**
+     * Takes in an address (event location) and uses that to get a latitude and longitude
+     * @param strAddress
+     * @return a geopoint that contains the latitude and longitude of an event.
+     */
+    public GeoPoint getLocationFromAddress(String strAddress){
+            Geocoder coder = new Geocoder(requireContext());
+            List<Address> address;
+            GeoPoint point = null;
+            try{
+                address = coder.getFromLocationName(strAddress, MAX_ENTRIES);
+                if (address == null){
+                    return null;
+                }
+                Address location = address.get(0);
+                location.getLatitude();
+                location.getLongitude();
+                Log.v(TAG, "Do you go through this?");
+                point = new GeoPoint((double) (location.getLatitude()),
+                        (double) (location.getLongitude()));
+                return point;
+            }catch (IOException e) {
+            Log.e(TAG,"Address not found");
+            }
+            return null;
+        }
+    /**
+     * Handles the result of the request for location permissions.
+     */
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+        locationPermissionGranted = false;
+        if (requestCode
+                == FINE_LOCATION_PERMISSION) {// If request is cancelled, the result arrays are empty.
+            if (grantResults.length > 0
+                    && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                locationPermissionGranted = true;
+            }
+        } else {
+            super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
+        updateLocationUI();
     }
     /**
-     * This method will ask for permissions if they are not already granted.
-     * @param permission
-     * @param requestCode
+     * This method will ask for permissions and also check if permissions are already granted
+     *
      */
-    public void requestPermission(String permission, int requestCode){
-            ActivityCompat.requestPermissions(this, permissions, requestCode);
+    public void requestLocationPermission() {
+        // Request location permission
+        if (ContextCompat.checkSelfPermission(requireActivity(), Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED) {
+            locationPermissionGranted = true;
+        } else {
+            ActivityCompat.requestPermissions(requireActivity(),
+                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    FINE_LOCATION_PERMISSION);
+        }
     }
-    public boolean checkPermission(String permission){
-        return ActivityCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_GRANTED;
+
+    /**
+     * Will set the user's settings for the user interface based on permissions.
+     */
+    private void updateLocationUI(){
+        if (googleMap == null){
+            return;
+        }
+        try{
+            if(locationPermissionGranted){
+                googleMap.setMyLocationEnabled(true);
+                googleMap.getUiSettings().setMyLocationButtonEnabled(true);
+            }else {
+                googleMap.setMyLocationEnabled(false);
+                googleMap.getUiSettings().setMyLocationButtonEnabled(false);
+                lastKnownLocation = null;
+                requestLocationPermission();
+            }
+        }catch(SecurityException e){
+            Log.e("Exception: %s", e.getMessage());
+        }
     }
 }
-

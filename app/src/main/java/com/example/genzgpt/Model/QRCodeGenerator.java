@@ -45,7 +45,7 @@ public class QRCodeGenerator {
      * @param height  The height of the QR code image.
      * @return A bitmap of the QR code or null if an error occurs during generation.
      */
-    private static Bitmap createQRCodeBitmap(String content, int width, int height) {
+    public static Bitmap createQRCodeBitmap(String content, int width, int height) {
         QRCodeWriter qrCodeWriter = new QRCodeWriter();
         try {
             BitMatrix bitMatrix = qrCodeWriter.encode(content, BarcodeFormat.QR_CODE, width, height);
