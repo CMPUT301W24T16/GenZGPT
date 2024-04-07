@@ -23,7 +23,9 @@ import android.content.pm.PackageManager;
 import android.location.Address;
 import android.location.Location;
 
+import android.location.LocationRequest;
 import android.os.Bundle;
+import android.os.Looper;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -40,8 +42,11 @@ import androidx.fragment.app.Fragment;
 import com.example.genzgpt.Model.Event;
 
 
+import com.example.genzgpt.Model.User;
 import com.example.genzgpt.R;
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -66,9 +71,11 @@ import java.util.List;
  */
 public class GeolocationTracking extends Fragment implements OnMapReadyCallback {
     public Event event;
+    public User user;
     public static final String TAG = GeolocationTracking.class.getSimpleName();
     private GoogleMap googleMap;
     private FusedLocationProviderClient fusedLocationProviderClient;
+    private LocationRequest locationRequest;
     //This will be the default position for the camera (Edmonton, Alberta)
     private final LatLng defaultLocation = new LatLng(53.5460983,-113.4937266);
     private static final int DEFAULT_ZOOM = 15;
@@ -81,6 +88,7 @@ public class GeolocationTracking extends Fragment implements OnMapReadyCallback 
     private static final int MAX_ENTRIES = 5;
     //Constructor that takes in an event object
     public GeolocationTracking(Event event){this.event = event;}
+    public GeolocationTracking(User user){this.user = user;}
     //Empty required constructor
     public GeolocationTracking(){}
 
@@ -148,9 +156,10 @@ public class GeolocationTracking extends Fragment implements OnMapReadyCallback 
      * @param googleMap
      */
     public void dropMarker(GoogleMap googleMap){
+
             googleMap.addMarker(new MarkerOptions()
                     .position(new LatLng(lastKnownLocation.getLatitude(), lastKnownLocation.getLongitude()))
-                    .title("Marker"));
+                    .title(user.getFirstName() + "" + user.getLastName()));
         }
 
     /**
@@ -268,5 +277,8 @@ public class GeolocationTracking extends Fragment implements OnMapReadyCallback 
         }catch(SecurityException e){
             Log.e("Exception: %s", e.getMessage());
         }
+    }
+    public LatLng getLocation(User user){
+        return new LatLng(lastKnownLocation.getLatitude(), lastKnownLocation.getLongitude());
     }
 }
