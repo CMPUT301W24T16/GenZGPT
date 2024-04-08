@@ -63,7 +63,11 @@ public class NotifyAttendeesFragment extends Fragment {
                     }
                 }
                 // After collecting tokens, send message to all
-                sendMessageToAttendees(deviceTokens, message);
+                if (!deviceTokens.isEmpty()) {
+                    sendMessageToAttendees(deviceTokens, "Event Notification", message, "message");
+                } else {
+                    Toast.makeText(getContext(), "No attendees to send message to.", Toast.LENGTH_SHORT).show();
+                }
             }
 
             @Override
@@ -73,11 +77,9 @@ public class NotifyAttendeesFragment extends Fragment {
         });
     }
 
-    private void sendMessageToAttendees(List<String> deviceTokens, String message) {
-        Map<String, String> messageData = new HashMap<>();
-        messageData.put("message", message);
-        firebaseMessages.sendMessageToMultipleDevices(deviceTokens, messageData);
-
+    private void sendMessageToAttendees(List<String> deviceTokens, String title, String content, String type) {
+        // Using the updated sendMessageToMultipleDevices method
+        firebaseMessages.sendMessageToMultipleDevices(deviceTokens, title, content, type);
         Toast.makeText(getContext(), "Message sent to attendees.", Toast.LENGTH_SHORT).show();
     }
 }
