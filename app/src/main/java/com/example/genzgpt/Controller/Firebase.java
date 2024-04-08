@@ -9,6 +9,7 @@ import android.widget.Toast;
 import com.example.genzgpt.Model.AppUser;
 import com.example.genzgpt.Model.Event;
 import com.example.genzgpt.Model.User;
+import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -1185,7 +1186,7 @@ public class Firebase {
 
         Map<String, Object> updates = new HashMap<>();
         updates.put("eventName", newEventName);
-        updates.put("eventDate", newEventDate);
+        updates.put("eventDate", new Timestamp(newEventDate));
         updates.put("location", newLocation);
         updates.put("maxAttendees", newMaxAttendees);
         updates.put("imageURL", newImageURL);
