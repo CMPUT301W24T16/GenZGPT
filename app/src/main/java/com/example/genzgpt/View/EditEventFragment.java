@@ -31,6 +31,7 @@ import com.google.android.material.appbar.MaterialToolbar;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 
 public class EditEventFragment extends Fragment {
 
@@ -73,6 +74,10 @@ public class EditEventFragment extends Fragment {
                         selectedImageUri = result;
                     }
                 });
+
+        if (eventCurrent != null) {
+            Bind(eventCurrent);
+        }
 
         return view;
     }
@@ -158,6 +163,8 @@ public class EditEventFragment extends Fragment {
         } else {
             // If selectedImageUri is null, proceed to create event without imageURL
             createAndSaveEvent(eventName, location, null, maxAttendees);
+            Log.d("EditEventFragment", "Updating event with name: " + eventName + " and location: " + location);
+
         }
     }
 
@@ -181,12 +188,7 @@ public class EditEventFragment extends Fragment {
         );
         // Add the new event to Firebase
         Firebase firebase = new Firebase();
-        firebase.getEventData(eventCurrent.getEventId(), new Firebase.OnEventLoadedListener() {
-            @Override
-            public void onEventLoaded(Event event) {
-                Bind(event);
-                eventCurrent = event;
-                firebase.updateEvent(event.getEventId(), eventName, eventDateCalendar.getTime(), location, imageURL, maxAttendees, new Firebase.OnEventUpdatedListener() {
+            firebase.updateEvent(eventCurrent.getEventId(), eventName, eventDateCalendar.getTime(), location, imageURL, maxAttendees, new Firebase.OnEventUpdatedListener() {
                     @Override
                     public void onEventUpdated() {
                         // Update profile picture if available
@@ -201,20 +203,11 @@ public class EditEventFragment extends Fragment {
                             Log.e("EventEdit", "Event update failed.");
                     }
                 });
-            }
-            @Override
-            public void onEventNotFound() {
-                Log.d("EventEdit", "Event not found");
-            }
-
-            @Override
-            public void onEventLoadFailed(Exception e) {
-                Log.d("EventEdit", "Event load failed.");
-            }
-        });
 
         getParentFragmentManager().popBackStack();
     }
+
+
 
     /**
      * Initiates the process of selecting an image from the device's gallery.
@@ -226,6 +219,7 @@ public class EditEventFragment extends Fragment {
         eventNameEditText.setText(event.getEventName());
         updateLabel();
         locationEditText.setText(event.getLocation());
-        maxAttendeesEditText.setText(event.getMaxAttendees());
+        maxAttendeesEditText.setText(String.valueOf(event.getMaxAttendees()));
     }
+
 }
