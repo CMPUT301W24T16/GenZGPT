@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -34,6 +35,8 @@ import com.example.genzgpt.Controller.CameraHandler;
 import com.example.genzgpt.Controller.Firebase;
 import com.example.genzgpt.Controller.GalleryHandler;
 import com.example.genzgpt.Controller.ImageViewUpdater;
+import com.example.genzgpt.Controller.ProfileGenerator;
+import com.example.genzgpt.Model.AppUser;
 import com.example.genzgpt.Model.User;
 import com.example.genzgpt.R;
 
@@ -47,7 +50,7 @@ public class EditProfileFragment extends DialogFragment {
     ImageView profilePicture;
     Uri selectedImageUri;
     private static final int REQUEST_IMAGE_CAPTURE = 101;
-
+    private ProfileGenerator profileMaker = new ProfileGenerator();
     private CameraHandler cameraHandler;
 
     /**
@@ -88,7 +91,6 @@ public class EditProfileFragment extends DialogFragment {
         EditText editEmail = view.findViewById(R.id.edit_email);
         EditText editPhone = view.findViewById(R.id.edit_phone_number);
         profilePicture = view.findViewById(R.id.profile_picture);
-        Button editThemeButton = view.findViewById(R.id.edit_theme_button);
         Button editProfilePicture = view.findViewById(R.id.edit_profile_picture_button);
         Button deleteProfilePicture = view.findViewById(R.id.delete_profile_picture_button);
         SwitchCompat geolocationSwitch = view.findViewById(R.id.geolocation_switch);
@@ -142,9 +144,19 @@ public class EditProfileFragment extends DialogFragment {
                     Toast.makeText(getContext(), "No image to delete", Toast.LENGTH_SHORT).show();
                     return; // Exit the method if there's no image to delete
                 }
-                selectedUser.setImageURL(null);
-                profilePicture.setImageResource(R.drawable.ic_launcher_foreground);
-                selectedImageUri = null;
+
+                // get the default profile picture for this user.
+                Bitmap bitmap = profileMaker.generateProfile(selectedUser.getFirstName(),
+                        selectedUser.getLastName());
+                selectedImageUri = cameraHandler.getImageUri(bitmap);
+                Context context = EditProfileFragment.this.getContext();
+                Firebase.uploadImageForUser(selectedUser.getId(), selectedImageUri,
+                        new ProgressDialog(context), context);
+
+                // update the imageURL to be the deterministic profile picture
+                String url = selectedImageUri.toString();
+                selectedUser.setImageURL(url);
+                profilePicture.setImageBitmap(bitmap);
             }
         });
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
