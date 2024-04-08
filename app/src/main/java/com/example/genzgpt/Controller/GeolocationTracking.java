@@ -15,8 +15,6 @@ limitations under the License.
 package com.example.genzgpt.Controller;
 
 
-
-
 import static com.example.genzgpt.BuildConfig.DEFAULT_API_KEY;
 
 import android.Manifest;
@@ -88,7 +86,7 @@ public class GeolocationTracking extends Fragment implements OnMapReadyCallback 
     private GoogleMap googleMap;
     private FusedLocationProviderClient fusedLocationProviderClient;
     //This will be the default position for the camera (Edmonton, Alberta)
-    private final LatLng defaultLocation = new LatLng(53.5460983,-113.4937266);
+    private final LatLng defaultLocation = new LatLng(53.5460983, -113.4937266);
     private static final int DEFAULT_ZOOM = 15;
     public static final int FINE_LOCATION_PERMISSION = 101;
     private PlacesClient placesClient;
@@ -103,10 +101,15 @@ public class GeolocationTracking extends Fragment implements OnMapReadyCallback 
     private List[] likelyPlaceAttributions;
     private LatLng[] likelyPlaceLatLngs;
     GeoPoint userLocation;
+
     //Constructor that takes in an event object
-    public GeolocationTracking(Event event){this.event = event;}
+    public GeolocationTracking(Event event) {
+        this.event = event;
+    }
+
     //Empty required constructor
-    public GeolocationTracking(){}
+    public GeolocationTracking() {
+    }
 
     /**
      * Creates the map to be displayed. If any saved instances, get them and return view.
@@ -127,7 +130,7 @@ public class GeolocationTracking extends Fragment implements OnMapReadyCallback 
         View view;
         Places.initialize(requireActivity().getApplicationContext(), DEFAULT_API_KEY);
         placesClient = Places.createClient(requireContext());
-        if (savedInstanceState != null){
+        if (savedInstanceState != null) {
             lastKnownLocation = savedInstanceState.getParcelable(KEY_LOCATION);
             cameraPosition = savedInstanceState.getParcelable(KEY_CAMERA_POSITION);
         }
@@ -138,7 +141,7 @@ public class GeolocationTracking extends Fragment implements OnMapReadyCallback 
                 .findFragmentById(R.id.map);
         try {
             mapFragment.getMapAsync(this);
-        }catch(NullPointerException e){
+        } catch (NullPointerException e) {
             Log.e("Exception: %s", e.getMessage(), e);
         }
         return view;
@@ -148,14 +151,14 @@ public class GeolocationTracking extends Fragment implements OnMapReadyCallback 
      * Saves preferences for the map.
      * @param outState Bundle in which to place your saved state.
      */
-        @Override
-        public void onSaveInstanceState(Bundle outState){
-            if (googleMap != null){
-                outState.putParcelable(KEY_CAMERA_POSITION, googleMap.getCameraPosition());
-                outState.putParcelable(KEY_LOCATION, lastKnownLocation);
-            }
-            super.onSaveInstanceState(outState);
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        if (googleMap != null) {
+            outState.putParcelable(KEY_CAMERA_POSITION, googleMap.getCameraPosition());
+            outState.putParcelable(KEY_LOCATION, lastKnownLocation);
         }
+        super.onSaveInstanceState(outState);
+    }
 
     /**
      * When the map is ready, display this.
@@ -163,61 +166,65 @@ public class GeolocationTracking extends Fragment implements OnMapReadyCallback 
      * The view for GoogleMaps.
      */
     @Override
-        public void onMapReady(GoogleMap googleMap){
-            firebase = new Firebase();
-            this.googleMap = googleMap;
-            if (lastKnownLocation != null) {
-                dropMarker(googleMap, lastKnownLocation.getLatitude(), lastKnownLocation.getLongitude(), "Event");
-            }
-            requestLocationPermission();
-            firebase.retrieveLocations(event.getEventName(), new Firebase.OnLocationsRetrievedListener() {
-                @Override
-                public void onLocationsRetrieved(List<GeoPoint> locations) {
-                    for (GeoPoint location: locations){
-                        double lat = location.getLatitude();
-                        double lng = location.getLongitude();
-                        dropMarker(googleMap, lat, lng, "User");
-                    }
-                }
-
-                @Override
-                public void onLocationsRetrievalFailed(Exception e) {
-                    Log.e("Geolocation", "Location retrieval failed.");
-                }
-            });
-            updateLocationUI();
-            getEventLocation();
+    public void onMapReady(GoogleMap googleMap) {
+        firebase = new Firebase();
+        this.googleMap = googleMap;
+        if (lastKnownLocation != null) {
+            dropMarker(googleMap, lastKnownLocation.getLatitude(), lastKnownLocation.getLongitude(), "Event");
         }
+        requestLocationPermission();
+        firebase.retrieveLocations(event.getEventName(), new Firebase.OnLocationsRetrievedListener() {
+            @Override
+            public void onLocationsRetrieved(List<GeoPoint> locations) {
+                for (GeoPoint location : locations) {
+                    double lat = location.getLatitude();
+                    double lng = location.getLongitude();
+                    dropMarker(googleMap, lat, lng, "User");
+                }
+            }
+
+            @Override
+            public void onLocationsRetrievalFailed(Exception e) {
+                Log.e("Geolocation", "Location retrieval failed.");
+            }
+        });
+        updateLocationUI();
+        getEventLocation();
+    }
 
     /**
      * Drops marker at user's current location
      * @param googleMap
      * The view for googleMaps.
      */
-    public void dropMarker(GoogleMap googleMap, double latitude, double longitude, String title){
-            googleMap.addMarker(new MarkerOptions()
-                    .position(new LatLng(latitude, longitude))
-                    .title(title));
+    public void dropMarker(GoogleMap googleMap, double latitude, double longitude, String title) {
+        googleMap.addMarker(new MarkerOptions()
+                .position(new LatLng(latitude, longitude))
+                .title(title));
     }
 
     /**
      * obtains the user's location
      * @return GeoPoint of user's location
      */
-    @SuppressLint("MissingPermission")
-    public GeoPoint getUserLocation(){
-        fusedLocationProviderClient.getLastLocation().addOnSuccessListener(requireActivity(), new OnSuccessListener<Location>() {
-            @Override
-            public void onSuccess(Location location) {
-                if (location != null) {
-                    double latitude = location.getLatitude();
-                    double longitude = location.getLongitude();
-                    userLocation = new GeoPoint(latitude, longitude);
-                }else{
-                    throw new NullPointerException("Location turned off");
+    public GeoPoint getUserLocation() {
+            if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
+            fusedLocationProviderClient.getLastLocation().addOnSuccessListener(requireActivity(), new OnSuccessListener<Location>() {
+                @Override
+                public void onSuccess(Location location) {
+                    if (location != null) {
+                        double latitude = location.getLatitude();
+                        double longitude = location.getLongitude();
+                        userLocation = new GeoPoint(latitude, longitude);
+                    } else {
+                        throw new NullPointerException("Location turned off");
+                    }
                 }
+            });
+        }else{
+                requestLocationPermission();
+                userLocation = new GeoPoint(0,0);
             }
-        });
         return userLocation;
     }
 
@@ -280,15 +287,15 @@ public class GeolocationTracking extends Fragment implements OnMapReadyCallback 
                             // Set the map's camera position to the current location of the device.
                             lastKnownLocation = task.getResult();
                             if (lastKnownLocation != null) {
-                                googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
-                                        new LatLng(lastKnownLocation.getLatitude(),
-                                                lastKnownLocation.getLongitude()), DEFAULT_ZOOM));
+                                        LatLng latlng = new LatLng(lastKnownLocation.getLatitude(),
+                                                lastKnownLocation.getLongitude());
+                                        userLocation = new GeoPoint(latlng.latitude, latlng.longitude);
+
                             }
                         } else {
                             Log.d(TAG, "Current location is null. Using defaults.");
                             Log.e(TAG, "Exception: %s", task.getException());
-                            googleMap.moveCamera(CameraUpdateFactory
-                                    .newLatLngZoom(defaultLocation, DEFAULT_ZOOM));
+                            userLocation = new GeoPoint(0,0);
                             googleMap.getUiSettings().setMyLocationButtonEnabled(false);
                         }
                     }

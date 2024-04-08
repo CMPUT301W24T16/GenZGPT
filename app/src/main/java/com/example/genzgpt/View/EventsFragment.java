@@ -244,6 +244,10 @@ abstract class EventsFragment extends Fragment {
                 if (shouldShowMapViewOption()) {
                     optionsList.add(5, "View Map");
                 }
+                // Conditional option addition for MyEventsFragment
+                if (shouldShowSendMessageOption()) {
+                    optionsList.add(5, "Send Message");
+                }
 
 
                 CharSequence[] options = optionsList.toArray(new CharSequence[0]);
@@ -274,6 +278,10 @@ abstract class EventsFragment extends Fragment {
                     }else if (options[item].equals("View Map")){
                         GeolocationTracking geolocationTracking = new GeolocationTracking(event);
                         switchFragment(context, geolocationTracking, R.id.BaseFragment);
+                    }
+                    else if (options[item].equals("Send Message")){
+                        NotifyAttendeesFragment notifyAttendeesFragment = new NotifyAttendeesFragment(event);
+                        switchFragment(context, notifyAttendeesFragment, R.id.BaseFragment);
                     }
                     else if (options[item].equals("Cancel")) {
                         dialog.dismiss();
@@ -316,4 +324,6 @@ abstract class EventsFragment extends Fragment {
         return false;
     }
     protected boolean shouldShowMapViewOption(){return false;}
+    protected boolean shouldShowSendMessageOption(){return false;}
+
 }
