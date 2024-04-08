@@ -129,7 +129,21 @@ public class UserProfileFragment extends Fragment {
                     Glide.with(requireContext())
                             .load(userCurrent.getImageURL()) // Load image URL
                             .into(userPicture); // ImageView to load the image into
+                    if (userCurrent != null) {
+                        editButton.setOnClickListener(new View.OnClickListener() {
+                            /**
+                             * Opens the dialog fragment for editing a user profile
+                             *
+                             * @param v The view that was clicked.
+                             */
+                            @Override
+                            public void onClick(View v) {
+                                new EditProfileFragment(userCurrent).show(getParentFragmentManager(), "Edit Profile");
+                            }
+                        });
+                    }
                 }
+
             }
 
             @Override
@@ -142,21 +156,8 @@ public class UserProfileFragment extends Fragment {
                 Log.e("Firebase", "User retrieval failed.");
             }
         });
-        if (userCurrent != null) {
-            editButton.setOnClickListener(new View.OnClickListener() {
-                /**
-                 * Opens the dialog fragment for editing a user profile
-                 *
-                 * @param v The view that was clicked.
-                 */
-                @Override
-                public void onClick(View v) {
-                    new EditProfileFragment(userCurrent).show(getParentFragmentManager(), "Edit Profile");
-                }
-            });
-            }
-            return view;
-        }
+        return view;
+    }
     /**
      * Gets the user data from the firebase
      * @param user the user
