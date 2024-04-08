@@ -11,6 +11,9 @@
       <entry key="FirstSignInActivityTest">
         <State />
       </entry>
+      <entry key="LoadingActivityTest">
+        <State />
+      </entry>
       <entry key="QRCodeFragmentTest">
         <State />
       </entry>

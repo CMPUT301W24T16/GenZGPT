@@ -45,7 +45,7 @@ public class FirstSignInActivityTest {
             new ActivityScenarioRule<>(FirstSignInActivity.class);
 
     @Rule
-    public GrantPermissionRule permissionWrite = GrantPermissionRule.grant(android.Manifest.permission.POST_NOTIFICATIONS);
+    public GrantPermissionRule permissionNotifications = GrantPermissionRule.grant(android.Manifest.permission.POST_NOTIFICATIONS);
 
     @Test
     public void testValidUserProfileCreation() {
