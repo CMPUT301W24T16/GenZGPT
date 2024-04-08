@@ -22,6 +22,7 @@ public class User {
     private List<Role> roles; // Organizer/Attendee
     private String imageURL;
     private int checkInCount;
+    private String token;
 
     /**
      * The constructor for a User.
@@ -53,6 +54,17 @@ public class User {
         this.roles = new ArrayList<>();
         this.geolocation = geolocation;
         this.imageURL = imageURL;
+    }
+    public User(String id, String firstName, String lastName, long phone, String email, boolean geolocation, String imageURL,String token) {
+        this.id = id;
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.email = email;
+        this.phone = phone;
+        this.roles = new ArrayList<>();
+        this.geolocation = geolocation;
+        this.imageURL = imageURL;
+        this.token = token;
     }
 
     /**
@@ -242,10 +254,28 @@ public class User {
         // Logout implementation
     }
 
+    /**
+     * A getter for the imageURL of a User.
+     * @return
+     * The current ImageURL of the user.
+     */
     public String getImageURL() {
         return imageURL;
     }
+
+    /**
+     * A setter for the imageURL of a User.
+     * @param imageURL
+     * The imageURL to set.
+     */
     public void setImageURL(String imageURL){
         this.imageURL = imageURL;
     }
+    public String getToken(){
+        return this.token;
+    }
+    public void setToken(String token){
+        this.token = token;
+    }
+
 }

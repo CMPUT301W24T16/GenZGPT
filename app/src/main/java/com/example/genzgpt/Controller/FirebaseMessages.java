@@ -17,6 +17,13 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.ContextCompat;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
 import com.example.genzgpt.Model.AppNotification;
 import com.example.genzgpt.Model.MessageNotification;
 import com.example.genzgpt.Model.MilestoneNotification;
@@ -27,6 +34,10 @@ import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.firebase.messaging.FirebaseMessagingService;
 import com.google.firebase.messaging.RemoteMessage;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -44,6 +55,11 @@ public class FirebaseMessages extends FirebaseMessagingService {
     private final int milestone4 = 25;
 
 
+    /**
+     * A constructor for FirebaseMessages service.
+     * @param context
+     * The context needed for FirebaseMessages and all its methods to work correctly.
+     */
     public FirebaseMessages(Context context) {
         this.context = context;
         db = FirebaseFirestore.getInstance();
@@ -112,12 +128,71 @@ public class FirebaseMessages extends FirebaseMessagingService {
      * @param deviceToken The device token of the recipient.
      * @param messageData The data to be sent in the message.
      */
-    public void sendMessageToDevice(String deviceToken, Map<String, String> messageData) {
+    /**public void sendMessageToDevice(String deviceToken, Map<String, String> messageData) {
+        Log.d("FirebaseMessages","sendMessageToDevice");
         RemoteMessage message = new RemoteMessage.Builder(deviceToken)
                 .setData(messageData)
                 .build();
 
         FirebaseMessaging.getInstance().send(message);
+    }*/
+
+    public void sendMessageToDevice(String deviceToken, String title, String content, String type) {
+        String apiKey = "AAAAu_84Npw:APA91bEoQshG5JIrh1pUxwSfC2lm2KXC8cvbbiEN0qDXJyibtHipaNFwcvsHfjlo2nFPzRCn68ew1bUgQinicxHFGHrOviuvQnfD1GNICl4_3OIFC6PsaWS0BAMQ7QbaengCTxCoPM1l";
+        String url = "https://fcm.googleapis.com/fcm/send";
+
+        try {
+            JSONObject message = new JSONObject();
+            message.put("to", deviceToken);
+
+            JSONObject notification = new JSONObject();
+            notification.put("title", title);
+            notification.put("body", content);
+
+            JSONObject data = new JSONObject();
+            data.put("type", type);
+
+            message.put("notification", notification);
+            message.put("data", data);
+
+            JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, url, message,
+                    new Response.Listener<JSONObject>() {
+                        @Override
+                        public void onResponse(JSONObject response) {
+                            // Message sent successfully
+                            Log.d("FirebaseMessages", "Message sent successfully");
+                        }
+                    },
+                    new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            if (error instanceof AuthFailureError) {
+                                // Authentication failure
+                                Log.e("FirebaseMessages", "Authentication failure", error);
+                                // Handle the authentication failure, e.g., check the server key
+                            } else {
+                                // Other error
+                                Log.e("FirebaseMessages", "Error sending message", error);
+                                // Handle other errors appropriately
+                            }
+                        }
+                    }) {
+                @Override
+                public Map<String, String> getHeaders() throws AuthFailureError {
+                    Map<String, String> headers = new HashMap<>();
+                    headers.put("Authorization", "key=" + apiKey);
+                    headers.put("Content-Type", "application/json");
+                    return headers;
+                }
+            };
+
+            // Add the request to the Volley request queue
+            RequestQueue queue = Volley.newRequestQueue(context);
+            queue.add(request);
+        } catch (JSONException e) {
+            // Handle the exception
+            Log.e("FirebaseMessages", "Error creating JSON payload", e);
+        }
     }
 
     /**
@@ -131,24 +206,24 @@ public class FirebaseMessages extends FirebaseMessagingService {
      * @param type
      * The type of message to send.
      */
-    public void sendMessageToDevice(String deviceToken, String title, String content, String type) {
+    /**public void sendMessageToDevice(String deviceToken, String title, String content, String type) {
         RemoteMessage message = new RemoteMessage.Builder(deviceToken)
                 .addData("title", title)
                 .addData("content", content)
                 .setMessageType(type)
                 .build();
-    }
+    }*/
 
     /**
      * Sends a message to multiple devices.
      * @param deviceTokens The device tokens of the recipients.
      * @param messageData The data to be sent in the message.
      */
-    public void sendMessageToMultipleDevices(List<String> deviceTokens, Map<String, String> messageData) {
+    /**public void sendMessageToMultipleDevices(List<String> deviceTokens, Map<String, String> messageData) {
         for (String deviceToken : deviceTokens) {
             sendMessageToDevice(deviceToken, messageData);
         }
-    }
+    }*/
 
     /**
      * Sends a message to multiple devices.
@@ -163,7 +238,9 @@ public class FirebaseMessages extends FirebaseMessagingService {
      */
     public void sendMessageToMultipleDevices(List<String> deviceTokens, String title,
                                              String content, String type) {
+        Log.d("FirebaseMessages","sendMessageToMultipleDevices: message loop started");
         for (String deviceToken : deviceTokens) {
+            Log.d("FirebaseMessages","sendMessageToMultipleDevices: inside loop");
             sendMessageToDevice(deviceToken, title, content, type);
         }
     }
@@ -192,6 +269,7 @@ public class FirebaseMessages extends FirebaseMessagingService {
      */
     @Override
     public void onMessageSent(@NonNull String messageId) {
+        Log.d("FirebaseMessages", "onMessageSent");
         super.onMessageSent(messageId);
         // Message sent successfully
         Toast.makeText(context, "Message sent successfully", Toast.LENGTH_SHORT).show();
@@ -240,7 +318,6 @@ public class FirebaseMessages extends FirebaseMessagingService {
      * The unique identifier for
      */
     public void displayNotification(AppNotification notification, int id) {
-        // FIXME need to check for permissions in this function somewhere.
         // get the notification to display
         Notification displayable = notification.getDisplayable(context);
 
@@ -264,6 +341,7 @@ public class FirebaseMessages extends FirebaseMessagingService {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS)
                     == PackageManager.PERMISSION_GRANTED) {
+                Log.d("FirebaseMessages", "displayNotification");
                 manager.notify(id, displayable);
             }
         }
@@ -279,6 +357,7 @@ public class FirebaseMessages extends FirebaseMessagingService {
      */
     @Override
     public void onMessageReceived(@NonNull RemoteMessage remoteMessage) {
+        Log.d("FirebaseMessages", "onMessageReceived");
         super.onMessageReceived(remoteMessage);
 
         // get information from the RemoteMessage

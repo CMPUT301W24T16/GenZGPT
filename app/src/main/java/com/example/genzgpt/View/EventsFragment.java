@@ -225,21 +225,30 @@ abstract class EventsFragment extends Fragment {
                 ArrayList<String> optionsList = new ArrayList<>(Arrays.asList("Event Info", "Cancel"));
 
                 // Conditional option addition for MyEventsFragment
+                if (shouldShowEditEventOption()) {
+                    optionsList.add(1, "Edit Event");
+                }
+                // Conditional option addition for MyEventsFragment
                 if (shouldShowCheckInQrCodeOption()) {
-                    optionsList.add(1, "View Check-In QR Code");
+                    optionsList.add(2, "View Check-In QR Code");
                 }
                 // Conditional option addition for MyEventsFragment
                 if (shouldShowRegisteredAttendeesOption()) {
-                    optionsList.add(2, "Registered Attendees");
+                    optionsList.add(3, "Registered Attendees");
                 }
                 // Conditional option addition for MyEventsFragment
                 if (shouldShowCheckedInAttendeesOption()) {
-                    optionsList.add(3, "Attendees");
+                    optionsList.add(4, "Attendees");
                 }
                 // Conditional option addition for MyEventsFragment
-                if (shouldShowCheckedInAttendeesOption()) {
-                    optionsList.add(4, "View Map");
+                if (shouldShowMapViewOption()) {
+                    optionsList.add(5, "View Map");
                 }
+                // Conditional option addition for MyEventsFragment
+                if (shouldShowSendMessageOption()) {
+                    optionsList.add(5, "Send Message");
+                }
+
 
                 CharSequence[] options = optionsList.toArray(new CharSequence[0]);
 
@@ -260,12 +269,19 @@ abstract class EventsFragment extends Fragment {
                         // Navigate to AttendeeListFragment
                         EventInfoFragment eventInfoFragment = new EventInfoFragment(event);
                         switchFragment(context, eventInfoFragment, R.id.BaseFragment);
+                    } else if (options[item].equals("Edit Event")){
+                        EditEventFragment editEventFragment = new EditEventFragment(event);
+                        switchFragment(context, editEventFragment, R.id.BaseFragment);
                     } else if (options[item].equals("View Check-In QR Code")) {
                         CheckInQRCodeFragment checkInQRCodeFragment = new CheckInQRCodeFragment(event);
                         switchFragment(context, checkInQRCodeFragment, R.id.BaseFragment);
                     }else if (options[item].equals("View Map")){
                         GeolocationTracking geolocationTracking = new GeolocationTracking(event);
                         switchFragment(context, geolocationTracking, R.id.BaseFragment);
+                    }
+                    else if (options[item].equals("Send Message")){
+                        NotifyAttendeesFragment notifyAttendeesFragment = new NotifyAttendeesFragment(event);
+                        switchFragment(context, notifyAttendeesFragment, R.id.BaseFragment);
                     }
                     else if (options[item].equals("Cancel")) {
                         dialog.dismiss();
@@ -297,6 +313,7 @@ abstract class EventsFragment extends Fragment {
             fragmentTransaction.commit();
         }
     }
+    protected boolean shouldShowEditEventOption(){return false;}
     protected boolean shouldShowCheckInQrCodeOption() {
         return false;
     }
@@ -307,4 +324,6 @@ abstract class EventsFragment extends Fragment {
         return false;
     }
     protected boolean shouldShowMapViewOption(){return false;}
+    protected boolean shouldShowSendMessageOption(){return false;}
+
 }

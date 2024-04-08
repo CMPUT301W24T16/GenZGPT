@@ -24,7 +24,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * A fragment where an administrator can access all events (unfinished)
+ * A fragment where an administrator can access all events
  * A simple {@link Fragment} subclass.
  * Use the {@link AdminEventsFragment#newInstance} factory method to
  * create an instance of this fragment.
@@ -45,7 +45,6 @@ public class AdminEventsFragment extends EventsFragment {
      *
      * @return A new instance of fragment AdminEventsFragment.
      */
-    // TODO: Rename and change types and number of parameters
     public static AdminEventsFragment newInstance() {
         AdminEventsFragment fragment = new AdminEventsFragment();
         return fragment;

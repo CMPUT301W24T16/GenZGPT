@@ -18,6 +18,9 @@ import com.example.genzgpt.Model.Event;
 import com.example.genzgpt.Model.QRCodeGenerator;
 import com.example.genzgpt.R;
 
+/**
+ * A display for the Check In QR Code for an Event.
+ */
 public class CheckInQRCodeFragment extends Fragment {
 
     private Event event;

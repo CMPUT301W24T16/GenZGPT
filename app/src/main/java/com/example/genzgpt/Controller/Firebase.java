@@ -9,6 +9,7 @@ import android.widget.Toast;
 import com.example.genzgpt.Model.AppUser;
 import com.example.genzgpt.Model.Event;
 import com.example.genzgpt.Model.User;
+import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -282,6 +283,32 @@ public class Firebase {
                     listener.onUserLoadFailed(e);
                 });
     }
+    public void getUserDataAndToken(String userId, OnUserLoadedListener listener) {
+        db.collection("users")
+                .whereEqualTo("id", userId)
+                .get()
+                .addOnSuccessListener(querySnapshot -> {
+                    if (!querySnapshot.isEmpty()) {
+                        DocumentSnapshot document = querySnapshot.getDocuments().get(0);
+                        String firstName = document.getString("firstName");
+                        String lastName = document.getString("lastName");
+                        String email = document.getString("email");
+                        Long phoneNumber = document.getLong("phoneNumber");
+                        boolean geolocation = Boolean.TRUE.equals(document.getBoolean("geolocation"));
+                        String imageURL = document.getString("imageURL");
+                        String token = document.getString("deviceToken");
+
+                        User user = new User(userId, firstName, lastName, phoneNumber, email, geolocation, imageURL, token);
+                        listener.onUserLoaded(user);
+                    } else {
+                        listener.onUserNotFound();
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("Firebase", "Error fetching user data: " + e.getMessage());
+                    listener.onUserLoadFailed(e);
+                });
+    }
 
     public interface OnUserLoadedListener {
         void onUserLoaded(User user);
@@ -445,6 +472,9 @@ public class Firebase {
                 });
     }
 
+    /**
+     * A listener for when an event is loaded from Firebase.
+     */
     public interface OnEventLoadedListener {
         void onEventLoaded(Event event);
 
@@ -536,6 +566,9 @@ public class Firebase {
                 });
     }
 
+    /**
+     * A listener for when a user is created in Firebase.
+     */
     public interface OnUserCreatedListener {
         void onUserCreated(String userId);
 
@@ -876,6 +909,9 @@ public class Firebase {
                 });
     }
 
+    /**
+     * A listener for when multiple users are loaded from Firebase.
+     */
     public interface OnUsersLoadedListener {
         void onUsersLoaded(List<User> userList);
 
@@ -919,6 +955,9 @@ public class Firebase {
                 });
     }
 
+    /**
+     * A listener for when multiple events are loaded from Firebase.
+     */
     public interface OnEventsLoadedListener {
         void onEventsLoaded(List<Event> eventList);
 
@@ -988,6 +1027,9 @@ public class Firebase {
         return event;
     }
 
+    /**
+     * A listener for when a user's events are loaded from Firebase.
+     */
     public interface OnUserEventsLoadedListener {
         void onEventsLoaded(String email, List<Event> eventList);
         void onEventsLoadFailed(Exception e);
@@ -1063,6 +1105,9 @@ public class Firebase {
         });
     }
 
+    /**
+     * A listener for when attendees check into an event through Firebase.
+     */
     public interface OnCheckInAttendeesLoadedListener {
         void onCheckInAttendeesLoaded(List<User> checkedInAttendees);
 
@@ -1135,6 +1180,9 @@ public class Firebase {
         });
     }
 
+    /**
+     * A listener for when a list of registered attendees are loaded from Firebase.
+     */
     public interface OnRegisteredAttendeesLoadedListener {
         void onRegisteredAttendeesLoaded(List<User> registeredAttendees);
 
@@ -1169,6 +1217,9 @@ public class Firebase {
                 });
     }
 
+    /**
+     * A listener for when a user is updated in the Firebase.
+     */
     public interface OnUserUpdatedListener {
         void onUserUpdated();
 
@@ -1180,12 +1231,15 @@ public class Firebase {
      * 
      * @param eventId, newEventDate, newLocation
      */
-    public void updateEvent(String eventId, Date newEventDate, String newLocation, OnEventUpdatedListener listener) {
+    public void updateEvent(String eventId, String newEventName, Date newEventDate, String newLocation, String newImageURL, int newMaxAttendees,OnEventUpdatedListener listener) {
         DocumentReference eventRef = db.collection("events").document(eventId);
 
         Map<String, Object> updates = new HashMap<>();
-        updates.put("eventDate", newEventDate);
+        updates.put("eventName", newEventName);
+        updates.put("eventDate", new Timestamp(newEventDate));
         updates.put("location", newLocation);
+        updates.put("maxAttendees", newMaxAttendees);
+        updates.put("imageURL", newImageURL);
 
         eventRef.update(updates)
                 .addOnSuccessListener(aVoid -> {
@@ -1244,6 +1298,9 @@ public class Firebase {
         });
     }
 
+    /**
+     * A listener for when Attendees are registered in Firebase.
+     */
     public interface OnAttendeeRegisteredListener {
         void onAttendeeRegistered();
 
@@ -1254,6 +1311,9 @@ public class Firebase {
         void onEventLoadFailed(Exception e);
     }
 
+    /**
+     * A listener for an event being updated in Firebase.
+     */
     public interface OnEventUpdatedListener {
         void onEventUpdated();
 
@@ -1457,6 +1517,9 @@ public class Firebase {
         }
     }
 
+    /**
+     * A listener for when Attendees are removed from Firebase.
+     */
     public interface OnAttendeeRemovedListener {
         void onAttendeeRemoved();
 
@@ -1598,6 +1661,9 @@ public class Firebase {
         });
     }
 
+    /**
+     * A listener for when a location is retrieved from Firebase.
+     */
     public interface OnLocationsRetrievedListener {
         void onLocationsRetrieved(List<GeoPoint> locations);
         void onLocationsRetrievalFailed(Exception e);
@@ -1641,6 +1707,69 @@ public class Firebase {
                 }
             } else {
                 Log.e("firebase", "Error checking event existence: ", task.getException());
+            }
+        });
+    }
+    public void fetchCheckedInAttendeesPlusToken(String eventId, OnCheckInAttendeesLoadedListener listener) {
+        CollectionReference checkInRef = db.collection("checkIn");
+        Query query = checkInRef.whereEqualTo("eventId", eventId);
+
+        query.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                QuerySnapshot snapshot = task.getResult();
+                if (snapshot != null && !snapshot.isEmpty()) {
+                    List<String> checkedInAttendeeIds = new ArrayList<>();
+
+                    // Iterate through the documents in the "checkIn" collection
+                    for (DocumentSnapshot document : snapshot.getDocuments()) {
+                        List<Map<String, Object>> checkInList = (List<Map<String, Object>>) document.get("checkInList");
+                        if (checkInList != null) {
+                            for (Map<String, Object> checkInEntry : checkInList) {
+                                String userId = (String) checkInEntry.get("userId");
+                                checkedInAttendeeIds.add(userId);
+                            }
+                        }
+                    }
+
+                    // Create a list to store the User objects
+                    List<User> checkedInAttendees = new ArrayList<>();
+
+                    // Create a counter to keep track of loaded users
+                    AtomicInteger loadedUserCount = new AtomicInteger(0);
+
+                    // Iterate through the list of attendee IDs and fetch their user data
+                    for (String userId : checkedInAttendeeIds) {
+                        getUserDataAndToken(userId, new OnUserLoadedListener() {
+                            @Override
+                            public void onUserLoaded(User user) {
+                                checkedInAttendees.add(user);
+                                if (loadedUserCount.incrementAndGet() == checkedInAttendeeIds.size()) {
+                                    // All users have been loaded
+                                    listener.onCheckInAttendeesLoaded(checkedInAttendees);
+                                }
+                            }
+
+                            @Override
+                            public void onUserNotFound() {
+                                if (loadedUserCount.incrementAndGet() == checkedInAttendeeIds.size()) {
+                                    // All users have been loaded
+                                    listener.onCheckInAttendeesLoaded(checkedInAttendees);
+                                }
+                            }
+
+                            @Override
+                            public void onUserLoadFailed(Exception e) {
+                                listener.onCheckInAttendeesLoadFailed(e);
+                            }
+                        });
+                    }
+                } else {
+                    // No check-in data found for the specified event
+                    listener.onCheckInAttendeesLoaded(new ArrayList<>());
+                }
+            } else {
+                // Error occurred while querying check-in data
+                listener.onCheckInAttendeesLoadFailed(task.getException());
             }
         });
     }

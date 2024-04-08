@@ -1,8 +1,6 @@
 package com.example.genzgpt.View;
 
-import android.app.AlertDialog;
 import android.app.DatePickerDialog;
-import android.content.DialogInterface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -22,6 +20,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.bumptech.glide.Glide;
 import com.example.genzgpt.Controller.Firebase;
 import com.example.genzgpt.Controller.ImageViewUpdater;
 import com.example.genzgpt.Model.AppUser;
@@ -33,24 +32,24 @@ import com.google.android.material.appbar.MaterialToolbar;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.List;
 
 /**
- * A fragment to handle the Creation of an Event.
+ * A fragment that allows for editing a currently existing Event.
  */
-public class EventCreationFragment extends Fragment {
+public class EditEventFragment extends Fragment {
 
     private EditText eventNameEditText, eventDateEditText, locationEditText, maxAttendeesEditText;
     private ImageView eventImageView;
     private Calendar eventDateCalendar;
     private ActivityResultLauncher<String> galleryLauncher;
-
     private Uri selectedImageUri;
-    private String updatedImageURL;
+    public Event eventCurrent;
+
+    public EditEventFragment(Event event){this.eventCurrent = event;}
 
 
     /**
-     * Handles the creation of the View for the Event Creation Fragment.
+     * Handles the creation of the Edit Event View.
      * @param inflater The LayoutInflater object that can be used to inflate
      * any views in the fragment,
      * @param container If non-null, this is the parent view that the fragment's
@@ -60,32 +59,29 @@ public class EventCreationFragment extends Fragment {
      * from a previous saved state as given here.
      *
      * @return
-     * The View for the EventCreationFragment.
+     * The displayable View for this fragment.
      */
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.event_creation_fragment, container, false);
+        View view = inflater.inflate(R.layout.fragment_edit_event, container, false);
 
         eventDateCalendar = Calendar.getInstance();
 
         MaterialToolbar toolbar = view.findViewById(R.id.toolbar);
         toolbar.setNavigationOnClickListener(v -> getParentFragmentManager().popBackStack());
 
-        eventNameEditText = view.findViewById(R.id.eventNameEditText);
-        eventDateEditText = view.findViewById(R.id.eventDateEditText);
-        locationEditText = view.findViewById(R.id.locationEditText);
-        eventImageView = view.findViewById(R.id.eventImageView);
-        Button selectImageButton = view.findViewById(R.id.selectImageButton);
-        Button createEventButton = view.findViewById(R.id.createEventButton);
-        Button reuseEventIdButton = view.findViewById(R.id.reuseQRCodeButton);
-        maxAttendeesEditText = view.findViewById(R.id.maxAttendeesEditText);
+        eventNameEditText = view.findViewById(R.id.editEventNameEditText);
+        eventDateEditText = view.findViewById(R.id.editEventDateEditText);
+        locationEditText = view.findViewById(R.id.editLocationEditText);
+        eventImageView = view.findViewById(R.id.editEventImageView);
+        Button selectImageButton = view.findViewById(R.id.editSelectImageButton);
+        Button createEventButton = view.findViewById(R.id.confirmEditEventButton);
+        maxAttendeesEditText = view.findViewById(R.id.editMaxAttendeesEditText);
 
         eventDateEditText.setOnClickListener(v -> showDatePickerDialog());
         createEventButton.setOnClickListener(v -> createEvent());
         selectImageButton.setOnClickListener(v -> selectImage());
-        reuseEventIdButton.setOnClickListener(v -> reuseEventId());
-
 
         galleryLauncher = registerForActivityResult(new ActivityResultContracts.GetContent(),
                 result -> {
@@ -95,11 +91,15 @@ public class EventCreationFragment extends Fragment {
                     }
                 });
 
+        if (eventCurrent != null) {
+            Bind(eventCurrent);
+        }
+
         return view;
     }
 
     /**
-     * Handles the creation of the EventCreationFragment.
+     * Handles creation of this Fragment.
      * @param savedInstanceState If the fragment is being re-created from
      * a previous saved state, this is the state.
      */
@@ -184,6 +184,8 @@ public class EventCreationFragment extends Fragment {
         } else {
             // If selectedImageUri is null, proceed to create event without imageURL
             createAndSaveEvent(eventName, location, null, maxAttendees);
+            Log.d("EditEventFragment", "Updating event with name: " + eventName + " and location: " + location);
+
         }
     }
 
@@ -207,117 +209,26 @@ public class EventCreationFragment extends Fragment {
         );
         // Add the new event to Firebase
         Firebase firebase = new Firebase();
-        firebase.getUserData(AppUser.getUserId(), new Firebase.OnUserLoadedListener() {
-            @Override
-            public void onUserLoaded(User user) {
-                firebase.createEvent(newEvent, user);
-            }
-
-            @Override
-            public void onUserNotFound() {
-                Log.d("EventCreation", "User not Found");
-            }
-
-            @Override
-            public void onUserLoadFailed(Exception e) {
-                Log.d("EventCreation", "LoadFailed");
-            }
-        });
+            firebase.updateEvent(eventCurrent.getEventId(), eventName, eventDateCalendar.getTime(), location, imageURL, maxAttendees, new Firebase.OnEventUpdatedListener() {
+                    @Override
+                    public void onEventUpdated() {
+                        // Update profile picture if available
+                        if (eventCurrent!= null && eventCurrent.getImageURL() != null) {
+                            Glide.with(requireContext())
+                                    .load(eventCurrent.getImageURL()) // Load image URL
+                                    .into(eventImageView); // ImageView to load the image into
+                        }
+                    }
+                    @Override
+                    public void onEventUpdateFailed(Exception e) {
+                            Log.e("EventEdit", "Event update failed.");
+                    }
+                });
 
         getParentFragmentManager().popBackStack();
     }
 
-    private void reuseEventId() {
-        //shows an alert dialog where the current user can choose from a list of events that they're an organizer of.
-        //This will allow for the reusing of the QR codes in existence to map to a different event
-        //The user will be able to select an event from the list and map all the updated info into an existing event, overwriting the data and resetting the attendees
-        Firebase firebase = new Firebase();
-        // Retrieve the current user's ID
-        String currentUserId = AppUser.getUserId();
 
-        // Fetch the events for the current user as an organizer
-        firebase.fetchEventsForOrganizer(currentUserId, new Firebase.OnEventsLoadedListener() {
-            @Override
-            public void onEventsLoaded(List<Event> organizerEvents) {
-                // Create an array of event names
-                String[] eventNames = new String[organizerEvents.size()];
-                for (int i = 0; i < organizerEvents.size(); i++) {
-                    eventNames[i] = organizerEvents.get(i).getEventName();
-                }
-
-                // Create an alert dialog
-                AlertDialog.Builder builder = new AlertDialog.Builder(EventCreationFragment.this.getContext());
-                builder.setTitle("Select Event to Reuse")
-                        .setSingleChoiceItems(eventNames, -1, null)
-                        .setPositiveButton("Create Event", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                int selectedPosition = ((AlertDialog) dialog).getListView().getCheckedItemPosition();
-                                if (selectedPosition >= 0) {
-                                    // Get the selected event
-                                    Event selectedEvent = organizerEvents.get(selectedPosition);
-                                    String updatedEventName = eventNameEditText.getText().toString();
-                                    Date updatedEventDate = eventDateCalendar.getTime();
-                                    String updatedLocation = locationEditText.getText().toString();
-                                    String maxAttendeesText = maxAttendeesEditText.getText().toString();
-                                    int updatedMaxAttendees = maxAttendeesText.isEmpty() ? 0 : Integer.parseInt(maxAttendeesText);
-
-                                    if (selectedImageUri != null) {
-                                        Firebase.uploadImageAndGetUrl("event_images/" + System.currentTimeMillis() + ".jpg", selectedImageUri, new Firebase.OnUploadCompleteListener() {
-                                            @Override
-                                            public void onUploadComplete(String imageURL) {
-                                                // Image upload is complete, now create the Event
-                                                updatedImageURL = imageURL;
-                                                firebase.reusePastEvent(currentUserId, selectedEvent.getEventId(),
-                                                        updatedEventName, updatedEventDate, updatedLocation,
-                                                        updatedMaxAttendees, updatedImageURL, new Firebase.OnEventUpdatedListener() {
-                                                            @Override
-                                                            public void onEventUpdated() {
-                                                                // Event updated successfully
-                                                                Log.d("CreateEventActivity", "Event data updated successfully");
-                                                                // Perform any additional actions as needed
-                                                            }
-
-                                                            @Override
-                                                            public void onEventUpdateFailed(Exception e) {
-                                                                // Event update failed
-                                                                Log.e("CreateEventActivity", "Failed to update event data: " + e.getMessage());
-                                                                // Handle the failure case, e.g., display an error message
-                                                            }
-                                                        });
-                                            }
-
-                                            @Override
-                                            public void onUploadFailed(String errorMessage) {
-                                                // Handle the image upload failure
-                                                Log.e("Firebase", "Failed to upload image: " + errorMessage);
-                                            }
-                                        });
-                                    } else {
-                                        // If selectedImageUri is null, proceed to create event without imageURL
-                                        Log.d("EventCreationFragment", "no image URI ");
-                                    }
-
-
-                                } else {
-                                    // No event selected, log an error message or perform any other necessary actions
-                                    Log.e("CreateEventActivity", "No event selected to reuse");
-                                }
-                            }
-                        })
-                        .setNegativeButton("Cancel", null);
-
-                // Show the alert dialog
-                builder.create().show();
-            }
-
-            @Override
-            public void onEventsLoadFailed(Exception e) {
-                // Handle the failure case, e.g., log an error message
-                Log.e("CreateEventActivity", "Failed to load events: " + e.getMessage());
-            }
-        });
-    }
 
     /**
      * Initiates the process of selecting an image from the device's gallery.
@@ -325,4 +236,11 @@ public class EventCreationFragment extends Fragment {
     private void selectImage() {
         galleryLauncher.launch("image/*");
     }
+    public void Bind(Event event){
+        eventNameEditText.setText(event.getEventName());
+        updateLabel();
+        locationEditText.setText(event.getLocation());
+        maxAttendeesEditText.setText(String.valueOf(event.getMaxAttendees()));
+    }
+
 }

@@ -47,6 +47,8 @@ android {
 }
 
 dependencies {
+    implementation(platform("org.jetbrains.kotlin:kotlin-bom:1.8.22"))
+    implementation("com.google.android.libraries.places:places:3.4.0")
     implementation("androidx.appcompat:appcompat:1.6.1")
     implementation("com.google.android.material:material:1.11.0")
     implementation("androidx.constraintlayout:constraintlayout:2.1.4")
@@ -77,4 +79,5 @@ dependencies {
     implementation("org.osmdroid:osmdroid-android:6.1.10")
     annotationProcessor("com.github.bumptech.glide:compiler:4.12.0")
     implementation("com.google.android.gms:play-services-maps:18.2.0")
+    implementation("com.android.volley:volley:1.2.1")
 }

@@ -6,6 +6,9 @@ import static org.junit.jupiter.api.Assertions.*;
 import com.example.genzgpt.Model.Role;
 import com.example.genzgpt.Model.User;
 
+/**
+ * Test cases for the User class.
+ */
 class UserTest {
 
     @Test

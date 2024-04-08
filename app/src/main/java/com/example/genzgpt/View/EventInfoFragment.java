@@ -63,6 +63,19 @@ public class EventInfoFragment extends Fragment {
         // Required empty public constructor
     }
 
+    /**
+     * Handles creation of an EventInfoFragment
+     * @param inflater The LayoutInflater object that can be used to inflate
+     * any views in the fragment,
+     * @param container If non-null, this is the parent view that the fragment's
+     * UI should be attached to.  The fragment should not add the view itself,
+     * but this can be used to generate the LayoutParams of the view.
+     * @param savedInstanceState If non-null, this fragment is being re-constructed
+     * from a previous saved state as given here.
+     *
+     * @return
+     * A View for the EventInfoFragment.
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflates the layout and initializes UI components
@@ -86,6 +99,11 @@ public class EventInfoFragment extends Fragment {
         return view;
     }
 
+    /**
+     * Handles creation of an EventInfoFragment.
+     * @param savedInstanceState If the fragment is being re-created from
+     * a previous saved state, this is the state.
+     */
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         // Sets up back navigation
@@ -192,10 +210,16 @@ public class EventInfoFragment extends Fragment {
         }
     }
 
+    /**
+     * Signs a user up for an event in the app.
+     */
     public void signUpForEvent() {
         fetchUserData(AppUser.getUserId(), true);
     }
 
+    /**
+     * Withdraws a user from an event in the app.
+     */
     public void withdrawFromEvent() {
         fetchUserData(AppUser.getUserId(), false);
     }

@@ -56,6 +56,7 @@ public class EditProfileFragment extends DialogFragment {
     /**
      * Creates a profile fragment
      * @param user
+     * The user selected for profile editing.
      */
     public EditProfileFragment(User user){
         this.selectedUser = user;
@@ -91,7 +92,6 @@ public class EditProfileFragment extends DialogFragment {
         EditText editEmail = view.findViewById(R.id.edit_email);
         EditText editPhone = view.findViewById(R.id.edit_phone_number);
         profilePicture = view.findViewById(R.id.profile_picture);
-        Button editThemeButton = view.findViewById(R.id.edit_theme_button);
         Button editProfilePicture = view.findViewById(R.id.edit_profile_picture_button);
         Button deleteProfilePicture = view.findViewById(R.id.delete_profile_picture_button);
         SwitchCompat geolocationSwitch = view.findViewById(R.id.geolocation_switch);
@@ -155,9 +155,8 @@ public class EditProfileFragment extends DialogFragment {
                         new ProgressDialog(context), context);
 
                 // update the imageURL to be the deterministic profile picture
-                //FIXME CAN SOMEONE TELL ME WHAT I'M SUPPOSED TO DO HERE??? I don't have an ImageURL
-                //MIGHT REQUIRE A CALL TO Firebase.uploadImageAndGetURL()
-                selectedUser.setImageURL(null);
+                String url = selectedImageUri.toString();
+                selectedUser.setImageURL(url);
                 profilePicture.setImageBitmap(bitmap);
             }
         });
@@ -203,6 +202,17 @@ public class EditProfileFragment extends DialogFragment {
         }
     }
 
+    /**
+     * Handles the result of the EditProfileFragment.
+     * @param requestCode The integer request code originally supplied to
+     *                    startActivityForResult(), allowing you to identify who this
+     *                    result came from.
+     * @param resultCode The integer result code returned by the child activity
+     *                   through its setResult().
+     * @param data An Intent, which can return result data to the caller
+     *               (various data can be attached to Intent "extras").
+     *
+     */
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);

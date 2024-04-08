@@ -10,9 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         app:navigationIcon="@drawable/ic_back_arrow"
-        app:navigationIconTint="@color/white"
-        app:title="Create Event"
-        app:titleTextColor="@color/white"
+        app:title="Edit Event"
         android:background="?attr/colorPrimary"
         app:layout_constraintTop_toTopOf="parent"/>
 
@@ -29,9 +27,10 @@
         app:layout_constraintEnd_toEndOf="parent">
 
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/eventNameEditText"
+            android:id="@+id/editEventNameEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:text=""
             android:hint="Event Name" />
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -48,10 +47,11 @@
         app:layout_constraintEnd_toEndOf="parent">
 
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/eventDateEditText"
+            android:id="@+id/editEventDateEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:focusable="false"
+            android:text=""
             android:hint="Event Date" />
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -68,9 +68,10 @@
         app:layout_constraintEnd_toEndOf="parent">
 
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/locationEditText"
+            android:id="@+id/editLocationEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:text=""
             android:hint="Location" />
     </com.google.android.material.textfield.TextInputLayout>
 
@@ -87,17 +88,18 @@
         app:layout_constraintEnd_toEndOf="parent">
 
         <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/maxAttendeesEditText"
+            android:id="@+id/editMaxAttendeesEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:inputType="number"
+            android:text=""
             android:hint="Max Attendees (optional)" />
     </com.google.android.material.textfield.TextInputLayout>
 
 
 
     <ImageView
-        android:id="@+id/eventImageView"
+        android:id="@+id/editEventImageView"
         android:layout_width="0dp"
         android:layout_height="200dp"
         android:src="@drawable/ic_launcher_foreground"
@@ -109,35 +111,23 @@
         android:contentDescription="Event Image" />
 
     <Button
-        android:id="@+id/selectImageButton"
+        android:id="@+id/editSelectImageButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Select Image"
-        app:layout_constraintTop_toBottomOf="@id/eventImageView"
+        app:layout_constraintTop_toBottomOf="@id/editEventImageView"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="16dp" />
 
     <Button
-        android:id="@+id/createEventButton"
+        android:id="@+id/confirmEditEventButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="Create Event"
-        app:layout_constraintEnd_toStartOf="@id/reuseQRCodeButton"
-        app:layout_constraintHorizontal_bias="0.5"
+        android:text="Confirm"
+        app:layout_constraintTop_toBottomOf="@id/editSelectImageButton"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/selectImageButton" />
-
-    <Button
-        android:id="@+id/reuseQRCodeButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="Reuse QR Code"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toEndOf="@id/createEventButton"
-        app:layout_constraintTop_toBottomOf="@id/selectImageButton" />
+        android:layout_marginTop="16dp" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

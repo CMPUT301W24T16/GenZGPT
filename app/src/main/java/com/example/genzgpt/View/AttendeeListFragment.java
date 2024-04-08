@@ -65,7 +65,7 @@ public class AttendeeListFragment extends Fragment {
         firebase = new Firebase();
 
         // Fetch the list of attendees from Firestore and update the RecyclerView
-        fetchCheckedInAttendees(event.getEventName());
+        fetchCheckedInAttendees(event.getEventId());
 
         ImageView backArrowImageView = view.findViewById(R.id.backArrowImageView);
         backArrowImageView.setOnClickListener(v -> {

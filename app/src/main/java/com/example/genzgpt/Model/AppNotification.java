@@ -8,7 +8,6 @@ import androidx.core.app.NotificationCompat;
 
 /**
  * The General Structure for a notification that is used in this app.
- * FIXME: Currently does nothing
  */
 public abstract class AppNotification {
     /**
@@ -46,7 +45,6 @@ public abstract class AppNotification {
      * Returns a builder that will allow other processes to build a notification.
      * @param context
      *      The information needed about the app to construct this notification builder.
-     *      FIXME: I HAVE NO IDEA WHAT KIND OF CONTEXT I AM ACTUALLY LOOKING FOR.
      * @return
      *      The method of building the specific notification that should be sent out.
      */

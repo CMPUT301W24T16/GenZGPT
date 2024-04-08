@@ -38,6 +38,9 @@ import com.example.genzgpt.Model.AppUser;
 import com.example.genzgpt.Model.User;
 import com.example.genzgpt.View.AdminLoginFragment;
 
+/**
+ * The first activity a user will see when they need to Sign up for the app.
+ */
 public class FirstSignInActivity extends AppCompatActivity {
     Button profileButton;
     Button adminButton;
@@ -45,8 +48,8 @@ public class FirstSignInActivity extends AppCompatActivity {
     EditText profileLastName;
     EditText emailAddress;
     EditText phoneNumber;
-    Spinner theme;
     Switch geolocation;
+    boolean geo;
     ProfileGenerator profileMaker = new ProfileGenerator();
 
     @Override
@@ -63,7 +66,6 @@ public class FirstSignInActivity extends AppCompatActivity {
         emailAddress = findViewById(R.id.email_fill);
         phoneNumber = findViewById(R.id.edit_phone);
 
-        theme = findViewById(R.id.theme_spinner);
         geolocation = findViewById(R.id.geolocation_switch);
 
         requestNotificationPermissions();
@@ -75,17 +77,11 @@ public class FirstSignInActivity extends AppCompatActivity {
             String email = emailAddress.getText().toString().trim();
             String phoneStr = phoneNumber.getText().toString();
 
-            String currentTheme = theme.toString();
-            geolocation.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                @Override
-                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                    if (isChecked && (!checkPermission(Manifest.permission.ACCESS_COARSE_LOCATION)) && (!checkPermission(Manifest.permission.ACCESS_FINE_LOCATION))){
-                        requestPermission();
-                    }
-                }
-            });
-
-            boolean geo = geolocation.isActivated();
+            if (!checkPermission(Manifest.permission.ACCESS_FINE_LOCATION)) {
+                geo = false;
+            }else{
+                geo = geolocation.isActivated();
+            }
 
             // Check if input parameters are valid
             boolean isValidFirst = isValidName(firstName);
@@ -115,10 +111,10 @@ public class FirstSignInActivity extends AppCompatActivity {
                         Toast.LENGTH_SHORT).show();
             }
             else {
-                String imageURI = null;
+                String imageURL = null;
 
                 User newUser = new User(firstName, lastName, parseLong(phoneStr), email, geo,
-                        imageURI);
+                        imageURL);
 
                 Firebase firebase = new Firebase();
                 Log.e("FSFB", "We got to this point");
@@ -161,7 +157,6 @@ public class FirstSignInActivity extends AppCompatActivity {
                         Toast.makeText(getApplicationContext(),
                                 "The provided email already exists for another user." +
                                 "Please use a different email.", Toast.LENGTH_SHORT).show();
-                        Log.e("FSFB", "EMAIL ALREADY EXISTS");
                     }
 
                     @Override
@@ -169,6 +164,14 @@ public class FirstSignInActivity extends AppCompatActivity {
                         Log.e("FSFB", "The User was not Created", e);
                     }
                 });
+            }
+        });
+        geolocation.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked && (!checkPermission(Manifest.permission.ACCESS_FINE_LOCATION))){
+                    requestPermission();
+                }
             }
         });
 
@@ -238,6 +241,7 @@ public class FirstSignInActivity extends AppCompatActivity {
     /**
      * This method will check if permissions are granted or denied
      * @param permission
+     * A string representing the permissions that a user has or has not enabled.
      * @return a boolean value
      */
     public boolean checkPermission(String permission){

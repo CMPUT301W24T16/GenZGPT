@@ -16,18 +16,42 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.example.genzgpt.Controller.Firebase;
+import com.example.genzgpt.Controller.FirebaseMessages;
+import com.example.genzgpt.Controller.GeolocationTracking;
 import com.example.genzgpt.Model.AppUser;
 import com.example.genzgpt.Model.Event;
 import com.example.genzgpt.R;
+import com.google.firebase.firestore.GeoPoint;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
+import com.example.genzgpt.Model.User;
 
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * A fragment for the QR Code Scanner used in the app.
+ */
 public class QRCodeFragment extends Fragment {
     private static final int REQUEST_CAMERA_PERMISSION = 200;
     private String qrCodeResult;
     private Firebase firebase;
     private Event loadedEvent;
+    private GeolocationTracking geolocationTracking;
 
+    /**
+     * Handles the creation of the QRCodeFragment from within the app.
+     * @param inflater The LayoutInflater object that can be used to inflate
+     * any views in the fragment,
+     * @param container If non-null, this is the parent view that the fragment's
+     * UI should be attached to.  The fragment should not add the view itself,
+     * but this can be used to generate the LayoutParams of the view.
+     * @param savedInstanceState If non-null, this fragment is being re-constructed
+     * from a previous saved state as given here.
+     *
+     * @return
+     * A View for the QRCode Fragment.
+     */
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view;
@@ -87,6 +111,9 @@ public class QRCodeFragment extends Fragment {
                             if (qrCodeResult.startsWith("1")) {
                                 // Check the user in to the event
                                 checkInUser(eventCode);
+                                //geolocationTracking = new GeolocationTracking(event);
+                                //GeoPoint location = geolocationTracking.getUserLocation();
+                                //firebase.addLocationToEvent(event.getEventName(), location);
                             }
                             handleEventLoaded();
                         }
@@ -144,6 +171,39 @@ public class QRCodeFragment extends Fragment {
 
     private void checkInUser(String substring) {
         // Check in the user to the event
+        FirebaseMessages fms = new FirebaseMessages(this.getContext());
         firebase.addUserToCheckedInAttendees(substring, AppUser.getUserId());
+        List<String> organizerList = loadedEvent.getOrganizers();
+        for(String organizer : organizerList) {
+            firebase.getUserDataAndToken(organizer, new Firebase.OnUserLoadedListener(){
+                @Override
+                public void onUserLoaded(User user){
+                    firebase.getUserData(AppUser.getUserId(),new Firebase.OnUserLoadedListener(){
+                        @Override
+                        public void onUserLoaded(User user2){
+                            fms.sendMessageToDevice(user.getToken(), "New Checkin", user2.getFirstName() + " " + user2.getLastName()+" just checked-in","message");
+                        }
+                        @Override
+                        public void onUserNotFound(){
+                            Log.d("QRCodeFragment","UserNotFound");
+                        }
+                        @Override
+                        public void onUserLoadFailed(Exception e){
+                            Log.e("QRCodeFragment","error on Milestone");
+
+                        };
+                    });
+                }
+                @Override
+                public void onUserNotFound(){
+                    Log.d("QRCodeFragment","UserNotFound");
+                }
+                @Override
+                public void onUserLoadFailed(Exception e){
+                    Log.e("QRCodeFragment","error on Milestone");
+
+                };
+            });
+        }
     }
 }

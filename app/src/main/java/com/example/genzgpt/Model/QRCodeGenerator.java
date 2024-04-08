@@ -7,6 +7,9 @@ import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
 
+/**
+ * A generator for a QR code used in and with the app.
+ */
 public class QRCodeGenerator {
 
     /**

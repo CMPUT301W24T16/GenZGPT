@@ -55,32 +55,6 @@ public class AppUser extends User{
         super(firstName, lastName, phone, email, geolocation, imageURL);
     }
 
-    //FIXME: THIS CODE WILL UNLEASH A PLAGUE UPON THIS APP. NEVER, AND I MEAN EVER, UNLEASH THIS CODE. YOU HAVE BEEN WARNED!
-    /*
-    public static synchronized AppUser getInstance() {
-        if (instance == null) {
-            // Handle error or initialize with default values
-            throw new IllegalStateException("AppUser is not initialized");
-        }
-        return instance;
-    }
-
-    public static synchronized void initInstance(String id, String firstName, String lastName, long phone, String email, Boolean geolocation, String imageURL) {
-        if (instance == null) {
-            instance = new AppUser(id, firstName, lastName, phone, email, geolocation, imageURL);
-        }
-
-    }
-
-
-    public static synchronized void initInstance(User user) {
-        if (instance == null) {
-            instance = new AppUser(user.getId(), user.getFirstName(), user.getLastName(),
-                    user.getPhone(), user.getEmail(), user.isGeolocation(), user.getImageURL());
-        }
-    }
-    */
-
     /**
      * A getter for the static version of the User's Id
      * @return
@@ -99,20 +73,38 @@ public class AppUser extends User{
         userId = _userId;
     }
 
+    /**
+     * A getter for whether or not the current AppUser has signed in.
+     * @return
+     * The sign in status of the user (true or false).
+     */
     public static boolean getHasSignedIn() {
         return hasSignedIn;
     }
 
+    /**
+     * A setter for the sign in status of the user of the app.
+     * @param status
+     * Whether or not the user has signed in (true or false).
+     */
     public static void setHasSignedIn(boolean status) {
         hasSignedIn = status;
     }
 
-    //FIXME THIS SHOULD NOT BE NECESSARY ANYMORE
+    /**
+     * A setter for the email of the current app user.
+     * @param _userEmail
+     * The email for the current user of the app to have.
+     */
     public static void setUserEmail(String _userEmail) {
         userEmail = _userEmail;
     }
 
-    //FIXME THIS SHOULD NOT BE NECESSARY ANYMORE
+    /**
+     * A getter for the email of the current user of the app.
+     * @return
+     * The email for the current user of the app.
+     */
     public static String getAppUserEmail() {
         return userEmail;
     }

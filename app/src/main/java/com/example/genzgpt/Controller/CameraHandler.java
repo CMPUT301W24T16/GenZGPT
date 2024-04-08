@@ -14,6 +14,9 @@ import androidx.fragment.app.Fragment;
 
 import java.io.ByteArrayOutputStream;
 
+/**
+ * This class handles camera and image related data.
+ */
 public class CameraHandler {
     private static final int REQUEST_IMAGE_CAPTURE = 101;
 
@@ -30,6 +33,9 @@ public class CameraHandler {
         fragment = null;
     }
 
+    /**
+     * Opens the camera for the device within the app.
+     */
     public void openCamera() {
         if (fragment.getContext() != null && fragment.getActivity() != null) {
             if (ContextCompat.checkSelfPermission(fragment.getContext(), Manifest.permission.CAMERA)
@@ -45,6 +51,13 @@ public class CameraHandler {
         }
     }
 
+    /**
+     * Given a bitmap: create an image URI.
+     * @param bitmap
+     * The bitmap to create a URI for.
+     * @return
+     * The URI for the given bitmap.
+     */
     public Uri getImageUri(Bitmap bitmap) {
         Context context = fragment.getContext();
         if (context != null) {
