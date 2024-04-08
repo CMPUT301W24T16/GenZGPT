@@ -87,6 +87,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> 
     /**
      * A getter for the number of items within the EventAdapter.
      * @return
+     * The number of items in the eventList being used by EventAdapter.
      */
     @Override
     public int getItemCount() {
