@@ -7,6 +7,9 @@ import com.example.genzgpt.Model.AppUser;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+/**
+ * Test cases for the AppUser class.
+ */
 class AppUserTest {
 
     private AppUser appUser;

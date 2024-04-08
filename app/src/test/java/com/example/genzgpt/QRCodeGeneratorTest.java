@@ -25,6 +25,9 @@ import org.mockito.junit.MockitoRule;
 //FIXME: God this is a horrendous being, I apologize in advance for whoever has to work on this next.
 @RunWith(MockitoJUnitRunner.class)
 
+/**
+ * Test cases for the QRCode Generator Class.
+ */
 public class QRCodeGeneratorTest {
     private Bitmap bitmap;
     @Mock

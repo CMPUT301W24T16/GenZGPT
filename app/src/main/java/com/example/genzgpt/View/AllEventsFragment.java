@@ -13,8 +13,6 @@ import java.util.List;
 /**
  * A simple {@link Fragment} subclass.
  * Serves as a Display for the User's Events List
- * Use the {@link MyEventsFragment#newInstance} factory method to
- * create an instance of this fragment.
  */
 public class AllEventsFragment extends EventsFragment {
     public AllEventsFragment() {

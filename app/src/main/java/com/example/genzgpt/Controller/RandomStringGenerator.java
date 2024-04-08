@@ -4,6 +4,9 @@ import java.security.SecureRandom;
 import java.util.Locale;
 import java.util.Random;
 
+/**
+ * FIXME REMOVE THIS CLASS IT DOES NOTHING RIGHT NOW
+ */
 public class RandomStringGenerator {
     private static final String UPPER_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     private static final String LOWER_CHARS = "abcdefghijklmnopqrstuvwxyz";

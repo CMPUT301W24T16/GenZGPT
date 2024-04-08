@@ -7,6 +7,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * This class manages attendees for a given event.
+ */
 public class AttendeeManager {
     private List<User> registeredAttendees = new ArrayList<>();
     private List<User> checkedInAttendees = new ArrayList<>();
@@ -132,9 +135,20 @@ public class AttendeeManager {
         this.maxAttendees = maxAttendees;
     }
 
+    /**
+     * A setter for the checked in Attendees in the app.
+     * @param checkedInAttendees
+     * The list of checked in Attendees.
+     */
     public void setCheckedInAttendees(List<User> checkedInAttendees) {
         this.checkedInAttendees = checkedInAttendees;
     }
+
+    /**
+     * A setter for the list of registered Attendees in the app.
+     * @param registeredAttendees
+     * The list of registered Attendees to set.
+     */
     public void setRegisteredAttendees(List<User> registeredAttendees){
         this.registeredAttendees = registeredAttendees;}
 

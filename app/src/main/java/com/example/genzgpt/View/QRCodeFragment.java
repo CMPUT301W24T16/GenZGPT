@@ -24,6 +24,9 @@ import com.google.firebase.firestore.GeoPoint;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
+/**
+ * A fragment for the QR Code Scanner used in the app.
+ */
 public class QRCodeFragment extends Fragment {
     private static final int REQUEST_CAMERA_PERMISSION = 200;
     private String qrCodeResult;
@@ -31,6 +34,19 @@ public class QRCodeFragment extends Fragment {
     private Event loadedEvent;
     private GeolocationTracking geolocationTracking;
 
+    /**
+     * Handles the creation of the QRCodeFragment from within the app.
+     * @param inflater The LayoutInflater object that can be used to inflate
+     * any views in the fragment,
+     * @param container If non-null, this is the parent view that the fragment's
+     * UI should be attached to.  The fragment should not add the view itself,
+     * but this can be used to generate the LayoutParams of the view.
+     * @param savedInstanceState If non-null, this fragment is being re-constructed
+     * from a previous saved state as given here.
+     *
+     * @return
+     * A View for the QRCode Fragment.
+     */
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view;

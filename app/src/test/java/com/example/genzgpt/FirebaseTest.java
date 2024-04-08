@@ -21,6 +21,9 @@ import org.mockito.MockitoAnnotations;
 import java.util.Date;
 import com.google.firebase.firestore.CollectionReference;
 
+/**
+ * Test cases for the Firebase Class.
+ */
 public class FirebaseTest {
 
 

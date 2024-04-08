@@ -35,6 +35,9 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+/**
+ * A fragment to handle the Creation of an Event.
+ */
 public class EventCreationFragment extends Fragment {
 
     private EditText eventNameEditText, eventDateEditText, locationEditText, maxAttendeesEditText;
@@ -46,6 +49,19 @@ public class EventCreationFragment extends Fragment {
     private String updatedImageURL;
 
 
+    /**
+     * Handles the creation of the View for the Event Creation Fragment.
+     * @param inflater The LayoutInflater object that can be used to inflate
+     * any views in the fragment,
+     * @param container If non-null, this is the parent view that the fragment's
+     * UI should be attached to.  The fragment should not add the view itself,
+     * but this can be used to generate the LayoutParams of the view.
+     * @param savedInstanceState If non-null, this fragment is being re-constructed
+     * from a previous saved state as given here.
+     *
+     * @return
+     * The View for the EventCreationFragment.
+     */
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -82,6 +98,11 @@ public class EventCreationFragment extends Fragment {
         return view;
     }
 
+    /**
+     * Handles the creation of the EventCreationFragment.
+     * @param savedInstanceState If the fragment is being re-created from
+     * a previous saved state, this is the state.
+     */
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -194,12 +215,12 @@ public class EventCreationFragment extends Fragment {
 
             @Override
             public void onUserNotFound() {
-                Log.d("spaghetti code", "aaahahaahah");
+                Log.d("EventCreation", "User not Found");
             }
 
             @Override
             public void onUserLoadFailed(Exception e) {
-                Log.d("spaghetti code", "aaahahaahah");
+                Log.d("EventCreation", "LoadFailed");
             }
         });
 

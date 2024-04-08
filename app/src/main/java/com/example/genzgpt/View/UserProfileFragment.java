@@ -25,8 +25,6 @@ import com.example.genzgpt.R;
 /**
  * A simple {@link Fragment} subclass.
  * Serves as a display for a User's Profile
- * Use the {@link UserProfileFragment} factory method to
- * create an instance of this fragment.
  */
 public class UserProfileFragment extends Fragment {
     private TextView userBanner;

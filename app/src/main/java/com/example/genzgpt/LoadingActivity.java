@@ -11,6 +11,9 @@ import android.util.Log;
 import com.example.genzgpt.Controller.Firebase;
 import com.example.genzgpt.Model.AppUser;
 
+/**
+ * A place to send the user of the app between switches of activities.
+ */
 public class LoadingActivity extends AppCompatActivity {
     public boolean isAdmin = false;
     public boolean isSignedIn;
@@ -33,7 +36,7 @@ public class LoadingActivity extends AppCompatActivity {
     }
 
     /**
-     * Sends the user to the administrator activity
+     * Sends the user to the administrator activity (if they meet the right conditions).
      */
     public void sendToAdmin() {
         if (isAdmin) {
@@ -43,6 +46,9 @@ public class LoadingActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Checks whether or not the user of the app should be sent to the MainActivity.
+     */
     public void sendToMain() {
         if (isSignedIn) {
             Log.d("Loading", "Sent to Main");
