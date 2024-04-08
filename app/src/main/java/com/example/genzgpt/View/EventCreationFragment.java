@@ -1,6 +1,8 @@
 package com.example.genzgpt.View;
 
+import android.app.AlertDialog;
 import android.app.DatePickerDialog;
+import android.content.DialogInterface;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -30,6 +32,8 @@ import com.google.android.material.appbar.MaterialToolbar;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
 
 public class EventCreationFragment extends Fragment {
 
@@ -57,11 +61,14 @@ public class EventCreationFragment extends Fragment {
         eventImageView = view.findViewById(R.id.eventImageView);
         Button selectImageButton = view.findViewById(R.id.selectImageButton);
         Button createEventButton = view.findViewById(R.id.createEventButton);
+        Button reuseEventIdButton = view.findViewById(R.id.reuseQRCodeButton);
         maxAttendeesEditText = view.findViewById(R.id.maxAttendeesEditText);
 
         eventDateEditText.setOnClickListener(v -> showDatePickerDialog());
         createEventButton.setOnClickListener(v -> createEvent());
         selectImageButton.setOnClickListener(v -> selectImage());
+        reuseEventIdButton.setOnClickListener(v -> reuseEventId());
+
 
         galleryLauncher = registerForActivityResult(new ActivityResultContracts.GetContent(),
                 result -> {
@@ -196,6 +203,82 @@ public class EventCreationFragment extends Fragment {
         });
 
         getParentFragmentManager().popBackStack();
+    }
+
+    private void reuseEventId() {
+        //shows an alert dialog where the current user can choose from a list of events that they're an organizer of.
+        //This will allow for the reusing of the QR codes in existence to map to a different event
+        //The user will be able to select an event from the list and map all the updated info into an existing event, overwriting the data and resetting the attendees
+        Firebase firebase = new Firebase();
+        // Retrieve the current user's ID
+        String currentUserId = AppUser.getUserId();
+
+        // Fetch the events for the current user as an organizer
+        firebase.fetchEventsForOrganizer(currentUserId, new Firebase.OnEventsLoadedListener() {
+            @Override
+            public void onEventsLoaded(List<Event> organizerEvents) {
+                // Create an array of event names
+                String[] eventNames = new String[organizerEvents.size()];
+                for (int i = 0; i < organizerEvents.size(); i++) {
+                    eventNames[i] = organizerEvents.get(i).getEventName();
+                }
+
+                // Create an alert dialog
+                AlertDialog.Builder builder = new AlertDialog.Builder(EventCreationFragment.this.getContext());
+                builder.setTitle("Select Event to Reuse")
+                        .setSingleChoiceItems(eventNames, -1, null)
+                        .setPositiveButton("Create Event", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                int selectedPosition = ((AlertDialog) dialog).getListView().getCheckedItemPosition();
+                                if (selectedPosition >= 0) {
+                                    // Get the selected event
+                                    Event selectedEvent = organizerEvents.get(selectedPosition);
+
+                                    // Retrieve the updated event information from the edit texts
+                                    String updatedEventName = eventNameEditText.getText().toString();
+                                    Date updatedEventDate = eventDateCalendar.getTime();
+                                    String updatedLocation = locationEditText.getText().toString();
+                                    String maxAttendeesText = maxAttendeesEditText.getText().toString();
+                                    int updatedMaxAttendees = maxAttendeesText.isEmpty() ? 0 : Integer.parseInt(maxAttendeesText);
+                                    String updatedImageURL = ""; // Get the updated image URL as needed
+
+                                    // Call the reusePastEvent method from your Firebase class
+                                    firebase.reusePastEvent(currentUserId, selectedEvent.getEventId(),
+                                            updatedEventName, updatedEventDate, updatedLocation,
+                                            updatedMaxAttendees, updatedImageURL, new Firebase.OnEventUpdatedListener() {
+                                                @Override
+                                                public void onEventUpdated() {
+                                                    // Event updated successfully
+                                                    Log.d("CreateEventActivity", "Event data updated successfully");
+                                                    // Perform any additional actions as needed
+                                                }
+
+                                                @Override
+                                                public void onEventUpdateFailed(Exception e) {
+                                                    // Event update failed
+                                                    Log.e("CreateEventActivity", "Failed to update event data: " + e.getMessage());
+                                                    // Handle the failure case, e.g., display an error message
+                                                }
+                                            });
+                                } else {
+                                    // No event selected, log an error message or perform any other necessary actions
+                                    Log.e("CreateEventActivity", "No event selected to reuse");
+                                }
+                            }
+                        })
+                        .setNegativeButton("Cancel", null);
+
+                // Show the alert dialog
+                builder.create().show();
+            }
+
+            @Override
+            public void onEventsLoadFailed(Exception e) {
+                // Handle the failure case, e.g., log an error message
+                Log.e("CreateEventActivity", "Failed to load events: " + e.getMessage());
+            }
+        });
     }
 
     /**
