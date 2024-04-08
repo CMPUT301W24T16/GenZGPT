@@ -1,5 +1,7 @@
 package com.example.genzgpt.View;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -9,7 +11,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
+import com.example.genzgpt.FirstSignInActivity;
 import com.example.genzgpt.R;
 
 /**
@@ -21,7 +25,7 @@ public class AdminLoginFragment extends Fragment {
     Button loginButton;
     Button returnButton;
     View view;
-    private String correctPassword;
+    private final String correctPassword = "pomegranate";
 
     /**
      * The empty constructor for the AdminLoginFragment
@@ -39,24 +43,6 @@ public class AdminLoginFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        adminPassword = view.findViewById(R.id.admin_password);
-        loginButton = view.findViewById(R.id.admin_signin_button);
-        returnButton = view.findViewById(R.id.return_button);
-
-        loginButton.setOnClickListener(v -> {
-            String password = adminPassword.getText().toString().trim();
-            if (password == correctPassword) {
-                // FIXME send to the admin login page
-            }
-            else {
-                //FIXME give some indication of failure (or not)
-            }
-        });
-
-        returnButton.setOnClickListener(v -> {
-            // FIXME send back to SignInFragment
-        });
     }
 
     /**
@@ -78,6 +64,31 @@ public class AdminLoginFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         view = inflater.inflate(R.layout.fragment_admin_login, container, false);
+
+        adminPassword = view.findViewById(R.id.admin_password);
+        loginButton = view.findViewById(R.id.admin_signin_button);
+        returnButton = view.findViewById(R.id.return_button);
+
+        loginButton.setOnClickListener(v -> {
+            String password = adminPassword.getText().toString().trim();
+            if (password.equals(correctPassword)) {
+                SharedPreferences preferences = requireActivity().getSharedPreferences(
+                        "com.example.genzgpt", Context.MODE_PRIVATE);
+
+                preferences.edit().putBoolean("admin", true).apply();
+                requireActivity().getSupportFragmentManager().popBackStack();
+            }
+            else {
+                Toast.makeText(getContext(), "Invalid Admin Password", Toast.LENGTH_SHORT);
+            }
+        });
+
+        returnButton.setOnClickListener(v -> {
+            requireActivity().getSupportFragmentManager().popBackStack();
+        });
+
         return view;
     }
+
+    public static AdminLoginFragment newInstance() {return new AdminLoginFragment();}
 }

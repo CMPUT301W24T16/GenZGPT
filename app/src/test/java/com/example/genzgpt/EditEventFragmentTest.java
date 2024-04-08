@@ -11,6 +11,9 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import android.text.TextUtils;
 
+/**
+ * Test cases for EditEventFragment Class.
+ */
 public class EditEventFragmentTest {
 
     @Test

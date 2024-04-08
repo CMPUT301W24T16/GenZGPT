@@ -51,6 +51,7 @@ public class FirstSignInActivity extends AppCompatActivity {
     Switch geolocation;
     boolean geo;
     ProfileGenerator profileMaker = new ProfileGenerator();
+    AdminLoginFragment adminLogin = new AdminLoginFragment();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -178,11 +179,11 @@ public class FirstSignInActivity extends AppCompatActivity {
 
         // Set the adminButton to send to the admin sign in page.
         adminButton.setOnClickListener( v -> {
-            SharedPreferences preferences = FirstSignInActivity.this.getSharedPreferences("com.example.genzgpt",
-                    Context.MODE_PRIVATE);
-
-            preferences.edit().putBoolean("admin", true).apply();
-            finish();
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.sign_in_container, adminLogin)
+                    .addToBackStack("FirstSign")
+                    .commit();
         });
     }
 
@@ -264,5 +265,17 @@ public class FirstSignInActivity extends AppCompatActivity {
                         new String[]{android.Manifest.permission.POST_NOTIFICATIONS}, 7);
             }
         }
+    }
+
+    @Override
+    protected void onResume() {
+       super.onResume();
+       SharedPreferences preferences = getSharedPreferences("com.example.genzgpt",
+               Context.MODE_PRIVATE);
+       boolean isAdmin = preferences.getBoolean("admin", false);
+
+       if (isAdmin) {
+           finish();
+       }
     }
 }

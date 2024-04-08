@@ -28,7 +28,7 @@ public class LoadingActivity extends AppCompatActivity {
      * Sends the user to a first time sign in if they have need to do this already.
      */
     public void sendToFirstTime() {
-        if (!isSignedIn) {
+        if (!isSignedIn && !isAdmin) {
             Log.d("Loading", "Sent to First Time");
             Intent toFirst = new Intent(LoadingActivity.this, FirstSignInActivity.class);
             startActivity(toFirst);
