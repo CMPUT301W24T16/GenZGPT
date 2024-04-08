@@ -126,7 +126,7 @@ public class Firebase {
                             .addOnSuccessListener(uri -> {
                                 String imageURL = uri.toString();
                                 updateUserImageURL(userID, imageURL);
-                                showToast(context, "Image uploaded and associated with the event");
+                                //showToast(context, "Image uploaded");
                             })
                             .addOnFailureListener(e -> {
                                 showToast(context, "Failed to get image download URL: " + e.getMessage());

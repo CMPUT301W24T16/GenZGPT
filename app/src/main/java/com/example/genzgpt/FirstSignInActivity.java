@@ -1,5 +1,6 @@
 package com.example.genzgpt;
 
+import static com.example.genzgpt.Controller.GeolocationTracking.FINE_LOCATION_PERMISSION;
 import static java.lang.Character.isLetter;
 import static java.lang.Long.parseLong;
 
@@ -9,10 +10,13 @@ import androidx.core.content.ContextCompat;
 
 import android.Manifest;
 import android.app.PendingIntent;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -25,9 +29,11 @@ import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.Toast;
 
+import com.example.genzgpt.Controller.CameraHandler;
 import com.example.genzgpt.Controller.Firebase;
 import com.example.genzgpt.Controller.FirebaseMessages;
 import com.example.genzgpt.Controller.GeolocationTracking;
+import com.example.genzgpt.Controller.ProfileGenerator;
 import com.example.genzgpt.Model.AppUser;
 import com.example.genzgpt.Model.User;
 import com.example.genzgpt.View.AdminLoginFragment;
@@ -39,9 +45,9 @@ public class FirstSignInActivity extends AppCompatActivity {
     EditText profileLastName;
     EditText emailAddress;
     EditText phoneNumber;
-    Spinner theme;
     Switch geolocation;
     boolean geo;
+    ProfileGenerator profileMaker = new ProfileGenerator();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,7 +63,6 @@ public class FirstSignInActivity extends AppCompatActivity {
         emailAddress = findViewById(R.id.email_fill);
         phoneNumber = findViewById(R.id.edit_phone);
 
-        theme = findViewById(R.id.theme_spinner);
         geolocation = findViewById(R.id.geolocation_switch);
 
         requestNotificationPermissions();
@@ -69,16 +74,11 @@ public class FirstSignInActivity extends AppCompatActivity {
             String email = emailAddress.getText().toString().trim();
             String phoneStr = phoneNumber.getText().toString();
 
-            String currentTheme = theme.toString();
-
             if (!checkPermission(Manifest.permission.ACCESS_FINE_LOCATION)) {
                 geo = false;
             }else{
                 geo = geolocation.isActivated();
             }
-
-            // FIXME Put procedural generation here
-            String imageURL = null;
 
             // Check if input parameters are valid
             boolean isValidFirst = isValidName(firstName);
@@ -108,10 +108,13 @@ public class FirstSignInActivity extends AppCompatActivity {
                         Toast.LENGTH_SHORT).show();
             }
             else {
+                String imageURL = null;
+
                 User newUser = new User(firstName, lastName, parseLong(phoneStr), email, geo,
                         imageURL);
 
                 Firebase firebase = new Firebase();
+                Log.e("FSFB", "We got to this point");
                 firebase.createUser(newUser, new Firebase.OnUserCreatedListener() {
                     @Override
                     public void onUserCreated(String userId) {
@@ -125,15 +128,23 @@ public class FirstSignInActivity extends AppCompatActivity {
 
                         // Store info that the user has signed in for future app usage
                         preferences.edit().putBoolean("signIn", AppUser.getHasSignedIn()).apply();
-                        Log.d("FirstsignIn", String.valueOf(AppUser.getHasSignedIn()));
+                        Log.d("FSFB", String.valueOf(AppUser.getHasSignedIn()));
                         preferences.edit().putString("id", AppUser.getUserId()).apply();
 
                         Log.e("FSI UserId", userId);
-                        Log.e("User Creation", "Successful User Creation");
+                        Log.e("FSFB", "Successful User Creation");
 
                         // Set up Firebase Messaging for this user.
                         FirebaseMessages fms = new FirebaseMessages(getApplicationContext());
                         fms.FMSFlow(userId);
+
+                        // Generate the profile picture for this user
+                        Bitmap bitmap = profileMaker.generateProfile(firstName, lastName);
+                        CameraHandler uriGetter = new CameraHandler();
+                        Context context = getApplicationContext();
+                        Uri uri = uriGetter.getImageUri(bitmap, context);
+                        Firebase.uploadImageForUser(AppUser.getUserId(), uri,
+                                new ProgressDialog(context), context);
 
                         finish();
                     }
@@ -147,7 +158,7 @@ public class FirstSignInActivity extends AppCompatActivity {
 
                     @Override
                     public void onUserCreationFailed(Exception e) {
-                        Log.e("User Creation", "The User was not Created", e);
+                        Log.e("FSFB", "The User was not Created", e);
                     }
                 });
             }
@@ -203,8 +214,7 @@ public class FirstSignInActivity extends AppCompatActivity {
      * True if the phone number is valid. False Otherwise.
      */
     private boolean isValidPhone(String phone) {
-        // FIXME May want to change number from 10
-        return (phone.length() == 4 || phone.length() >= 10);
+        return (phone.length() >= 4 && phone.length() <= 10);
     }
 
     /**
@@ -215,8 +225,7 @@ public class FirstSignInActivity extends AppCompatActivity {
      * True if the email is valid. False otherwise.
      */
     private boolean isValidEmail(String email) {
-        // FIXME NEED TO GET JAVA EMAIL package
-        return (!email.isEmpty());
+        return (email.contains("@") && email.contains("."));
     }
 
     /**

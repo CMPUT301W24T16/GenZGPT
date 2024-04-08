@@ -102,38 +102,28 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/email_fill" />
 
-        <Spinner
-            android:id="@+id/theme_spinner"
-            android:layout_width="300dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:background="@drawable/edit_text_outline"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/edit_phone" />
-
         <TextView
             android:id="@+id/geo_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="44dp"
-            android:layout_marginTop="36dp"
+            android:layout_marginTop="40dp"
             android:text="Geolocation Tracking"
             android:textColor="#FFFFFF"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/theme_spinner" />
+            app:layout_constraintTop_toBottomOf="@+id/edit_phone" />
 
         <Switch
             android:id="@+id/geolocation_switch"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
+            android:layout_marginTop="20dp"
             android:background="@drawable/edit_text_outline"
             android:shadowColor="#C5C5C5"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.45"
             app:layout_constraintStart_toEndOf="@+id/geo_text"
-            app:layout_constraintTop_toBottomOf="@+id/theme_spinner" />
+            app:layout_constraintTop_toBottomOf="@+id/edit_phone" />
 
         <EditText
             android:id="@+id/first_name_fill"
@@ -156,10 +146,10 @@
             android:id="@+id/user_profile_button"
             android:layout_width="320dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            app:backgroundTint="@null"
+            android:layout_marginTop="50dp"
             android:background="@drawable/edit_text_outline"
             android:text="Create User Profile"
+            app:backgroundTint="@null"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/geo_text" />
@@ -169,10 +159,10 @@
             android:layout_width="wrap_content"
             android:layout_height="40dp"
             android:layout_marginTop="15dp"
-            app:backgroundTint="@null"
             android:background="@drawable/edit_text_outline"
             android:text="Sign In As Administrator"
             android:textSize="12sp"
+            app:backgroundTint="@null"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
