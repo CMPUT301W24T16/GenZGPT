@@ -39,7 +39,6 @@ public class MainActivity extends AppCompatActivity {
     BottomNavigationView navBar;
     MainPageFragment homePage = new MainPageFragment();
     MyEventsFragment myEvents = new MyEventsFragment();
-    // FIXME SHOULD TAKE TO THE EVENTHOSTFRAGMENT
     AllEventsFragment eventHost = new AllEventsFragment();
     UserProfileFragment userProfile = new UserProfileFragment();
     QRCodeFragment QRCodeActivity = new QRCodeFragment();

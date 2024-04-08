@@ -46,7 +46,6 @@ public class MessageNotification extends AppNotification {
      * Creates a builder for the message notification an organizer wants to send out.
      * Uses specific parameters such as NotificationCompat.BigTextStyle to fit all information
      * about this message into the notification.
-     * FIXME: Mainly, we need to add Intent.
      * @param context
      *      The information needed about the app to construct this notification builder.
      * @return

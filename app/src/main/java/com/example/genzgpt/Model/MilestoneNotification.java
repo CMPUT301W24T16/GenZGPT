@@ -13,7 +13,6 @@ import com.example.genzgpt.R;
 /**
  * The contents of a notification that an attendee shall receive after reaching a milestone
  * number of attendees at their event.
- * FIXME: Currently does nothing in the app
  */
 public class MilestoneNotification extends AppNotification{
     /**
@@ -46,8 +45,6 @@ public class MilestoneNotification extends AppNotification{
 
     /**
      * Creates a builder that can create an event milestone notification.
-     * FIXME: The builder we return needs some other methods later (and maybe some removed).
-     * FIXME: Mainly, we need to add Intent (or not since this might make the assignment 1000x harder)
      * @param context
      *      The information needed about the app to construct this notification builder.
      * @return
@@ -56,7 +53,7 @@ public class MilestoneNotification extends AppNotification{
     public Notification getDisplayable(@NonNull Context context) {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(
                 context, channelID)
-                .setSmallIcon(R.drawable.test_picture) // FIXME: set to app icon later
+                .setSmallIcon(R.drawable.test_picture)
                 .setContentTitle(title)
                 .setContentText(message)
                 .setWhen(System.currentTimeMillis())

@@ -25,9 +25,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * FIXME CAN WE GET ADMINPROFILESFRAGMENT DELETED AND REFACTOR THIS TO BE ADMINPROFILESFRAGMENT?
  * A simple {@link Fragment} subclass.
- * Serves as a Display for the User's List
+ * Serves as a Display for the Users List
  */
 public class UserListFragment extends Fragment {
     private UserAdapter userAdapter;

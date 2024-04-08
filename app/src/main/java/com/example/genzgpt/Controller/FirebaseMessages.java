@@ -123,12 +123,12 @@ public class FirebaseMessages extends FirebaseMessagingService {
         }
     }
 
-    /**
+    /*
      * Sends a message to a specific device.
      * @param deviceToken The device token of the recipient.
      * @param messageData The data to be sent in the message.
      */
-    /**public void sendMessageToDevice(String deviceToken, Map<String, String> messageData) {
+    /*public void sendMessageToDevice(String deviceToken, Map<String, String> messageData) {
         Log.d("FirebaseMessages","sendMessageToDevice");
         RemoteMessage message = new RemoteMessage.Builder(deviceToken)
                 .setData(messageData)
@@ -195,7 +195,7 @@ public class FirebaseMessages extends FirebaseMessagingService {
         }
     }
 
-    /**
+    /*
      * Sends a message to a phone using Firebase Messaging
      * @param deviceToken
      * The token of the device to send a message to.
@@ -206,7 +206,7 @@ public class FirebaseMessages extends FirebaseMessagingService {
      * @param type
      * The type of message to send.
      */
-    /**public void sendMessageToDevice(String deviceToken, String title, String content, String type) {
+    /*public void sendMessageToDevice(String deviceToken, String title, String content, String type) {
         RemoteMessage message = new RemoteMessage.Builder(deviceToken)
                 .addData("title", title)
                 .addData("content", content)
@@ -214,12 +214,12 @@ public class FirebaseMessages extends FirebaseMessagingService {
                 .build();
     }*/
 
-    /**
+    /*
      * Sends a message to multiple devices.
      * @param deviceTokens The device tokens of the recipients.
      * @param messageData The data to be sent in the message.
      */
-    /**public void sendMessageToMultipleDevices(List<String> deviceTokens, Map<String, String> messageData) {
+    /*public void sendMessageToMultipleDevices(List<String> deviceTokens, Map<String, String> messageData) {
         for (String deviceToken : deviceTokens) {
             sendMessageToDevice(deviceToken, messageData);
         }
@@ -315,7 +315,7 @@ public class FirebaseMessages extends FirebaseMessagingService {
      * @param notification
      * An AppNotification that will be used to provide info about what to display
      * @param id
-     * The unique identifier for
+     * The unique identifier for a specific notification.
      */
     public void displayNotification(AppNotification notification, int id) {
         // get the notification to display
@@ -337,7 +337,6 @@ public class FirebaseMessages extends FirebaseMessagingService {
             manager.createNotificationChannel(channel);
         }
 
-        // TODO CONFIRM THAT THIS ACTUALLY WORKS ON A DEVICE
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (ActivityCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS)
                     == PackageManager.PERMISSION_GRANTED) {
@@ -366,7 +365,6 @@ public class FirebaseMessages extends FirebaseMessagingService {
         String title = messageData.get("title");
         String content = messageData.get("content");
 
-        // FIXME Not sure if this is ever null due to method description
         String notiId = remoteMessage.getMessageId();
 
         if (notiId == null) {
