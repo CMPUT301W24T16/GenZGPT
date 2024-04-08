@@ -1,0 +1,1 @@
+packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html"},{"l":"com.example.genzgpt"},{"l":"com.example.genzgpt.Controller"},{"l":"com.example.genzgpt.Model"},{"l":"com.example.genzgpt.View"}];updateSearchResults();
