@@ -272,7 +272,7 @@ public class GeolocationTracking extends Fragment implements OnMapReadyCallback 
     /**
      * Gets the current location of the device, and positions the map's camera.
      */
-    private void getDeviceLocation() {
+    public GeoPoint getDeviceLocation() {
         /*
          * Get the best and most recent location of the device, which may be null in rare
          * cases when a location is not available.
@@ -301,9 +301,12 @@ public class GeolocationTracking extends Fragment implements OnMapReadyCallback 
                     }
                 });
             }
-        } catch (SecurityException e)  {
+
+        }
+        catch (SecurityException e)  {
             Log.e("Exception: %s", e.getMessage(), e);
         }
+        return userLocation;
     }
     /**
      * Prompts the user to select the current place from a list of likely places, and shows the
