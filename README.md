@@ -16,15 +16,15 @@ An Android app simplifying event attendance with QR code check-in for event orig
 
 Our app addresses the need for a seamless event check-in process, allowing organizers to manage events effortlessly and attendees to check in with just a scan of a QR code. 
 
-## Features
+## Main Features
 
 QRCheckIn boasts a range of features designed to enhance event management and attendance:
 
 - **QR Code Scanning:** Enables attendees to check in quickly by scanning an event-specific QR code.
 - **Firebase Integration:** Utilizes Firebase for efficient management of event details, attendee lists, and real-time check-in updates.
-- **Multi-User Roles:** Differentiates between organizer and attendee roles, each with tailored permissions and functionalities.
-- **Geolocation Verification:** Optionally verifies attendee presence at the event location, enhancing security and data accuracy.
-- **Image Uploads:** Allows both organizers and attendees to upload images, facilitating a personalized and engaging event experience.
+- **Multi-User Roles:** Differentiates between organizer and Admin roles.
+- **Geolocation Verification:** Optionally verifies attendee presence at the event location.
+- **Image Uploads:** Allows both organizers and attendees to upload images.
 
 ## Technology Stack
 
@@ -35,7 +35,7 @@ QRCheckIn boasts a range of features designed to enhance event management and at
 ## Installation
 
 1. Clone the repository:
-git clone https://github.com/yourusername/QRCheckIn.git
+git clone https://github.com/CMPUT301W24T16/GenZGPT
 2. Open the project in Android Studio:
 - Launch Android Studio.
 - Select 'Open an Existing Project' and navigate to the cloned repository.
@@ -58,6 +58,7 @@ For attendees:
 ## UML Diagram
 
 ## Demo Video
+![Demo GIF](/GenZGPT/demo-video/demo.gif)
 
 ## License
 
