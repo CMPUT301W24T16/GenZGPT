@@ -11,6 +11,9 @@ import static org.junit.jupiter.api.Assertions.*;
 import com.example.genzgpt.Model.Event;
 import com.example.genzgpt.Model.User;
 
+/**
+ * Test Cases for the Event Class.
+ */
 class EventTest {
 
     @Test

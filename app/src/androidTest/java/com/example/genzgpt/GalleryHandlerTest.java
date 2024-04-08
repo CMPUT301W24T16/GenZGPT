@@ -15,6 +15,9 @@ import static org.mockito.Mockito.verify;
 
 import com.example.genzgpt.Controller.GalleryHandler;
 
+/**
+ * Test Cases for the GalleryHandler class.
+ */
 @RunWith(AndroidJUnit4.class)
 public class GalleryHandlerTest {
 

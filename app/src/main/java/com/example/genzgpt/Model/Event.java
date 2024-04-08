@@ -64,10 +64,21 @@ public class Event {
 
 
     // Getters and Setters for event properties
+
+    /**
+     * A getter for the id of an event.
+     * @return
+     * The id of an event.
+     */
     public String getEventId() {
         return eventId;
     }
 
+    /**
+     * A setter for the id of an event.
+     * @param eventId
+     * The id to set for an event.
+     */
     public void setEventId(String eventId) {
         this.eventId = eventId;
     }
@@ -246,22 +257,47 @@ public class Event {
         attendeeManager.removeAttendee(user);
     }
 
+    /**
+     * A getter for the ImageURL of an event.
+     * @return
+     * The imageUrl for an event.
+     */
     public String getImageURL() {
         return imageURL;
     }
 
+    /**
+     * A setter for the checked in attendees of an event.
+     * @param checkedInAttendees
+     * The list of checked in attendees to set.
+     */
     public void setCheckedInAttendees(List<User> checkedInAttendees) {
         attendeeManager.setCheckedInAttendees(checkedInAttendees);
     }
 
+    /**
+     * A setter for the registered attendees of an event.
+     * @param registeredAttendees
+     * The list of registered attendees to set.
+     */
     public void setRegisteredAttendees(List<User> registeredAttendees) {
         attendeeManager.setRegisteredAttendees(registeredAttendees);
     }
 
+    /**
+     * A setter for the organizers of an event.
+     * @param organizersId
+     * The ids for all of the organizers of an event.
+     */
     public void setOrganizers(List<String> organizersId) {
         this.organizers = organizersId;
     }
 
+    /**
+     * Converts the current event to a map.
+     * @return
+     * The current event data as a map.
+     */
     public Map<String, Object> toMap() {
         Map<String, Object> eventMap = new HashMap<>();
         eventMap.put("eventName", eventName);

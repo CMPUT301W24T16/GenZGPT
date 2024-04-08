@@ -12,6 +12,9 @@ import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+/**
+ * test cases for the Organizer Class.
+ */
 class OrganizerTest {
 
     private Organizer organizer;

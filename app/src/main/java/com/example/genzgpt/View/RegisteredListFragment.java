@@ -151,7 +151,7 @@ public class RegisteredListFragment extends Fragment {
             personName = itemView.findViewById(R.id.tvPersonName);
             //checkInCount = itemView.findViewById(R.id.tvCheckedInCount);
         }
-
+        
         public void bind(User user) {
             personName.setText(user.getFirstName()+" "+user.getLastName());
             //checkInCount.setText("Checked In: " + user.getCheckInCount());

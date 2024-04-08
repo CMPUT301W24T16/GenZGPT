@@ -445,6 +445,9 @@ public class Firebase {
                 });
     }
 
+    /**
+     * A listener for when an event is loaded from Firebase.
+     */
     public interface OnEventLoadedListener {
         void onEventLoaded(Event event);
 
@@ -536,6 +539,9 @@ public class Firebase {
                 });
     }
 
+    /**
+     * A listener for when a user is created in Firebase.
+     */
     public interface OnUserCreatedListener {
         void onUserCreated(String userId);
 
@@ -876,6 +882,9 @@ public class Firebase {
                 });
     }
 
+    /**
+     * A listener for when multiple users are loaded from Firebase.
+     */
     public interface OnUsersLoadedListener {
         void onUsersLoaded(List<User> userList);
 
@@ -919,6 +928,9 @@ public class Firebase {
                 });
     }
 
+    /**
+     * A listener for when multiple events are loaded from Firebase.
+     */
     public interface OnEventsLoadedListener {
         void onEventsLoaded(List<Event> eventList);
 
@@ -988,6 +1000,9 @@ public class Firebase {
         return event;
     }
 
+    /**
+     * A listener for when a user's events are loaded from Firebase.
+     */
     public interface OnUserEventsLoadedListener {
         void onEventsLoaded(String email, List<Event> eventList);
         void onEventsLoadFailed(Exception e);
@@ -1063,6 +1078,9 @@ public class Firebase {
         });
     }
 
+    /**
+     * A listener for when attendees check into an event through Firebase.
+     */
     public interface OnCheckInAttendeesLoadedListener {
         void onCheckInAttendeesLoaded(List<User> checkedInAttendees);
 
@@ -1135,6 +1153,9 @@ public class Firebase {
         });
     }
 
+    /**
+     * A listener for when a list of registered attendees are loaded from Firebase.
+     */
     public interface OnRegisteredAttendeesLoadedListener {
         void onRegisteredAttendeesLoaded(List<User> registeredAttendees);
 
@@ -1169,6 +1190,9 @@ public class Firebase {
                 });
     }
 
+    /**
+     * A listener for when a user is updated in the Firebase.
+     */
     public interface OnUserUpdatedListener {
         void onUserUpdated();
 
@@ -1247,6 +1271,9 @@ public class Firebase {
         });
     }
 
+    /**
+     * A listener for when Attendees are registered in Firebase.
+     */
     public interface OnAttendeeRegisteredListener {
         void onAttendeeRegistered();
 
@@ -1257,6 +1284,9 @@ public class Firebase {
         void onEventLoadFailed(Exception e);
     }
 
+    /**
+     * A listener for an event being updated in Firebase.
+     */
     public interface OnEventUpdatedListener {
         void onEventUpdated();
 
@@ -1460,6 +1490,9 @@ public class Firebase {
         }
     }
 
+    /**
+     * A listener for when Attendees are removed from Firebase.
+     */
     public interface OnAttendeeRemovedListener {
         void onAttendeeRemoved();
 
@@ -1601,6 +1634,9 @@ public class Firebase {
         });
     }
 
+    /**
+     * A listener for when a location is retrieved from Firebase.
+     */
     public interface OnLocationsRetrievedListener {
         void onLocationsRetrieved(List<GeoPoint> locations);
         void onLocationsRetrievalFailed(Exception e);

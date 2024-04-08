@@ -38,6 +38,9 @@ import com.example.genzgpt.Model.AppUser;
 import com.example.genzgpt.Model.User;
 import com.example.genzgpt.View.AdminLoginFragment;
 
+/**
+ * The first activity a user will see when they need to Sign up for the app.
+ */
 public class FirstSignInActivity extends AppCompatActivity {
     Button profileButton;
     Button adminButton;
@@ -238,6 +241,7 @@ public class FirstSignInActivity extends AppCompatActivity {
     /**
      * This method will check if permissions are granted or denied
      * @param permission
+     * A string representing the permissions that a user has or has not enabled.
      * @return a boolean value
      */
     public boolean checkPermission(String permission){

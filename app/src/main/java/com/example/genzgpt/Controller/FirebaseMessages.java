@@ -44,6 +44,11 @@ public class FirebaseMessages extends FirebaseMessagingService {
     private final int milestone4 = 25;
 
 
+    /**
+     * A constructor for FirebaseMessages service.
+     * @param context
+     * The context needed for FirebaseMessages and all its methods to work correctly.
+     */
     public FirebaseMessages(Context context) {
         this.context = context;
         db = FirebaseFirestore.getInstance();
@@ -240,7 +245,6 @@ public class FirebaseMessages extends FirebaseMessagingService {
      * The unique identifier for
      */
     public void displayNotification(AppNotification notification, int id) {
-        // FIXME need to check for permissions in this function somewhere.
         // get the notification to display
         Notification displayable = notification.getDisplayable(context);
 

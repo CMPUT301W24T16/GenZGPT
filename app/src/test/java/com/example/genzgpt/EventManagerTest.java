@@ -11,6 +11,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Test Cases for the Event Manager Class.
+ */
 public class EventManagerTest {
     private EventManager eventManager;
     private Event event1;

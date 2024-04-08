@@ -8,10 +8,18 @@ import android.os.Build;
 import android.provider.MediaStore;
 import android.util.Log;
 
+/**
+ * Handles photo gallery usage within the app.
+ */
 public class GalleryHandler {
     public static final int REQUEST_PICK_IMAGE = 1;
     public static final int REQUEST_PERMISSION = 2;
 
+    /**
+     * Opens the photo gallery.
+     * @param activity
+     * The current activity to open the gallery from.
+     */
     public static void openGallery(Activity activity) {
         if (hasPermission(activity)) {
             launchGallery(activity);
@@ -39,6 +47,17 @@ public class GalleryHandler {
         activity.startActivityForResult(galleryIntent, REQUEST_PICK_IMAGE);
     }
 
+    /**
+     * Handles the result of getting an image from the gallery.
+     * @param requestCode
+     * A request code for the gallery (not currently used).
+     * @param resultCode
+     * The code representing the result of using the Gallery.
+     * @param data
+     * The data from the interaction with the Gallery.
+     * @return
+     * The data from the gallery or nothing if the result did not go correctly.
+     */
     public static Uri handleGalleryResult(int requestCode, int resultCode, Intent data) {
         if (resultCode == Activity.RESULT_OK && data != null) {
             return data.getData();

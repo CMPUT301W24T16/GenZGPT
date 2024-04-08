@@ -31,6 +31,9 @@ import static androidx.test.espresso.matcher.ViewMatchers.isDisplayed;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
 import static org.hamcrest.Matchers.allOf;
 
+/**
+ * Test Cases for the MainActivity Class
+ */
 @RunWith(AndroidJUnit4.class)
 public class MainActivityTest {
 

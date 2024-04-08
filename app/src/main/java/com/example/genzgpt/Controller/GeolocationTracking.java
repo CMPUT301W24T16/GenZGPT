@@ -160,6 +160,7 @@ public class GeolocationTracking extends Fragment implements OnMapReadyCallback 
     /**
      * When the map is ready, display this.
      * @param googleMap
+     * The view for GoogleMaps.
      */
     @Override
         public void onMapReady(GoogleMap googleMap){
@@ -191,6 +192,7 @@ public class GeolocationTracking extends Fragment implements OnMapReadyCallback 
     /**
      * Drops marker at user's current location
      * @param googleMap
+     * The view for googleMaps.
      */
     public void dropMarker(GoogleMap googleMap, double latitude, double longitude, String title){
             googleMap.addMarker(new MarkerOptions()
@@ -414,6 +416,7 @@ public class GeolocationTracking extends Fragment implements OnMapReadyCallback 
     /**
      * Takes in an address (event location) and uses that to get a latitude and longitude
      * @param strAddress
+     * An address for the event location represented as a string.
      * @return a geopoint that contains the latitude and longitude of an event.
      */
     public GeoPoint getLocationFromAddress(String strAddress){
@@ -436,6 +439,7 @@ public class GeolocationTracking extends Fragment implements OnMapReadyCallback 
             }
             return null;
         }
+
     /**
      * Handles the result of the request for location permissions.
      */
@@ -492,6 +496,14 @@ public class GeolocationTracking extends Fragment implements OnMapReadyCallback 
             Log.e("Exception: %s", e.getMessage());
         }
     }
+
+    /**
+     * A getter for the location of a user.
+     * @param user
+     * The user to get a location for.
+     * @return
+     * The location of the user.
+     */
     public LatLng getLocation(User user){
         return new LatLng(lastKnownLocation.getLatitude(), lastKnownLocation.getLongitude());
     }

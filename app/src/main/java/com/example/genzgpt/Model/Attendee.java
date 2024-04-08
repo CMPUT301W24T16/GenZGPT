@@ -5,6 +5,7 @@ import java.util.List;
 
 /**
  * Represents the Attendee role in the event management system.
+ * FIXME THIS CLASS IS NOT USED ANYWHERE
  * */
 
 public class Attendee extends Role {

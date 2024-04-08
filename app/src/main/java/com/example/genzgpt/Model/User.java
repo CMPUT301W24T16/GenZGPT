@@ -242,9 +242,20 @@ public class User {
         // Logout implementation
     }
 
+    /**
+     * A getter for the imageURL of a User.
+     * @return
+     * The current ImageURL of the user.
+     */
     public String getImageURL() {
         return imageURL;
     }
+
+    /**
+     * A setter for the imageURL of a User.
+     * @param imageURL
+     * The imageURL to set.
+     */
     public void setImageURL(String imageURL){
         this.imageURL = imageURL;
     }

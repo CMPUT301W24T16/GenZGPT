@@ -56,6 +56,7 @@ public class EditProfileFragment extends DialogFragment {
     /**
      * Creates a profile fragment
      * @param user
+     * The user selected for profile editing.
      */
     public EditProfileFragment(User user){
         this.selectedUser = user;
@@ -201,6 +202,17 @@ public class EditProfileFragment extends DialogFragment {
         }
     }
 
+    /**
+     * Handles the result of the EditProfileFragment.
+     * @param requestCode The integer request code originally supplied to
+     *                    startActivityForResult(), allowing you to identify who this
+     *                    result came from.
+     * @param resultCode The integer result code returned by the child activity
+     *                   through its setResult().
+     * @param data An Intent, which can return result data to the caller
+     *               (various data can be attached to Intent "extras").
+     *
+     */
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);

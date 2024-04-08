@@ -27,12 +27,23 @@ import java.util.List;
 /**
  * A simple {@link Fragment} subclass.
  * Serves as a Display for the User's Events List
- * Use the {@link MyEventsFragment#newInstance} factory method to
- * create an instance of this fragment.
  */
 public class MyEventsFragment extends EventsFragment {
     private Firebase firebase;
 
+    /**
+     * Handles the creation of the View for MyEventsFragment.
+     * @param inflater The LayoutInflater object that can be used to inflate
+     *  any views in the fragment,
+     * @param container If non-null, this is the parent view that the fragment's
+     *  UI should be attached to.  The fragment should not add the view itself,
+     *  but this can be used to generate the LayoutParams of the view.
+     * @param savedInstanceState If non-null, this fragment is being re-constructed
+     *  from a previous saved state as given here.
+     *
+     * @return
+     * The View for MyEventsFragment.
+     */
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.event_list_fragment, container, false);
@@ -86,6 +97,9 @@ public class MyEventsFragment extends EventsFragment {
         return view;
     }
 
+    /**
+     * An empty constructor for MyEventsFragment.
+     */
     public MyEventsFragment() {
         // Required empty public constructor
     }

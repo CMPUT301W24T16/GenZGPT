@@ -7,6 +7,9 @@ import com.example.genzgpt.Model.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+/**
+ * Test cases for the AttendeeManager Class
+ */
 class AttendeeManagerTest {
 
     private AttendeeManager attendeeManager;

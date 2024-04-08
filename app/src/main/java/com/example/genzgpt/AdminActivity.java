@@ -14,7 +14,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
 
 /**
- * The main Activity for administrator stories and usage (not finished yet).
+ * The main Activity for administrator stories and usage.
  *
  *  Acknowledgements:
  *  1. NavBar Credit to agarwalkeshav8399, Last Updated April 5th: 2023,

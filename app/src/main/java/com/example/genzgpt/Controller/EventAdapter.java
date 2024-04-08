@@ -17,26 +17,54 @@ import com.squareup.picasso.Picasso;
 import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Locale;
+
+/**
+ * An adapter made so that users of the app can view events.
+ */
 public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> {
 
     private List<Event> eventList;
     private OnSettingButtonClickListener settingButtonClickListener;
     private EventClickListener eventClickListener;
 
+    /**
+     * A listener for what to do when someone clicks on an event.
+     */
     public interface EventClickListener {
         void onEventClick(Event event);
     }
 
+    /**
+     * A listener for handling what to do when someone clicks on the settings button.
+     */
     public interface OnSettingButtonClickListener {
         void onSettingButtonClick(Event event);
     }
 
+    /**
+     * The constructor for the eventAdapter.
+     * @param eventList
+     * The list of events to be shown in the app.
+     * @param settingButtonClickListener
+     * The click listener for the settings button.
+     * @param eventClickListener
+     * The click listener for when you click on an event.
+     */
     public EventAdapter(List<Event> eventList, OnSettingButtonClickListener settingButtonClickListener, EventClickListener eventClickListener) {
         this.eventList = eventList;
         this.settingButtonClickListener = settingButtonClickListener;
         this.eventClickListener = eventClickListener;
     }
 
+    /**
+     * Handles the creation of the view holder for the event adapter.
+     * @param parent The ViewGroup into which the new View will be added after it is bound to
+     *               an adapter position.
+     * @param viewType The view type of the new View.
+     *
+     * @return
+     * The inflated version of the EventAdapter's view.
+     */
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -44,17 +72,30 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> 
         return new ViewHolder(view);
     }
 
+    /**
+     * Handles binding an event to a view holder.
+     * @param holder The ViewHolder which should be updated to represent the contents of the
+     *        item at the given position in the data set.
+     * @param position The position of the item within the adapter's data set.
+     */
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Event event = eventList.get(position);
         holder.bind(event);
     }
 
+    /**
+     * A getter for the number of items within the EventAdapter.
+     * @return
+     */
     @Override
     public int getItemCount() {
         return eventList.size();
     }
 
+    /**
+     * The view holder to be used with this EventAdapter.
+     */
     class ViewHolder extends RecyclerView.ViewHolder {
         TextView eventName, eventLocation, eventDate, eventIndicator, hostName;
         ImageView eventImage;
@@ -76,6 +117,11 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> 
             });
         }
 
+        /**
+         * Binds an event to an EventAdapter.
+         * @param event
+         * The event to bind.
+         */
         void bind(Event event) {
             eventName.setText(event.getEventName());
             eventLocation.setText(event.getLocation());
