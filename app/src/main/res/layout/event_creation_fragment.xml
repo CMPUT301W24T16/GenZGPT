@@ -120,10 +120,22 @@
         android:id="@+id/createEventButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
         android:text="Create Event"
-        app:layout_constraintTop_toBottomOf="@id/selectImageButton"
+        app:layout_constraintEnd_toStartOf="@id/reuseQRCodeButton"
+        app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/selectImageButton" />
+
+    <Button
+        android:id="@+id/reuseQRCodeButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Reuse QR Code"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="16dp" />
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@id/createEventButton"
+        app:layout_constraintTop_toBottomOf="@id/selectImageButton" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
