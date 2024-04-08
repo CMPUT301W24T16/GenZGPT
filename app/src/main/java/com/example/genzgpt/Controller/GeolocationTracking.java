@@ -206,7 +206,7 @@ public class GeolocationTracking extends Fragment implements OnMapReadyCallback 
      * @return GeoPoint of user's location
      */
     public GeoPoint getUserLocation() {
-            if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED){
+            if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
             fusedLocationProviderClient.getLastLocation().addOnSuccessListener(requireActivity(), new OnSuccessListener<Location>() {
                 @Override
                 public void onSuccess(Location location) {
