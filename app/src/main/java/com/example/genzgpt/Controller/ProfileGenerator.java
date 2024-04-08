@@ -40,9 +40,6 @@ public class ProfileGenerator {
         // get colours and true false values
         int colour = generateColour(firstName, lastName);
 
-        // char[] charLetters = {firstName.charAt(0), lastName.charAt(0)};
-        // String letters = String.copyValueOf(charLetters);
-
         // Create an off white mutable bitmap
         Bitmap bitmap = Bitmap.createBitmap(CREATE_WIDTH, CREATE_HEIGHT, CONFIG);
         bitmap.eraseColor(bgColour);
@@ -147,7 +144,7 @@ public class ProfileGenerator {
         StringBuilder binaryBuilder = new StringBuilder(binary);
 
         // Only extend the binary String if necessary.
-        while (binaryBuilder.length() < 25) {
+        while (binaryBuilder.length() < (CREATE_WIDTH * CREATE_HEIGHT)) {
             if (!extender) {
                 binaryBuilder.append("0");
             }
@@ -172,12 +169,12 @@ public class ProfileGenerator {
      * The finished version of the bitmap.
      */
     private Bitmap setProfileImage(Bitmap bitmap, int colour, String binary) {
-        // set the pixels in the bitmap
+        // set the pixels in the bitmap to colour on / off depending on binary string value
         bitmap = bitmap.copy(CONFIG, true);
         Log.d("BINARY ENCODING", binary);
-        for (int y = 0; y < 5; y++) {
-            for (int x = 0; x < 5; x++) {
-                if (binary.charAt(x+(y*5)) == '0') {
+        for (int y = 0; y < CREATE_HEIGHT; y++) {
+            for (int x = 0; x < CREATE_WIDTH; x++) {
+                if (binary.charAt(x+(y*CREATE_WIDTH)) == '0') {
                     bitmap.setPixel(x, y, colour);
                 }
             }
