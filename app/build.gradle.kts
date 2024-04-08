@@ -80,4 +80,5 @@ dependencies {
     annotationProcessor("com.github.bumptech.glide:compiler:4.12.0")
     implementation("com.google.android.gms:play-services-maps:18.2.0")
     implementation("com.android.volley:volley:1.2.1")
+    debugImplementation("androidx.fragment:fragment-testing:1.6.2")
 }
