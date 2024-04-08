@@ -47,6 +47,7 @@ public class FirstSignInActivity extends AppCompatActivity {
     EditText phoneNumber;
     Spinner theme;
     Switch geolocation;
+    boolean geo;
     ProfileGenerator profileMaker = new ProfileGenerator();
 
     @Override
@@ -76,16 +77,12 @@ public class FirstSignInActivity extends AppCompatActivity {
             String phoneStr = phoneNumber.getText().toString();
 
             String currentTheme = theme.toString();
-            geolocation.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                @Override
-                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                    if (isChecked && (!checkPermission(Manifest.permission.ACCESS_COARSE_LOCATION)) && (!checkPermission(Manifest.permission.ACCESS_FINE_LOCATION))){
-                        requestPermission();
-                    }
-                }
-            });
 
-            boolean geo = geolocation.isActivated();
+            if (!checkPermission(Manifest.permission.ACCESS_FINE_LOCATION)) {
+                geo = false;
+            }else{
+                geo = geolocation.isActivated();
+            }
 
             // Check if input parameters are valid
             boolean isValidFirst = isValidName(firstName);
@@ -161,7 +158,6 @@ public class FirstSignInActivity extends AppCompatActivity {
                         Toast.makeText(getApplicationContext(),
                                 "The provided email already exists for another user." +
                                 "Please use a different email.", Toast.LENGTH_SHORT).show();
-                        Log.e("FSFB", "EMAIL ALREADY EXISTS");
                     }
 
                     @Override
@@ -169,6 +165,14 @@ public class FirstSignInActivity extends AppCompatActivity {
                         Log.e("FSFB", "The User was not Created", e);
                     }
                 });
+            }
+        });
+        geolocation.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked && (!checkPermission(Manifest.permission.ACCESS_FINE_LOCATION))){
+                    requestPermission();
+                }
             }
         });
 
