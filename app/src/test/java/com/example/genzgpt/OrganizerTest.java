@@ -65,8 +65,8 @@ class OrganizerTest {
         User organizer1 = new User("1", "John", "Doe", 1234567890, "john@example.com", false, "img");
         User organizer2 = new User("2", "Bob", "Smith", 168402749, "bob@example.com", false, null);
 
-        event.addOrganizer(organizer1);
-        event.addOrganizer(organizer2);
+        event.addOrganizer(organizer1.getId());
+        event.addOrganizer(organizer2.getId());
 
         return event;
     }

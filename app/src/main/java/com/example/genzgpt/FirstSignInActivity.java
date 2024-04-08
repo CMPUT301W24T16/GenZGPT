@@ -1,11 +1,15 @@
 package com.example.genzgpt;
 
+import static com.example.genzgpt.Controller.GeolocationTracking.FINE_LOCATION_PERMISSION;
 import static java.lang.Character.isLetter;
 import static java.lang.Long.parseLong;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
+import android.Manifest;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -16,6 +20,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Switch;
@@ -23,6 +28,7 @@ import android.widget.Toast;
 
 import com.example.genzgpt.Controller.Firebase;
 import com.example.genzgpt.Controller.FirebaseMessages;
+import com.example.genzgpt.Controller.GeolocationTracking;
 import com.example.genzgpt.Model.AppUser;
 import com.example.genzgpt.Model.User;
 import com.example.genzgpt.View.AdminLoginFragment;
@@ -64,6 +70,14 @@ public class FirstSignInActivity extends AppCompatActivity {
             String phoneStr = phoneNumber.getText().toString();
 
             String currentTheme = theme.toString();
+            geolocation.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    if (isChecked && (!checkPermission(Manifest.permission.ACCESS_COARSE_LOCATION)) && (!checkPermission(Manifest.permission.ACCESS_FINE_LOCATION))){
+                        requestPermission();
+                    }
+                }
+            });
 
             boolean geo = geolocation.isActivated();
 
@@ -143,6 +157,7 @@ public class FirstSignInActivity extends AppCompatActivity {
             }
         });
 
+
         // Set the adminButton to send to the admin sign in page.
         adminButton.setOnClickListener( v -> {
             SharedPreferences preferences = FirstSignInActivity.this.getSharedPreferences("com.example.genzgpt",
@@ -201,6 +216,22 @@ public class FirstSignInActivity extends AppCompatActivity {
     }
 
     /**
+     *
+     */
+    public void requestPermission(){
+        ActivityCompat.requestPermissions(FirstSignInActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, GeolocationTracking.FINE_LOCATION_PERMISSION);
+    }
+
+    /**
+     * This method will check if permissions are granted or denied
+     * @param permission
+     * @return a boolean value
+     */
+    public boolean checkPermission(String permission){
+        return (ContextCompat.checkSelfPermission(getApplicationContext(), permission) == PackageManager.PERMISSION_GRANTED);
+    }
+
+    /**
      * Requests permission to receive push notifications from the app.
      */
    private void requestNotificationPermissions() {
@@ -215,9 +246,6 @@ public class FirstSignInActivity extends AppCompatActivity {
                 ActivityCompat.requestPermissions(this,
                         new String[]{android.Manifest.permission.POST_NOTIFICATIONS}, 7);
             }
-
         }
-
     }
-
 }
