@@ -5,6 +5,7 @@ import java.util.Locale;
 import java.util.Random;
 
 /**
+ * A generator for random string data.
  * FIXME REMOVE THIS CLASS IT DOES NOTHING RIGHT NOW
  */
 public class RandomStringGenerator {
