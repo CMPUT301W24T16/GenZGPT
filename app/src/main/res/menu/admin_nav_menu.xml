@@ -5,10 +5,10 @@
         android:id="@+id/profile"
         android:title="Admin Main"
         android:icon="@drawable/navbar_admin_profiles"/>
-    <item
+    <!--<item
         android:id="@+id/admin_home"
         android:title="Admin Home"
-        android:icon="@drawable/navbar_darkhome"/>
+        android:icon="@drawable/navbar_darkhome"/>-->
     <item
         android:id="@+id/allevents"
         android:title="All Events"

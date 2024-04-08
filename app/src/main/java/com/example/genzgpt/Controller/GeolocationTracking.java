@@ -121,7 +121,8 @@ public class GeolocationTracking extends Fragment implements OnMapReadyCallback 
      * @param savedInstanceState If non-null, this fragment is being re-constructed
      * from a previous saved state as given here.
      *
-     * @return the view
+     * @return
+     * The view
      */
     @SuppressLint("RestrictedApi")
     @Override
@@ -205,7 +206,8 @@ public class GeolocationTracking extends Fragment implements OnMapReadyCallback 
 
     /**
      * obtains the user's location
-     * @return GeoPoint of user's location
+     * @return
+     * GeoPoint of user's location
      */
     public GeoPoint getUserLocation() {
             if (ActivityCompat.checkSelfPermission(requireContext(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED){
@@ -262,6 +264,14 @@ public class GeolocationTracking extends Fragment implements OnMapReadyCallback 
                 Log.e("Exception: %s", e.getMessage(), e);
             }
         }
+
+    /**
+     * Takes in an item and if it is equal to a given option for getPlace, it will show it.
+     * @param item The menu item that was selected.
+     *
+     * @return
+     * True
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.option_get_place) {
@@ -270,7 +280,7 @@ public class GeolocationTracking extends Fragment implements OnMapReadyCallback 
         return true;
     }
     /**
-     * Gets the current location of the device, and positions the map's camera.
+     * Gets the current location of the device.
      */
     private void getDeviceLocation() {
         /*
@@ -290,7 +300,6 @@ public class GeolocationTracking extends Fragment implements OnMapReadyCallback 
                                         LatLng latlng = new LatLng(lastKnownLocation.getLatitude(),
                                                 lastKnownLocation.getLongitude());
                                         userLocation = new GeoPoint(latlng.latitude, latlng.longitude);
-
                             }
                         } else {
                             Log.d(TAG, "Current location is null. Using defaults.");
@@ -502,17 +511,6 @@ public class GeolocationTracking extends Fragment implements OnMapReadyCallback 
         }catch(SecurityException e){
             Log.e("Exception: %s", e.getMessage());
         }
-    }
-
-    /**
-     * A getter for the location of a user.
-     * @param user
-     * The user to get a location for.
-     * @return
-     * The location of the user.
-     */
-    public LatLng getLocation(User user){
-        return new LatLng(lastKnownLocation.getLatitude(), lastKnownLocation.getLongitude());
     }
 }
 
