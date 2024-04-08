@@ -126,7 +126,7 @@ public class Firebase {
                             .addOnSuccessListener(uri -> {
                                 String imageURL = uri.toString();
                                 updateUserImageURL(userID, imageURL);
-                                showToast(context, "Image uploaded and associated with the event");
+                                //showToast(context, "Image uploaded");
                             })
                             .addOnFailureListener(e -> {
                                 showToast(context, "Failed to get image download URL: " + e.getMessage());
@@ -1180,12 +1180,15 @@ public class Firebase {
      * 
      * @param eventId, newEventDate, newLocation
      */
-    public void updateEvent(String eventId, Date newEventDate, String newLocation, OnEventUpdatedListener listener) {
+    public void updateEvent(String eventId, String newEventName, Date newEventDate, String newLocation, String newImageURL, int newMaxAttendees,OnEventUpdatedListener listener) {
         DocumentReference eventRef = db.collection("events").document(eventId);
 
         Map<String, Object> updates = new HashMap<>();
+        updates.put("eventName", newEventName);
         updates.put("eventDate", newEventDate);
         updates.put("location", newLocation);
+        updates.put("maxAttendees", newMaxAttendees);
+        updates.put("imageURL", newImageURL);
 
         eventRef.update(updates)
                 .addOnSuccessListener(aVoid -> {

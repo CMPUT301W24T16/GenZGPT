@@ -53,7 +53,7 @@
         android:layout_gravity="center"
         android:background="@drawable/round_outline"
         android:gravity="center_horizontal"
-        android:text="User Profile\n\nFirst Name:\n\nLast Name:\n\nContact Info:\nPhone Number:\n\nEmail:\n\nCurrent Theme:\n\nGeolocation:\n"
+        android:text="User Profile\n\nFirst Name:\n\nLast Name:\n\nContact Info:\nPhone Number:\n\nEmail:\n\nGeolocation:\n"
         android:textAlignment="center"
         android:textColor="@color/white"
         android:textSize="20sp"
@@ -118,36 +118,19 @@
         android:textAlignment="center"
         android:textColor="@color/white"
         android:textSize="20sp"
-        app:layout_constraintBottom_toTopOf="@id/theme_text"
         app:layout_constraintEnd_toEndOf="@+id/user_profile"
         app:layout_constraintHorizontal_bias="0.625"
         app:layout_constraintStart_toStartOf="@+id/user_profile"
         app:layout_constraintTop_toBottomOf="@+id/phone_number_text" />
 
     <TextView
-        android:id="@+id/theme_text"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="*THEME*"
-        android:textAlignment="center"
-        android:textColor="@color/white"
-        android:textSize="20sp"
-        app:layout_constraintTop_toBottomOf="@id/email_text"
-        app:layout_constraintBottom_toTopOf="@id/geolocation_text"
-        app:layout_constraintEnd_toEndOf="@+id/user_profile"
-        app:layout_constraintStart_toStartOf="@+id/user_profile" />
-
-    <TextView
         android:id="@+id/geolocation_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
         android:text="OFF"
         android:textAlignment="center"
         android:textColor="@color/white"
         android:textSize="20sp"
-        app:layout_constraintTop_toBottomOf="@id/theme_text"
         app:layout_constraintBottom_toBottomOf="@+id/user_profile"
         app:layout_constraintEnd_toEndOf="@+id/user_profile"
         app:layout_constraintStart_toStartOf="@+id/user_profile" />

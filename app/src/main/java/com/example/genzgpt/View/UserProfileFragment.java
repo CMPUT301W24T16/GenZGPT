@@ -35,7 +35,6 @@ public class UserProfileFragment extends Fragment {
     private TextView userLastName;
     private TextView userPhoneNumber;
     private TextView userEmail;
-    private TextView userTheme;
     private TextView userGeolocation;
     private Firebase firebase;
     private User userCurrent;
@@ -119,7 +118,6 @@ public class UserProfileFragment extends Fragment {
         userLastName = view.findViewById(R.id.last_name_text);
         userPhoneNumber = view.findViewById(R.id.phone_number_text);
         userEmail = view.findViewById(R.id.email_text);
-        userTheme = view.findViewById(R.id.theme_text);
         userGeolocation = view.findViewById(R.id.geolocation_text);
         String appUser = AppUser.getUserId();
 
@@ -171,7 +169,6 @@ public class UserProfileFragment extends Fragment {
         userPhoneNumber.setText(String.valueOf(user.getPhone()));
         userEmail.setText(user.getEmail());
         userBanner.setText(user.getFirstName() + " " + user.getLastName());
-        userTheme.setText(R.string.black_and_white);
         if (user.isGeolocation() == Boolean.TRUE && checkPermission(Manifest.permission.ACCESS_FINE_LOCATION)){
             userGeolocation.setText(R.string.on);
         }

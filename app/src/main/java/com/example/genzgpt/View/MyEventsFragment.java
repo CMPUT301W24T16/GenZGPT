@@ -135,9 +135,9 @@ public class MyEventsFragment extends EventsFragment {
         });
     }
     @Override
-    protected boolean shouldShowCheckInQrCodeOption() {
-        return true;
-    }
+    protected boolean shouldShowEditEventOption(){return true;}
+    @Override
+    protected boolean shouldShowCheckInQrCodeOption() {return true;}
     @Override
     protected boolean shouldShowRegisteredAttendeesOption() {
         return true;
@@ -146,4 +146,6 @@ public class MyEventsFragment extends EventsFragment {
     protected boolean shouldShowCheckedInAttendeesOption() {
         return true;
     }
+    @Override
+    protected boolean shouldShowMapViewOption(){return true;}
 }
