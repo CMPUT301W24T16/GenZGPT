@@ -77,5 +77,4 @@ dependencies {
     implementation("org.osmdroid:osmdroid-android:6.1.10")
     annotationProcessor("com.github.bumptech.glide:compiler:4.12.0")
     implementation("com.google.android.gms:play-services-maps:18.2.0")
-    debugImplementation("androidx.fragment:fragment-testing:1.6.2")
 }
