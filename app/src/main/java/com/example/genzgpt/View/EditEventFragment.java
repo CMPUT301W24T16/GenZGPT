@@ -31,6 +31,7 @@ import com.google.android.material.appbar.MaterialToolbar;
 
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 
 public class EditEventFragment extends Fragment {
 
@@ -220,4 +221,5 @@ public class EditEventFragment extends Fragment {
         locationEditText.setText(event.getLocation());
         maxAttendeesEditText.setText(String.valueOf(event.getMaxAttendees()));
     }
+
 }
