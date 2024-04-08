@@ -8,6 +8,8 @@ An Android app simplifying event attendance with QR code check-in for event orig
 - [Technology Stack](#technology-stack)
 - [Installation](#installation)
 - [Usage](#usage)
+- [UML Diagram](#UML-Diagram)
+- [Demo Video](#Demo-Video)
 - [License](#license)
 
 ## About app
@@ -53,6 +55,9 @@ For organizers:
 For attendees:
 - Browse events, sign up to attend, check in via QR code scanning, and receive updates from event organizers.
 
+## UML Diagram
+
+## Demo Video
 
 ## License
 
