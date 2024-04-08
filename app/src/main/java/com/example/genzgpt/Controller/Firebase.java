@@ -1620,27 +1620,33 @@ public class Firebase {
             if (task.isSuccessful()) {
                 DocumentSnapshot eventSnapshot = task.getResult();
                 if (eventSnapshot.exists()) {
-                    // Event document exists, add the location to the existing list
-                    eventRef.collection("locations").add(new HashMap<String, Object>() {{
-                        put("location", location);
-                    }}).addOnSuccessListener(documentReference -> {
-                        Log.d("firebase", "Location added to event: " + eventName);
-                    }).addOnFailureListener(e -> {
-                        Log.e("firebase", "Error adding location to event: ", e);
-                    });
+                    // Event document exists, add the location to the "locations" collection
+                    eventRef.collection("locations").add(location)
+                            .addOnSuccessListener(documentReference -> {
+                                Log.d("firebase", "Location added to event: " + eventName);
+                            })
+                            .addOnFailureListener(e -> {
+                                Log.e("firebase", "Error adding location to event: ", e);
+                            });
                 } else {
-                    // Event document doesn't exist, create it with a new location list
+                    // Event document doesn't exist, create it with a new "locations" collection
                     Map<String, Object> eventData = new HashMap<>();
                     eventData.put("name", eventName);
-                    eventData.put("locations", Arrays.asList(new HashMap<String, Object>() {{
-                        put("location", location);
-                    }}));
 
-                    eventRef.set(eventData).addOnSuccessListener(aVoid -> {
-                        Log.d("firebase", "Event created with location: " + eventName);
-                    }).addOnFailureListener(e -> {
-                        Log.e("firebase", "Error creating event with location: ", e);
-                    });
+                    eventRef.set(eventData)
+                            .addOnSuccessListener(aVoid -> {
+                                // Add the location to the newly created "locations" collection
+                                eventRef.collection("locations").add(location)
+                                        .addOnSuccessListener(documentReference -> {
+                                            Log.d("firebase", "Event created with location: " + eventName);
+                                        })
+                                        .addOnFailureListener(e -> {
+                                            Log.e("firebase", "Error adding location to new event: ", e);
+                                        });
+                            })
+                            .addOnFailureListener(e -> {
+                                Log.e("firebase", "Error creating event: ", e);
+                            });
                 }
             } else {
                 Log.e("firebase", "Error checking event existence: ", task.getException());
