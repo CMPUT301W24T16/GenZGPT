@@ -1,6 +1,5 @@
 package com.example.genzgpt;
 
-import static com.example.genzgpt.Controller.GeolocationTracking.FINE_LOCATION_PERMISSION;
 import static java.lang.Character.isLetter;
 import static java.lang.Long.parseLong;
 
@@ -42,6 +41,7 @@ public class FirstSignInActivity extends AppCompatActivity {
     EditText phoneNumber;
     Spinner theme;
     Switch geolocation;
+    boolean geo;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,16 +70,12 @@ public class FirstSignInActivity extends AppCompatActivity {
             String phoneStr = phoneNumber.getText().toString();
 
             String currentTheme = theme.toString();
-            geolocation.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-                @Override
-                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                    if (isChecked && (!checkPermission(Manifest.permission.ACCESS_COARSE_LOCATION)) && (!checkPermission(Manifest.permission.ACCESS_FINE_LOCATION))){
-                        requestPermission();
-                    }
-                }
-            });
 
-            boolean geo = geolocation.isActivated();
+            if (!checkPermission(Manifest.permission.ACCESS_FINE_LOCATION)) {
+                geo = false;
+            }else{
+                geo = geolocation.isActivated();
+            }
 
             // FIXME Put procedural generation here
             String imageURL = null;
@@ -154,6 +150,14 @@ public class FirstSignInActivity extends AppCompatActivity {
                         Log.e("User Creation", "The User was not Created", e);
                     }
                 });
+            }
+        });
+        geolocation.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked && (!checkPermission(Manifest.permission.ACCESS_FINE_LOCATION))){
+                    requestPermission();
+                }
             }
         });
 
