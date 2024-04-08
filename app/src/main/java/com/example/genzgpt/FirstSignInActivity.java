@@ -45,7 +45,6 @@ public class FirstSignInActivity extends AppCompatActivity {
     EditText profileLastName;
     EditText emailAddress;
     EditText phoneNumber;
-    Spinner theme;
     Switch geolocation;
     boolean geo;
     ProfileGenerator profileMaker = new ProfileGenerator();
@@ -64,7 +63,6 @@ public class FirstSignInActivity extends AppCompatActivity {
         emailAddress = findViewById(R.id.email_fill);
         phoneNumber = findViewById(R.id.edit_phone);
 
-        theme = findViewById(R.id.theme_spinner);
         geolocation = findViewById(R.id.geolocation_switch);
 
         requestNotificationPermissions();
@@ -75,8 +73,6 @@ public class FirstSignInActivity extends AppCompatActivity {
             String lastName = profileLastName.getText().toString().trim();
             String email = emailAddress.getText().toString().trim();
             String phoneStr = phoneNumber.getText().toString();
-
-            String currentTheme = theme.toString();
 
             if (!checkPermission(Manifest.permission.ACCESS_FINE_LOCATION)) {
                 geo = false;

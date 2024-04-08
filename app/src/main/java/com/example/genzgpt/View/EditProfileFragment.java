@@ -91,7 +91,6 @@ public class EditProfileFragment extends DialogFragment {
         EditText editEmail = view.findViewById(R.id.edit_email);
         EditText editPhone = view.findViewById(R.id.edit_phone_number);
         profilePicture = view.findViewById(R.id.profile_picture);
-        Button editThemeButton = view.findViewById(R.id.edit_theme_button);
         Button editProfilePicture = view.findViewById(R.id.edit_profile_picture_button);
         Button deleteProfilePicture = view.findViewById(R.id.delete_profile_picture_button);
         SwitchCompat geolocationSwitch = view.findViewById(R.id.geolocation_switch);
@@ -155,7 +154,8 @@ public class EditProfileFragment extends DialogFragment {
                         new ProgressDialog(context), context);
 
                 // update the imageURL to be the deterministic profile picture
-                selectedUser.setImageURL(null);
+                String url = selectedImageUri.toString();
+                selectedUser.setImageURL(url);
                 profilePicture.setImageBitmap(bitmap);
             }
         });
