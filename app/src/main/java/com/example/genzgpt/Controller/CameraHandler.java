@@ -23,13 +23,6 @@ public class CameraHandler {
         this.fragment = fragment;
     }
 
-    /**
-     * A constructor for situations where this class is not used in a fragment situation.
-     */
-    public CameraHandler() {
-        fragment = null;
-    }
-
     public void openCamera() {
         if (fragment.getContext() != null && fragment.getActivity() != null) {
             if (ContextCompat.checkSelfPermission(fragment.getContext(), Manifest.permission.CAMERA)
@@ -54,22 +47,5 @@ public class CameraHandler {
             return Uri.parse(path);
         }
         return null;
-    }
-
-    /**
-     * An alternate ImageUri getter for non-fragment situations.
-     * @param bitmap
-     * The bitmap to get the Uri for.
-     * @param context
-     * The context of the app needed to invoke this method.
-     * @return
-     * The imageURI for a bitmap.
-     */
-    public Uri getImageUri(Bitmap bitmap, Context context) {
-        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
-        String path = MediaStore.Images.Media.insertImage(context.getContentResolver(), bitmap,
-                "Title", null);
-        return Uri.parse(path);
     }
 }
