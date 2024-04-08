@@ -1,6 +1,7 @@
 package com.example.genzgpt.View;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,9 +28,14 @@ public class NotifyAttendeesFragment extends Fragment {
     private Button sendButton;
     private Firebase firebase;
     private FirebaseMessages firebaseMessages;
+    private String token;
 
     public NotifyAttendeesFragment(Event event) {
         this.event = event;
+    }
+    public NotifyAttendeesFragment(Event event, String token) {
+        this.event = event;
+        this.token = token;
     }
 
     @Override
@@ -52,12 +58,13 @@ public class NotifyAttendeesFragment extends Fragment {
             return;
         }
 
-        firebase.fetchCheckedInAttendees(event.getEventId(), new Firebase.OnCheckInAttendeesLoadedListener() {
+        firebase.fetchCheckedInAttendeesPlusToken(event.getEventId(), new Firebase.OnCheckInAttendeesLoadedListener() {
             @Override
             public void onCheckInAttendeesLoaded(List<User> checkedInAttendees) {
+                Log.d("NotifyAttendeesFragment", "Checkedin attendees loaded");
                 List<String> deviceTokens = new ArrayList<>();
                 for (User attendee : checkedInAttendees) {
-                    String token = firebaseMessages.getStoredDeviceToken();
+                    String token = attendee.getToken();
                     if (token != null) {
                         deviceTokens.add(token);
                     }
