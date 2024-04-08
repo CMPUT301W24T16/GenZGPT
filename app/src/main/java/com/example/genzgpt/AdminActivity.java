@@ -26,7 +26,7 @@ public class AdminActivity extends AppCompatActivity {
     BottomNavigationView adminBar;
 
     AdminEventsFragment adminEvents = new AdminEventsFragment();
-    AdminHomeFragment adminHome = new AdminHomeFragment();
+    //AdminHomeFragment adminHome = new AdminHomeFragment();
     UserListFragment adminProfiles = new UserListFragment();
 
     // adminListener was made with Acknowledgements 1.
@@ -40,12 +40,12 @@ public class AdminActivity extends AppCompatActivity {
                         .replace(R.id.BaseAdminFragment, adminProfiles)
                         .commit();
                 return true;
-            } else if (id == R.id.admin_home) {
+           /* } else if (id == R.id.admin_home) {
                 getSupportFragmentManager()
                         .beginTransaction()
                         .replace(R.id.BaseAdminFragment, adminHome)
                         .commit();
-                return true;
+                return true;*/
             } else if (id == R.id.allevents) {
                 getSupportFragmentManager()
                         .beginTransaction()

@@ -31,12 +31,6 @@ public class AdminActivityTest {
     }
 
     @Test
-    public void testAdminHomeNavigation() {
-        onView(withId(R.id.admin_home)).perform(click());
-        onView(withId(R.id.BaseAdminFragment)).check(matches(isDisplayed()));
-    }
-
-    @Test
     public void testAdminEventsNavigation() {
         onView(withId(R.id.allevents)).perform(click());
         onView(withId(R.id.BaseAdminFragment)).check(matches(isDisplayed()));
