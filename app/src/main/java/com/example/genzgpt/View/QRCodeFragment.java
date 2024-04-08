@@ -114,7 +114,7 @@ public class QRCodeFragment extends Fragment {
                                 geolocationTracking = new GeolocationTracking(event);
                                 GeoPoint location = geolocationTracking.getDeviceLocation();
                                 Log.d("GeoTest", location.toString());
-                                firebase.addLocationToEvent(event.getEventName(), location);
+                                firebase.addLocationToEvent(event.getEventId(), location);
                             }
                             handleEventLoaded();
                         }

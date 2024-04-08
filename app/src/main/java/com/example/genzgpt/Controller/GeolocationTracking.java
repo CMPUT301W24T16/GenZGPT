@@ -310,7 +310,6 @@ public class GeolocationTracking extends Fragment implements OnMapReadyCallback 
                     }
                 });
             }
-
         }
         catch (SecurityException e)  {
             Log.e("Exception: %s", e.getMessage(), e);
