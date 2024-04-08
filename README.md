@@ -58,7 +58,7 @@ For attendees:
 ## UML Diagram
 
 ## Demo Video
-![Demo GIF](/GenZGPT/demo-video/demo.gif)
+![Demo GIF](demo-video/demo.gif)
 
 ## License
 
