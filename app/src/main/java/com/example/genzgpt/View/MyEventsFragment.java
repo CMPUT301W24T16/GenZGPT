@@ -147,5 +147,9 @@ public class MyEventsFragment extends EventsFragment {
         return true;
     }
     @Override
+    protected boolean shouldShowSendMessageOption() {
+        return true;
+    }
+    @Override
     protected boolean shouldShowMapViewOption(){return true;}
 }
