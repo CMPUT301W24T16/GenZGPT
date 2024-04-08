@@ -146,4 +146,8 @@ public class MyEventsFragment extends EventsFragment {
     protected boolean shouldShowCheckedInAttendeesOption() {
         return true;
     }
+    @Override
+    protected boolean shouldShowSendMessageOption() {
+        return true;
+    }
 }
