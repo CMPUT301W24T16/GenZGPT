@@ -2,6 +2,18 @@
 <project version="4">
   <component name="deploymentTargetDropDown">
     <value>
+      <entry key="AdminActivityTest">
+        <State />
+      </entry>
+      <entry key="EventCreationFragmentTest">
+        <State />
+      </entry>
+      <entry key="FirstSignInActivityTest">
+        <State />
+      </entry>
+      <entry key="QRCodeFragmentTest">
+        <State />
+      </entry>
       <entry key="app">
         <State />
       </entry>
