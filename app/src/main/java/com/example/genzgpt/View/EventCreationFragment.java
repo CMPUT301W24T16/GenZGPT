@@ -43,6 +43,7 @@ public class EventCreationFragment extends Fragment {
     private ActivityResultLauncher<String> galleryLauncher;
 
     private Uri selectedImageUri;
+    private String updatedImageURL;
 
 
     @Nullable
@@ -234,14 +235,33 @@ public class EventCreationFragment extends Fragment {
                                 if (selectedPosition >= 0) {
                                     // Get the selected event
                                     Event selectedEvent = organizerEvents.get(selectedPosition);
-
-                                    // Retrieve the updated event information from the edit texts
                                     String updatedEventName = eventNameEditText.getText().toString();
                                     Date updatedEventDate = eventDateCalendar.getTime();
                                     String updatedLocation = locationEditText.getText().toString();
                                     String maxAttendeesText = maxAttendeesEditText.getText().toString();
                                     int updatedMaxAttendees = maxAttendeesText.isEmpty() ? 0 : Integer.parseInt(maxAttendeesText);
-                                    String updatedImageURL = ""; // Get the updated image URL as needed
+
+                                    if (selectedImageUri != null) {
+                                        Firebase.uploadImageAndGetUrl("event_images/" + System.currentTimeMillis() + ".jpg", selectedImageUri, new Firebase.OnUploadCompleteListener() {
+                                            @Override
+                                            public void onUploadComplete(String imageURL) {
+                                                // Image upload is complete, now create the Event
+                                                updatedImageURL = imageURL;
+                                            }
+
+                                            @Override
+                                            public void onUploadFailed(String errorMessage) {
+                                                // Handle the image upload failure
+                                                Log.e("Firebase", "Failed to upload image: " + errorMessage);
+                                            }
+                                        });
+                                    } else {
+                                        // If selectedImageUri is null, proceed to create event without imageURL
+                                        Log.d("EventCreationFragment", "no image URI ");
+                                    }
+
+                                    // Retrieve the updated event information from the edit texts
+
 
                                     // Call the reusePastEvent method from your Firebase class
                                     firebase.reusePastEvent(currentUserId, selectedEvent.getEventId(),
