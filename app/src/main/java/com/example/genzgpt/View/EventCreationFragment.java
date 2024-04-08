@@ -247,6 +247,23 @@ public class EventCreationFragment extends Fragment {
                                             public void onUploadComplete(String imageURL) {
                                                 // Image upload is complete, now create the Event
                                                 updatedImageURL = imageURL;
+                                                firebase.reusePastEvent(currentUserId, selectedEvent.getEventId(),
+                                                        updatedEventName, updatedEventDate, updatedLocation,
+                                                        updatedMaxAttendees, updatedImageURL, new Firebase.OnEventUpdatedListener() {
+                                                            @Override
+                                                            public void onEventUpdated() {
+                                                                // Event updated successfully
+                                                                Log.d("CreateEventActivity", "Event data updated successfully");
+                                                                // Perform any additional actions as needed
+                                                            }
+
+                                                            @Override
+                                                            public void onEventUpdateFailed(Exception e) {
+                                                                // Event update failed
+                                                                Log.e("CreateEventActivity", "Failed to update event data: " + e.getMessage());
+                                                                // Handle the failure case, e.g., display an error message
+                                                            }
+                                                        });
                                             }
 
                                             @Override
@@ -260,27 +277,7 @@ public class EventCreationFragment extends Fragment {
                                         Log.d("EventCreationFragment", "no image URI ");
                                     }
 
-                                    // Retrieve the updated event information from the edit texts
 
-
-                                    // Call the reusePastEvent method from your Firebase class
-                                    firebase.reusePastEvent(currentUserId, selectedEvent.getEventId(),
-                                            updatedEventName, updatedEventDate, updatedLocation,
-                                            updatedMaxAttendees, updatedImageURL, new Firebase.OnEventUpdatedListener() {
-                                                @Override
-                                                public void onEventUpdated() {
-                                                    // Event updated successfully
-                                                    Log.d("CreateEventActivity", "Event data updated successfully");
-                                                    // Perform any additional actions as needed
-                                                }
-
-                                                @Override
-                                                public void onEventUpdateFailed(Exception e) {
-                                                    // Event update failed
-                                                    Log.e("CreateEventActivity", "Failed to update event data: " + e.getMessage());
-                                                    // Handle the failure case, e.g., display an error message
-                                                }
-                                            });
                                 } else {
                                     // No event selected, log an error message or perform any other necessary actions
                                     Log.e("CreateEventActivity", "No event selected to reuse");
