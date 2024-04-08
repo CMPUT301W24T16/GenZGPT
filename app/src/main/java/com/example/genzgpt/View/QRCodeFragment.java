@@ -16,6 +16,7 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.example.genzgpt.Controller.Firebase;
+import com.example.genzgpt.Controller.FirebaseMessages;
 import com.example.genzgpt.Controller.GeolocationTracking;
 import com.example.genzgpt.Model.AppUser;
 import com.example.genzgpt.Model.Event;
@@ -23,6 +24,10 @@ import com.example.genzgpt.R;
 import com.google.firebase.firestore.GeoPoint;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
+import com.example.genzgpt.Model.User;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class QRCodeFragment extends Fragment {
     private static final int REQUEST_CAMERA_PERMISSION = 200;
@@ -150,6 +155,39 @@ public class QRCodeFragment extends Fragment {
 
     private void checkInUser(String substring) {
         // Check in the user to the event
+        FirebaseMessages fms = new FirebaseMessages(this.getContext());
         firebase.addUserToCheckedInAttendees(substring, AppUser.getUserId());
+        List<String> organizerList = loadedEvent.getOrganizers();
+        for(String organizer : organizerList) {
+            firebase.getUserDataAndToken(organizer, new Firebase.OnUserLoadedListener(){
+                @Override
+                public void onUserLoaded(User user){
+                    firebase.getUserData(AppUser.getUserId(),new Firebase.OnUserLoadedListener(){
+                        @Override
+                        public void onUserLoaded(User user2){
+                            fms.sendMessageToDevice(user.getToken(), "New Checkin", user2.getFirstName() + " " + user2.getLastName()+" just checked-in","message");
+                        }
+                        @Override
+                        public void onUserNotFound(){
+                            Log.d("QRCodeFragment","UserNotFound");
+                        }
+                        @Override
+                        public void onUserLoadFailed(Exception e){
+                            Log.e("QRCodeFragment","error on Milestone");
+
+                        };
+                    });
+                }
+                @Override
+                public void onUserNotFound(){
+                    Log.d("QRCodeFragment","UserNotFound");
+                }
+                @Override
+                public void onUserLoadFailed(Exception e){
+                    Log.e("QRCodeFragment","error on Milestone");
+
+                };
+            });
+        }
     }
 }
