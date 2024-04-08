@@ -16,9 +16,11 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import com.example.genzgpt.Controller.Firebase;
+import com.example.genzgpt.Controller.GeolocationTracking;
 import com.example.genzgpt.Model.AppUser;
 import com.example.genzgpt.Model.Event;
 import com.example.genzgpt.R;
+import com.google.firebase.firestore.GeoPoint;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
@@ -27,6 +29,7 @@ public class QRCodeFragment extends Fragment {
     private String qrCodeResult;
     private Firebase firebase;
     private Event loadedEvent;
+    private GeolocationTracking geolocationTracking;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -87,6 +90,9 @@ public class QRCodeFragment extends Fragment {
                             if (qrCodeResult.startsWith("1")) {
                                 // Check the user in to the event
                                 checkInUser(eventCode);
+                                geolocationTracking = new GeolocationTracking(event);
+                                GeoPoint location = geolocationTracking.getUserLocation();
+                                firebase.addLocationToEvent(event.getEventName(), location);
                             }
                             handleEventLoaded();
                         }
