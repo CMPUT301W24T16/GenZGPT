@@ -155,8 +155,6 @@ public class EditProfileFragment extends DialogFragment {
                         new ProgressDialog(context), context);
 
                 // update the imageURL to be the deterministic profile picture
-                //FIXME CAN SOMEONE TELL ME WHAT I'M SUPPOSED TO DO HERE??? I don't have an ImageURL
-                //MIGHT REQUIRE A CALL TO Firebase.uploadImageAndGetURL()
                 selectedUser.setImageURL(null);
                 profilePicture.setImageBitmap(bitmap);
             }

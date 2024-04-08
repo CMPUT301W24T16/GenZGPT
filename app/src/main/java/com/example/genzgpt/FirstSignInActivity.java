@@ -115,10 +115,10 @@ public class FirstSignInActivity extends AppCompatActivity {
                         Toast.LENGTH_SHORT).show();
             }
             else {
-                String imageURI = null;
+                String imageURL = null;
 
                 User newUser = new User(firstName, lastName, parseLong(phoneStr), email, geo,
-                        imageURI);
+                        imageURL);
 
                 Firebase firebase = new Firebase();
                 Log.e("FSFB", "We got to this point");
