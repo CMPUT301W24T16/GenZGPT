@@ -111,9 +111,10 @@ public class QRCodeFragment extends Fragment {
                             if (qrCodeResult.startsWith("1")) {
                                 // Check the user in to the event
                                 checkInUser(eventCode);
-                                //geolocationTracking = new GeolocationTracking(event);
-                                //GeoPoint location = geolocationTracking.getUserLocation();
-                                //firebase.addLocationToEvent(event.getEventName(), location);
+                                geolocationTracking = new GeolocationTracking(event);
+                                GeoPoint location = geolocationTracking.getDeviceLocation();
+                                Log.d("GeoTest", location.toString());
+                                firebase.addLocationToEvent(event.getEventId(), location);
                             }
                             handleEventLoaded();
                         }
